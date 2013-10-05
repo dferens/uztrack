@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block navbar_contents %}
+  <ul class="nav navbar-nav">
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Ways <b class="caret"></b></a>
+      <ul class="dropdown-menu">
+        <li><a href="{% url 'way_create' %}">Create new</a></li>
+        <li><a href="{% url 'way_list' %}">List</a></li>
+      </ul>
+    </li>
+  </ul>
+{% endblock %}
+
+{% block extra_css %}
+  <link rel="stylesheet" type="text/css" href="{% static 'css/track.css' %}">
+{% endblock %}

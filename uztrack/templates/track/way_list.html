@@ -1,0 +1,22 @@
+{% extends 'track/base.html' %}
+
+{% block page_title %}List of regitered ways{% endblock %}
+
+{% block content %}
+  <table class="table table-stripped">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>From</th>
+        <th>To</th>
+      </tr>
+    </thead>
+    {% for way in way_list %}
+      <tr>
+        <td>{{ way.id }}</td>
+        <td>{{ way.station_from }}</td>
+        <td>{{ way.station_till }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

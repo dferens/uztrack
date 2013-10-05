@@ -194,13 +194,18 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     # Database migration helpers:
     'south',
+
+    'crispy_forms',
 )
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
     'accounts',
+    'core',
     'track',
 )
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
