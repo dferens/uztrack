@@ -7,7 +7,6 @@ from .forms import WayCreateForm
 
 
 class WayCreateView(CreateView):
-    model = Way
     form_class = WayCreateForm
     template_name = 'track/way_create.html'
 
