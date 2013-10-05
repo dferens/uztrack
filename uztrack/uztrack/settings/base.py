@@ -109,7 +109,7 @@ STATICFILES_FINDERS = (
 ########## SECRET CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 # Note: This key should only be used for development and testing.
-SECRET_KEY = r"gj_(9d1j(@8bm3*lm&b!0c4vku+w2(@3@(3r6d!$*^8m1=48h7"
+SECRET_KEY = "gj_(9d1j(@8bm3lm&b!0c4vkuw2(@3@(3r6d!8m1=48h7"
 ########## END SECRET CONFIGURATION
 
 
@@ -178,6 +178,7 @@ ROOT_URLCONF = '%s.urls' % SITE_NAME
 DJANGO_APPS = (
     # Default Django apps:
     'django.contrib.auth',
+    'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -186,10 +187,6 @@ DJANGO_APPS = (
 
     # Useful template tags:
     # 'django.contrib.humanize',
-
-    # Admin panel and documentation:
-    'django.contrib.admin',
-    # 'django.contrib.admindocs',
 )
 
 THIRD_PARTY_APPS = (
@@ -199,6 +196,7 @@ THIRD_PARTY_APPS = (
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
+    'track',
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
