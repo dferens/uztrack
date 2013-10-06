@@ -9,7 +9,7 @@ from .exceptions import *
 class Api(object):
 
     @classmethod
-    def _convert_station_id(cls`, station_id):
+    def _convert_station_id(cls, station_id):
         return int(station_id)
 
     @classmethod
