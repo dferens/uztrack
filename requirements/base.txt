@@ -8,4 +8,5 @@ django_annoying==0.7.7
 django_crispy_forms==1.4.0
 jsonfield==0.9.19
 logutils==0.3.3
+python-dateutil==2.1
 requests==2.0.0

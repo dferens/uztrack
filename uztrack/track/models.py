@@ -1,10 +1,14 @@
 import datetime
+import operator
+from dateutil import rrule
 
 from django.db import models
 from django.contrib import admin
 
 from bitfield import BitField
 from jsonfield import JSONField
+
+from . import utils
 
 
 class Way(models.Model):
@@ -25,16 +29,21 @@ class TrackedWay(models.Model):
         unique_together = (('way', 'days', 'start_time'))
 
     way = models.ForeignKey(Way)
-    days = BitField(flags=(
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
-    ))
+    days = BitField(flags=utils.WEEKDAYS)
     start_time = models.TimeField(default=lambda: datetime.time(0, 0))
+
+    def next_dates(self, till, starts_from=None):
+        if starts_from is None:
+            starts_from = datetime.date.today()
+
+        weekdays = [wday for wday, is_set in self.days if is_set]
+        dateutil_weekdays = map(utils.get_dateutil_weekday, weekdays)
+        rule = rrule.rrule(rrule.WEEKLY, byweekday=dateutil_weekdays, until=till)
+        dates = [x.date() for x in rule]
+
+        if starts_from.date() in dates:
+            dates.remove(starts_from.date())
+        return dates
 
 
 class TrackedWayDayHistory(models.Model):
