@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from django.contrib import admin
 
@@ -28,3 +30,4 @@ class TrackedWay(models.Model):
         'Saturday',
         'Sunday'
     ))
+    start_time = models.TimeField(default=lambda: datetime.time(0, 0))
