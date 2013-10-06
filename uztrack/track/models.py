@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib import admin
 
 from bitfield import BitField
+from jsonfield import JSONField
 
 
 class Way(models.Model):
@@ -20,6 +21,9 @@ class Way(models.Model):
 
 
 class TrackedWay(models.Model):
+    class Meta:
+        unique_together = (('way', 'days', 'start_time'))
+
     way = models.ForeignKey(Way)
     days = BitField(flags=(
         'Monday',
@@ -31,3 +35,20 @@ class TrackedWay(models.Model):
         'Sunday'
     ))
     start_time = models.TimeField(default=lambda: datetime.time(0, 0))
+
+
+class TrackedWayDayHistory(models.Model):
+    tracked_way = models.ForeignKey(TrackedWay)
+    arrival_date = models.DateField()
+    places_appeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
+                                            related_name='marks_appear',
+                                            null=True)
+    places_disappeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
+                                               related_name='marks_disappear')
+
+
+class TrackedWayDayHistorySnapshot(models.Model):
+    history = models.ForeignKey(TrackedWayDayHistory, related_name='snapshots')
+    made_on = models.DateTimeField(auto_now_add=True)
+    total_places_count = models.IntegerField()
+    snapshot_data = JSONField()
