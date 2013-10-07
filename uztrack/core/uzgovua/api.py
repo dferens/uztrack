@@ -64,6 +64,7 @@ class Api(object):
                                        access=Access())
         else:
             result = DotDict()
+            result.trains = []
             try:
                 json_data = access.get_stations_trains(station_id_from, station_id_till,
                                                        departure_date, departure_start_time,
@@ -71,7 +72,6 @@ class Api(object):
             except UzGovUaAPIException as e:
                 pass                
             else:
-                result.trains = []
                 for train_data in json_data['value']:
                     train = DotDict()
                     train.name = train_data['num']
