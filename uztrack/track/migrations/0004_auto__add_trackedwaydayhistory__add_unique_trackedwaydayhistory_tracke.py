@@ -12,11 +12,14 @@ class Migration(SchemaMigration):
         db.create_table(u'track_trackedwaydayhistory', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('tracked_way', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['track.TrackedWay'])),
-            ('arrival_date', self.gf('django.db.models.fields.DateField')()),
+            ('departure_date', self.gf('django.db.models.fields.DateField')()),
             ('places_appeared', self.gf('django.db.models.fields.related.OneToOneField')(related_name='marks_appear', unique=True, null=True, to=orm['track.TrackedWayDayHistorySnapshot'])),
-            ('places_disappeared', self.gf('django.db.models.fields.related.OneToOneField')(related_name='marks_disappear', unique=True, to=orm['track.TrackedWayDayHistorySnapshot'])),
+            ('places_disappeared', self.gf('django.db.models.fields.related.OneToOneField')(related_name='marks_disappear', unique=True, null=True, to=orm['track.TrackedWayDayHistorySnapshot'])),
         ))
         db.send_create_signal(u'track', ['TrackedWayDayHistory'])
+
+        # Adding unique constraint on 'TrackedWayDayHistory', fields ['tracked_way', 'departure_date']
+        db.create_unique(u'track_trackedwaydayhistory', ['tracked_way_id', 'departure_date'])
 
         # Adding model 'TrackedWayDayHistorySnapshot'
         db.create_table(u'track_trackedwaydayhistorysnapshot', (
@@ -36,6 +39,9 @@ class Migration(SchemaMigration):
         # Removing unique constraint on 'TrackedWay', fields ['start_time', 'days', 'way']
         db.delete_unique(u'track_trackedway', ['start_time', 'days', 'way_id'])
 
+        # Removing unique constraint on 'TrackedWayDayHistory', fields ['tracked_way', 'departure_date']
+        db.delete_unique(u'track_trackedwaydayhistory', ['tracked_way_id', 'departure_date'])
+
         # Deleting model 'TrackedWayDayHistory'
         db.delete_table(u'track_trackedwaydayhistory')
 
@@ -52,11 +58,11 @@ class Migration(SchemaMigration):
             'way': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['track.Way']"})
         },
         u'track.trackedwaydayhistory': {
-            'Meta': {'object_name': 'TrackedWayDayHistory'},
-            'arrival_date': ('django.db.models.fields.DateField', [], {}),
+            'Meta': {'unique_together': "(('tracked_way', 'departure_date'),)", 'object_name': 'TrackedWayDayHistory'},
+            'departure_date': ('django.db.models.fields.DateField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'places_appeared': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'marks_appear'", 'unique': 'True', 'null': 'True', 'to': u"orm['track.TrackedWayDayHistorySnapshot']"}),
-            'places_disappeared': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'marks_disappear'", 'unique': 'True', 'to': u"orm['track.TrackedWayDayHistorySnapshot']"}),
+            'places_disappeared': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'marks_disappear'", 'unique': 'True', 'null': 'True', 'to': u"orm['track.TrackedWayDayHistorySnapshot']"}),
             'tracked_way': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['track.TrackedWay']"})
         },
         u'track.trackedwaydayhistorysnapshot': {

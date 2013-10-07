@@ -36,8 +36,7 @@ class TrackedWay(models.Model):
         if starts_from is None:
             starts_from = datetime.date.today()
 
-        weekdays = [wday for wday, is_set in self.days if is_set]
-        dateutil_weekdays = map(utils.get_dateutil_weekday, weekdays)
+        dateutil_weekdays = map(utils.get_dateutil_weekday, self.selected_days)
         rule = rrule.rrule(rrule.WEEKLY, byweekday=dateutil_weekdays, until=till)
         dates = [x.date() for x in rule]
 
@@ -45,15 +44,23 @@ class TrackedWay(models.Model):
             dates.remove(starts_from.date())
         return dates
 
+    @property
+    def selected_days(self):
+        return (wday for wday, is_set in self.days if is_set)
+
 
 class TrackedWayDayHistory(models.Model):
-    tracked_way = models.ForeignKey(TrackedWay)
-    arrival_date = models.DateField()
+    class Meta:
+        unique_together = (('tracked_way', 'departure_date'))
+
+    tracked_way = models.ForeignKey(TrackedWay, related_name='histories')
+    departure_date = models.DateField()
     places_appeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
                                             related_name='marks_appear',
                                             null=True)
     places_disappeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
-                                               related_name='marks_disappear')
+                                               related_name='marks_disappear',
+                                               null=True)
 
 
 class TrackedWayDayHistorySnapshot(models.Model):
