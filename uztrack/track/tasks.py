@@ -1,4 +1,5 @@
 import datetime
+from celery import task
 
 from core.uzgovua.api import Api
 from core.uzgovua.raw import Access
@@ -42,7 +43,6 @@ class Search(object):
         objects.tracked_ways = tracked_ways
         return objects
 
-
     def _process(self, settings):
         with Access() as api_access:
             for tracked_way_settings in settings.tracked_ways:
@@ -79,6 +79,6 @@ class Search(object):
             # Regular snapshot
             pass
 
-    def search(self):
+    def run(self):
         settings = self._load_settings()
         self._process(settings)

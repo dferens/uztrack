@@ -1,8 +1,9 @@
 """Common settings and globals."""
 
-
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
+
+import djcelery; djcelery.setup_loader()
 
 
 ########## PATH CONFIGURATION
@@ -194,7 +195,7 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     # Database migration helpers:
     'south',
-
+    'djcelery',
     'crispy_forms',
     'django_tables2',
 )

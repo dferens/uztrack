@@ -45,6 +45,11 @@ CACHES = {
 }
 ########## END CACHE CONFIGURATION
 
+########## CELERY CONFIGURATION
+
+BROKER_URL = 'redis://localhost:6379/0'
+
+########## END CELERY CONFIGURATION
 
 ########## TOOLBAR CONFIGURATION
 # See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
