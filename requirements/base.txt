@@ -11,3 +11,6 @@ jsonfield==0.9.19
 logutils==0.3.3
 python-dateutil==2.1
 requests==2.0.0
+celery==3.0.24
+redis==2.8.0
+celery-with-redis==3.0
