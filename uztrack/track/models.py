@@ -4,6 +4,7 @@ from dateutil import rrule
 
 from django.db import models
 from django.contrib import admin
+from django.core.urlresolvers import reverse
 
 from bitfield import BitField
 from jsonfield import JSONField
@@ -23,11 +24,11 @@ class Way(models.Model):
     def __unicode__(self):
         return u'%s - %s' % (self.station_from, self.station_till)
 
+    @property
+    def detail_url(self):
+        return 'Edit details'
 
 class TrackedWay(models.Model):
-    class Meta:
-        unique_together = (('way', 'days', 'start_time'))
-
     way = models.ForeignKey(Way)
     days = BitField(flags=utils.WEEKDAYS)
     start_time = models.TimeField(default=lambda: datetime.time(0, 0))
@@ -47,6 +48,10 @@ class TrackedWay(models.Model):
     @property
     def selected_days(self):
         return (wday for wday, is_set in self.days if is_set)
+
+    @property
+    def detail_url(self):
+        return 'Edit details'
 
 
 class TrackedWayDayHistory(models.Model):

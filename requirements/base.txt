@@ -6,6 +6,7 @@ django-bitfield==1.6.4
 django-model-utils==1.4.0
 django_annoying==0.7.7
 django_crispy_forms==1.4.0
+django-tables2==0.14.0
 jsonfield==0.9.19
 logutils==0.3.3
 python-dateutil==2.1

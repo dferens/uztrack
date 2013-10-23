@@ -196,6 +196,7 @@ THIRD_PARTY_APPS = (
     'south',
 
     'crispy_forms',
+    'django_tables2',
 )
 
 # Apps specific for this project go here.

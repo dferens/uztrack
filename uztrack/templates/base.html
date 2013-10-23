@@ -32,7 +32,22 @@
         <a class="navbar-brand" href="#">uztracker</a>
       </div>
       <div class="collapse navbar-collapse">
-        {% block navbar_contents %}{% endblock %}
+        <ul class="nav navbar-nav">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Ways <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'way_create' %}">Create new</a></li>
+              <li><a href="{% url 'way_list' %}">List</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Tracked ways <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'track_create' %}">Create new</a></li>
+              <li><a href="{% url 'track_list' %}">List</a></li>
+            </ul>
+          </li>
+        </ul>
       </div>
     </div>
 

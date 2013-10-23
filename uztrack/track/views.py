@@ -1,9 +1,13 @@
 from django.core.urlresolvers import reverse
-from django.views.generic import ListView
-from django.views.generic.edit import CreateView
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import CreateView, UpdateView
 
-from .models import Way
-from .forms import WayCreateForm
+from django_tables2 import SingleTableView
+
+from .models import Way, TrackedWay
+from .forms import WayCreateForm, TrackedWayCreateForm, \
+                   WayDetailForm, TrackedWayDetailForm
+from .tables import WayTable, TrackedWayTable
 
 
 class WayCreateView(CreateView):
@@ -14,5 +18,29 @@ class WayCreateView(CreateView):
         return reverse('way_list')
 
 
-class WayListView(ListView):
+class TrackedWayCreateView(CreateView):
+    form_class = TrackedWayCreateForm
+    template_name = 'track/trackedway_create.html'
+
+    def get_success_url(self):
+        return reverse('track_list')
+
+
+class WayDetailView(UpdateView):
     model = Way
+    form_class = WayDetailForm
+
+
+class TrackedWayDetailView(UpdateView):
+    model = TrackedWay
+    form_class = TrackedWayDetailForm
+
+
+class WayListView(SingleTableView):
+    model = Way
+    table_class = WayTable
+
+
+class TrackedWayListView(SingleTableView):
+    model = TrackedWay
+    table_class = TrackedWayTable

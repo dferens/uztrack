@@ -1,3 +1,7 @@
-.way-create {
-    
+.waytable, .trackedwaytable {
+    width: 100%;
+}
+.waytable .table-container,
+.trackedwaytable .table-container {
+    width: 100%;
 }
