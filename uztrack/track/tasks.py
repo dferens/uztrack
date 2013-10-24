@@ -1,6 +1,8 @@
 import datetime
 from celery import task
 
+from django.conf import settings
+
 from core.uzgovua.api import Api
 from core.uzgovua.raw import Access
 from core.utils import DotDict
@@ -8,15 +10,14 @@ from .models import (TrackedWay,
                      TrackedWayDayHistory, TrackedWayDayHistorySnapshot)
 
 
-class Search(object):
+class SearchTask(object):
 
     TrackedWaySettings = namedtuple('TrackedWaySettings', 'tracked_way dates')
     TrackedWayDaySettings = namedtuple('TrackedWayDateSettings', 'date history')
 
     def _get_search_date_limit(self):
-        # Ukrainian railways gives us 45 days
         today = datetime.date.today()
-        limit = datetime.timedelta(days=45)
+        limit = datetime.timedelta(days=settings.TICKETS_SEARCH_RANGE_DAYS)
         return limit
 
     def _load_settings(self):

@@ -214,6 +214,11 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 ########## END APP CONFIGURATION
 
 
+########## SITE CONFIGURATION
+TICKETS_SEARCH_RANGE_DAYS = 45
+########## END SITE CONFIGURAITON
+
+
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # A sample logging configuration. The only tangible logging
