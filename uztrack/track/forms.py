@@ -6,7 +6,7 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
-from core import uzgovua
+from core.uzgovua.api import Api
 from core.forms import SubmitForm
 from .models import Way, TrackedWay
 
@@ -27,8 +27,8 @@ class WayCreateForm(SubmitForm):
         cleaned_data = self.cleaned_data
         station_from = cleaned_data['station_from']
         station_till = cleaned_data['station_till']
-        station_from_id = uzgovua.Api.get_station_id(station_from)
-        station_till_id = uzgovua.Api.get_station_id(station_till)
+        station_from_id = Api.get_station_id(station_from)
+        station_till_id = Api.get_station_id(station_till)
 
         if station_from_id is None:
             raise forms.ValidationError('Station "%s" does not exists' % station_from)

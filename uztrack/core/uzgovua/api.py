@@ -8,12 +8,12 @@ from .exceptions import *
 
 class Api(object):
 
-    @classmethod
-    def _convert_station_id(cls, station_id):
+    _raw_api = raw.RawApi()
+
+    def _convert_station_id(self, station_id):
         return int(station_id)
 
-    @classmethod
-    def _convert_time(cls, date_format):
+    def _convert_time(self, date_format):
         return datetime.datetime(year=date_format['year'],
                                  month=date_format['mon'],
                                  day=date_format['mday'],
@@ -21,25 +21,27 @@ class Api(object):
                                  minute=date_format['minutes'],
                                  second=date_format['seconds']) 
 
-    @classmethod
-    def _convert_station(cls, station_data):
+    def _convert_station(self, station_data):
         return DotDict({
-            'station_id': cls._convert_station_id(station_data['station_id']),
+            'station_id': self._convert_station_id(station_data['station_id']),
             'station': station_data['station'],
-            'time': cls._convert_time(station_data['date_format'])
+            'time': self._convert_time(station_data['date_format'])
         })
 
-    @classmethod
-    def _convert_types(cls, types):
-        result = DotDict({
-            'total': sum([x['places'] for x in types]),    
-        })
-        for t in types:
-            result[t['title']] = t['places']
+    def _convert_types(self, train_types):
+        result = DotDict(total=sum([x['places'] for x in train_types]))
+        for train_type in train_types:
+            result[train_type['title']] = train_type['places']
+        return result
 
-    @classmethod
-    def get_station_id(cls, station_name):
-        json_data = raw.get_station_id(station_name)
+    def get_station_id(self, station_name):
+        """
+        Returns uzgovua station id for given station name.
+
+        :type station_name: str or unicode
+        :rtype: int or None
+        """
+        json_data = self._raw_api.get_station_id(station_name)
         results = json_data['value']
         if len(results) == 0:
             return None
@@ -54,33 +56,47 @@ class Api(object):
                 # Closest match
                 return results[0]['station_id']
 
-    @classmethod
-    def get_stations_trains(cls, station_id_from, station_id_till,
+    def get_stations_routes(self, station_id_from, station_id_till,
                             departure_date=None, departure_start_time=None,
-                            access=None):
-        if access is None:
-            return get_stations_trains(station_id_from, station_id_till,
-                                       departure_date, departure_start_time,
-                                       access=Access())
-        else:
-            result = DotDict()
-            result.trains = []
-            try:
-                json_data = access.get_stations_trains(station_id_from, station_id_till,
-                                                       departure_date, departure_start_time,
-                                                       access)
-            except UzGovUaAPIException as e:
-                pass                
-            else:
-                for train_data in json_data['value']:
-                    train = DotDict()
-                    train.name = train_data['num']
-                    train.category = train_data['category']
-                    train.model = train_data['model']
-                    train.places = cls._convert_types(train_data['types'])
-                    train.departure = cls._convert_station(train_data['from'])
-                    train.arrival = cls._convert_station(train_data['till'])
-                    result.trains.append(train)
+                            token=None):
+        if departure_date is None:
+            departure_date = datetime.date.today()
 
-            return result
+        if departure_start_time is None:
+            departure_start_time = datetime.time(0, 0)
+
+        token = raw.Token() if token is None else token
+        result = DotDict(trains=[])
+        json_data = self._raw_api.get_stations_routes(station_id_from, station_id_till,
+                                                      departure_date, departure_start_time,
+                                                      token=token)
+        for train_data in json_data['value']:
+            result.trains.append(DotDict(
+                name=train_data['num'],
+                category=train_data['category'],
+                model=train_data['model'],
+                places=self._convert_types(train_data['types']),
+                departure=self._convert_station(train_data['from']),
+                arrival=self._convert_station(train_data['till']),
+            ))
+
+        return result
+
+
+class ApiSession(Api):
+
+    def __enter__(self):
+        self.token = raw.Token()
+        return self
+
+    def __exit__(self, exc_type, exc_value, trace):
+        del self.token
+
+    def get_stations_routes(self, station_id_from, station_id_till,
+                                  departure_date=None, departure_start_time=None):
+        super_method = super(ApiSession, self).get_stations_routes
+        return super_method(station_id_from, station_id_till,
+                            departure_date, departure_start_time,
+                            token=self.token)
+
 

@@ -1,13 +1,17 @@
 import datetime
+import logging
 from celery import task
+from collections import namedtuple
 
 from django.conf import settings
 
-from core.uzgovua.api import Api
-from core.uzgovua.raw import Access
+from core.uzgovua.api import Api, ApiSession
 from core.utils import DotDict
 from .models import (TrackedWay,
                      TrackedWayDayHistory, TrackedWayDayHistorySnapshot)
+
+
+logger = logging.getLogger(__name__)
 
 
 class SearchTask(object):
@@ -17,69 +21,61 @@ class SearchTask(object):
 
     def _get_search_date_limit(self):
         today = datetime.date.today()
-        limit = datetime.timedelta(days=settings.TICKETS_SEARCH_RANGE_DAYS)
-        return limit
+        offset = datetime.timedelta(days=settings.TICKETS_SEARCH_RANGE_DAYS)
+        return today + offset
 
     def _load_settings(self):
+        logger.info('Collecting task data')
         objects = DotDict()
         search_till = self._get_search_date_limit()
-        tracked_ways = TrackedWay.object.all()
+        tracked_ways = TrackedWay.objects.all()
 
         for tracked_way in tracked_ways:
             dates_search_on = tracked_way.next_dates(search_till)
             histories = (TrackedWayDayHistory.objects
                                              .filter(tracked_way=tracked_way,
                                                      departure_date__in=dates_search_on))
-            histories = list(histories)
-            dates_with_history = histories.values('departure_date')
+            dates_with_history = [x.departure_date for x in histories]
 
             for date in dates_search_on:
-                if d not in dates_with_history:
+                if date not in dates_with_history:
                     history = TrackedWayDayHistory(tracked_way=tracked_way,
                                                    departure_date=date)
                     history.save()
-                    histories.append(history)
 
-            tracked_way.histories = histories
         objects.tracked_ways = tracked_ways
+        logger.info('%s tracked ways, %s days to check',
+                    len(objects.tracked_ways),
+                    sum([x.histories.count() for x in objects.tracked_ways]))
         return objects
 
     def _process(self, settings):
-        with Access() as api_access:
-            for tracked_way_settings in settings.tracked_ways:
-                tracked_way = tracked_way_settings.obj
-                for history in tracked_way_settings.histories:
-                    data = Api.get_stations_routes(tracked_way.way.station_from_id,
+        logger.info('Started grabbing data from uzgovua')
+        with ApiSession() as api:
+            for tracked_way in settings.tracked_ways:
+                for history in tracked_way.histories.all():
+                    data = api.get_stations_routes(tracked_way.way.station_from_id,
                                                    tracked_way.way.station_till_id,
                                                    history.departure_date,
-                                                   tracked_way.start_time,
-                                                   access=api_access)
-                    snapshot = self._make_snapshot(history, data)
-                    self._process_snapshot(snapshot)
+                                                   tracked_way.start_time)
+                    self._make_snapshot(history, data)
 
     def _make_snapshot(self, history, data):
-        total_places_count = sum([t.places for t in data.trains])
+        total_places_count = sum([t.places.total for t in data.trains])
         snapshot = TrackedWayDayHistorySnapshot(history=history,
                                                 total_places_count=total_places_count,
                                                 snapshot_data=data)
         snapshot.save()
+        logger.info('Made snapshot (route "%s", %d places)',
+                     snapshot.history.tracked_way.way,
+                     snapshot.total_places_count)
         return snapshot
 
-    def _process_snapshot(self, snapshot):
-        history = snapshot.history
-        if history.places_appeared is None:
-            if snapshot.total_places_count > 0:
-                history.places_appeared = snapshot
-                history.save()
-
-        elif history.places_disappeared is None:
-            if snapshot.total_places_count == 0:
-                history.places_disappeared = snapshot
-                history.save()
-        else:
-            # Regular snapshot
-            pass
-
-    def run(self):
+    def search(self):
         settings = self._load_settings()
         self._process(settings)
+
+
+@task
+def search():
+    SearchTask().search()

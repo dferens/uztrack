@@ -10,9 +10,10 @@ from .exceptions import *
 HOST_URL = 'http://booking.uz.gov.ua/'
 
 
-class Access(object):
-    pat_token = re.compile(r'"\\\\\\""\+(?P<token>[$_.+]*)\+')
-    encoded_token_subs = {
+class Token(object):
+    
+    _pat_token = re.compile(r'"\\\\\\""\+(?P<token>[$_.+]*)\+')
+    _encoded_token_subs = {
         '_': 'u',
         '_$': 'o',
         '__': 't',
@@ -33,43 +34,66 @@ class Access(object):
         '__$': '1',
         '___': '0'
     }
-    URLS = {
-        'root': HOST_URL,
-        'routes': urljoin(HOST_URL, 'purchase/search'),
+    _URLS = {
+        'token_source': HOST_URL,
     }
 
-    @utils.host_available
-    def __enter__(self):
-        response = requests.get(HOST_URL)
-        self.token = self.get_token(response)
+    def __init__(self):
+        response = requests.get(self._URLS['token_source'])
+        content = response.content
+        token_encoded = self._pat_token.search(content).group('token')
+        token_symbols_encoded = [x.split('$$_.')[1] for x in token_encoded.split('+')]
+        token_symbols_decoded = [self._encoded_token_subs[x] for x in token_symbols_encoded]
+        token_decoded = ''.join(token_symbols_decoded)
+
+        self.token = token_decoded
         self.cookies = response.cookies
-        return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        del self.token
-        del self.cookies
+    def __unicode__(self):
+        return u'<Access token "%s">' % self.token
 
-        if exc_type:
-            raise exc_value
+    @property
+    def access_headers(self):
+        return {
+            'GV-Ajax': 1,
+            'GV-Token': self.token,
+            'GV-Referer': self._URLS['token_source']
+        }
 
-    @utils.host_available
-    def get_stations_trains(self,
+    @property
+    def access_cookies(self):
+        return self.cookies
+
+    def patch_request(self, request_method, *args, **kwargs):
+        headers = kwargs.get('headers')
+        if headers is None:
+            kwargs['headers'] = self.access_headers
+        else:
+            kwargs['headers'].update(self.access_headers)
+
+        kwargs['cookies'] = self.access_cookies
+        return request_method(*args, **kwargs)
+
+
+class RawApi(object):
+
+    _URLS = {
+        'station': urljoin(HOST_URL, 'purchase/station/'),
+        'search_routes': urljoin(HOST_URL, 'purchase/search/'),
+    }
+
+    def get_stations_routes(self,
                             station_id_from, station_id_till,
-                            departure_date=None, departure_start_time=None):
+                            departure_date, departure_start_time,
+                            token=None):
         """
         :type station_id_from: int
         :type station_id_till: int
         :type departure_date: date | datetime
         :type departure_start_time: time | datetime
         """
-        if self.token is None or self.cookies is None:
-            raise APIException('Use it inside context manager')
-
-        if departure_date is None:
-            departure_date = datetime.date.today()
-
-        if departure_start_time is None:
-            departure_start_time = datetime.time(0, 0)
+        if token is None:
+            raise APIException('Token is required')
 
         data = {
             'station_id_from': station_id_from,
@@ -77,43 +101,12 @@ class Access(object):
             'date_dep': departure_date.strftime('%d.%m.%Y'),     # 05.10.2013
             'time_dep': departure_start_time.strftime('%H:%M'),  # 12:34
         }
-        headers = {
-            'GV-Ajax': 1,
-            'GV-Token': self.token,
-            'GV-Referer': HOST_URL
-        }
-        cookies = self.cookies
-        response = requests.post(self.URLS['routes'],
-                                 data=data,
-                                 headers=headers,
-                                 cookies=cookies)
+        response = token.patch_request(requests.post,
+                                       self._URLS['search_routes'],
+                                       data=data)
+        return response.json()
 
-        utils.check_content_type(response, 'json')
-        response = response.json()
-        utils.check_json_error(response)
-        return response
-
-    @utils.host_available
-    def get_token(self, response=None):
-        if response is None:
-            content = requests.get(HOST_URL).content
-        else:
-            content = response.content
-
-        token_encoded = self.pat_token.search(content).group('token')
-        token_symbols_encoded = [x.split('$$_.')[1] for x in token_encoded.split('+')]
-        token_symbols_decoded = [self.encoded_token_subs[x] for x in token_symbols_encoded]
-        token_decoded = ''.join(token_symbols_decoded)
-        return token_decoded
-
-
-@utils.host_available
-def get_station_id(station_name):
-    url = urljoin(HOST_URL, 'purchase/station/')
-    url = urljoin(url, station_name)
-    response = requests.post(url)
-
-    utils.check_content_type(response, 'json')
-    response = response.json()
-    utils.check_json_error(response)
-    return response
+    def get_station_id(station_name, token=None):
+        url = urljoin(self._URLS['station'], station_name)
+        response = requests.post(url)
+        return response.json()
