@@ -1,7 +1,7 @@
 """Common settings and globals."""
-
-from os.path import abspath, basename, dirname, join, normpath
 from sys import path
+from datetime import timedelta
+from os.path import abspath, basename, dirname, join, normpath
 
 import djcelery; djcelery.setup_loader()
 
@@ -216,7 +216,20 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 ########## SITE CONFIGURATION
 TICKETS_SEARCH_RANGE_DAYS = 45
+SEARCH_BEAT_INTERVAL = timedelta(hours=1)
 ########## END SITE CONFIGURAITON
+
+
+########## CELERY CONFIGURATION
+CELERYBEAT_SCHEDULE = {
+    'add-every-30-seconds': {
+        'task': 'uztrack.track.tasks.SearchTask',
+        'schedule': SEARCH_BEAT_INTERVAL,
+    },
+}
+
+CELERY_TIMEZONE = 'UTC'
+########## END CELERY CONFIGURATION
 
 
 ########## LOGGING CONFIGURATION
