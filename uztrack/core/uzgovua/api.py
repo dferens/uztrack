@@ -84,7 +84,9 @@ class Api(object):
 
 
 class ApiSession(Api):
-
+    """
+    Patches some json requests with generated token, use as context manager.
+    """
     def __enter__(self):
         self.token = raw.Token()
         return self

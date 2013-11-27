@@ -11,7 +11,11 @@ HOST_URL = 'http://booking.uz.gov.ua/'
 
 
 class Token(object):
-    
+    """
+    Site sends obfuscated JS code which contains secret hex string - this token.
+    This class decodes changing part of that code into string, without touching
+    js interpreter.
+    """
     _pat_token = re.compile(r'"\\\\\\""\+(?P<token>[$_.+]*)\+')
     _encoded_token_subs = {
         '_': 'u',
@@ -54,6 +58,9 @@ class Token(object):
 
     @property
     def access_headers(self):
+        """
+        Additional http headers we need to pass for making specific json requests.
+        """
         return {
             'GV-Ajax': 1,
             'GV-Token': self.token,
