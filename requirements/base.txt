@@ -1,5 +1,5 @@
 bpython==0.12
-Django==1.5.1
+Django==1.6.1
 celery==3.0.24
 celery-with-redis==3.0
 django_annoying==0.7.7

@@ -222,10 +222,6 @@ SEARCH_BEAT_INTERVAL = timedelta(hours=1)
 
 ########## CELERY CONFIGURATION
 CELERYBEAT_SCHEDULE = {
-    'add-every-30-seconds': {
-        'task': 'uztrack.track.tasks.SearchTask',
-        'schedule': SEARCH_BEAT_INTERVAL,
-    },
 }
 
 CELERY_TIMEZONE = 'UTC'
