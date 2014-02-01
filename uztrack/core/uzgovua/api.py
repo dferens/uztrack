@@ -3,7 +3,6 @@ import datetime
 from core.utils import DotDict
 
 from . import raw
-from .exceptions import *
 
 
 class Api(object):
@@ -36,7 +35,7 @@ class Api(object):
 
     def get_station_id(self, station_name):
         """
-        Returns uzgovua station id for given station name.
+        Returns uz.gov.ua station id for given station name.
 
         :type station_name: str or unicode
         :rtype: int or None
