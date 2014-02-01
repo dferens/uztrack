@@ -55,20 +55,14 @@ class Api(object):
                 # Closest match
                 return results[0]['station_id']
 
-    def get_stations_routes(self, station_id_from, station_id_till,
-                            departure_date=None, departure_start_time=None,
-                            token=None):
-        if departure_date is None:
-            departure_date = datetime.date.today()
-
-        if departure_start_time is None:
-            departure_start_time = datetime.time(0, 0)
-
+    def get_stations_routes(self, way_history, token=None):
         token = raw.Token() if token is None else token
+        tracked_way = way_history.tracked_way
+        args = (tracked_way.way.station_id_from, tracked_way.way.station_id_till,
+                tracked_way.departure_date, tracked_way.start_time)
+
         result = DotDict(trains=[])
-        json_data = self._raw_api.get_stations_routes(station_id_from, station_id_till,
-                                                      departure_date, departure_start_time,
-                                                      token=token)
+        json_data = self._raw_api.get_stations_routes(*args, token=token)
         for train_data in json_data['value']:
             result.trains.append(DotDict(
                 name=train_data['num'],
@@ -93,11 +87,8 @@ class ApiSession(Api):
     def __exit__(self, exc_type, exc_value, trace):
         del self.token
 
-    def get_stations_routes(self, station_id_from, station_id_till,
-                                  departure_date=None, departure_start_time=None):
+    def get_stations_routes(self, way_history):
         super_method = super(ApiSession, self).get_stations_routes
-        return super_method(station_id_from, station_id_till,
-                            departure_date, departure_start_time,
-                            token=self.token)
+        return super_method(way_history, token=self.token)
 
 

@@ -89,16 +89,19 @@ class RawApi(object):
         'search_routes': urljoin(HOST_URL, 'purchase/search/'),
     }
 
-    def get_stations_routes(self,
-                            station_id_from, station_id_till,
-                            departure_date, departure_start_time,
-                            token=None):
+    def get_stations_routes(self, station_id_from, station_id_to,
+                            departure_date, departure_start_time, token=None, **kwargs):
         """
         :type station_id_from: int
-        :type station_id_till: int
+        :type station_id_to: int
         :type departure_date: date | datetime
         :type departure_start_time: time | datetime
         """
+        station_id_from = kwargs.get('station_id_from', station_id_from)
+        station_id_to = kwargs.get('station_id_to', station_id_to)
+        departure_date = kwargs.get('departure_date', departure_date)
+        departure_start_time = kwargs.get('departure_start_time', departure_start_time)
+
         if token is None:
             raise APIException('Token is required')
 
