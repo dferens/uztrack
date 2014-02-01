@@ -21,3 +21,6 @@ build
 *.log
 
 *.DS_Store
+
+# Project files
+uztrack/assets/

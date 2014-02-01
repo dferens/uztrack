@@ -2,7 +2,10 @@ MANAGE=python uztrack/manage.py
 TEST_ENV=DJANGO_SETTINGS_MODULE="uztrack.settings.test"
 APPS=accounts core poller track
 
-run:
+collectstatic:
+	$(MANAGE) collectstatic
+
+run: collectstatic
 	$(MANAGE) runserver
 
 syncdb:
