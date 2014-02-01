@@ -58,7 +58,7 @@ class Api(object):
     def get_stations_routes(self, way_history, token=None):
         token = raw.Token() if token is None else token
         tracked_way = way_history.tracked_way
-        args = (tracked_way.way.station_id_from, tracked_way.way.station_id_till,
+        args = (tracked_way.way.station_id_from, tracked_way.way.station_id_to,
                 tracked_way.departure_date, tracked_way.start_time)
 
         result = DotDict(trains=[])

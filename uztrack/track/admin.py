@@ -8,8 +8,8 @@ from .models import Way, TrackedWay
 
 
 class WayAdmin(admin.ModelAdmin):
-    list_display = ('station_from', 'station_till')
-    list_filter = ('station_from', 'station_till')
+    list_display = ('station_from', 'station_to')
+    list_filter = ('station_from', 'station_to')
 
 
 class TrackedWayAdmin(admin.ModelAdmin):

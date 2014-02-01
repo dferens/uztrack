@@ -116,7 +116,7 @@ class RawApi(object):
                                        data=data)
         return response.json()
 
-    def get_station_id(station_name, token=None):
+    def get_station_id(self, station_name, token=None):
         url = urljoin(self._URLS['station'], station_name)
         response = requests.post(url)
         return response.json()

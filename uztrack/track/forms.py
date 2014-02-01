@@ -17,27 +17,28 @@ class WayCreateForm(SubmitForm):
 
     def __init__(self, *args, **kwargs):
         super(WayCreateForm, self).__init__(*args, **kwargs)
-        self.fields['station_from_id'].widget = forms.HiddenInput()
-        self.fields['station_till_id'].widget = forms.HiddenInput()
+        self.fields['station_id_from'].widget = forms.HiddenInput()
+        self.fields['station_id_to'].widget = forms.HiddenInput()
 
     def clean(self):
-        del self.errors['station_from_id']
-        del self.errors['station_till_id']
+        api = Api()
+        del self.errors['station_id_from']
+        del self.errors['station_id_to']
 
         cleaned_data = self.cleaned_data
         station_from = cleaned_data['station_from']
-        station_till = cleaned_data['station_till']
-        station_from_id = Api.get_station_id(station_from)
-        station_till_id = Api.get_station_id(station_till)
+        station_to = cleaned_data['station_to']
+        station_id_from = api.get_station_id(station_from)
+        station_id_to = api.get_station_id(station_to)
 
-        if station_from_id is None:
+        if station_id_from is None:
             raise forms.ValidationError('Station "%s" does not exists' % station_from)
         
-        if station_till_id is None:
-            raise forms.ValidationError('Station "%s" does not exists' % station_till)
+        if station_id_to is None:
+            raise forms.ValidationError('Station "%s" does not exists' % station_to)
 
-        cleaned_data['station_from_id'] = station_from_id
-        cleaned_data['station_till_id'] = station_till_id
+        cleaned_data['station_id_from'] = station_id_from
+        cleaned_data['station_id_to'] = station_id_to
         return cleaned_data
 
 

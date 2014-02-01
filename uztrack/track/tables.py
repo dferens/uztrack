@@ -10,7 +10,7 @@ class WayTable(tables.Table):
     class Meta:
         model = Way
         attrs = {'class': 'table table-striped table-bordered table-hover'}
-        fields = ('id', 'station_from', 'station_till', 'detail_url')
+        fields = ('id', 'station_from', 'station_to')
 
 
 class TrackedWayTable(tables.Table):
@@ -21,4 +21,4 @@ class TrackedWayTable(tables.Table):
     class Meta:
         model = TrackedWay
         attrs = {'class': 'table table-striped table-bordered table-hover'}
-        fields = ('id', 'way', 'days', 'start_time', 'detail_url')
+        fields = ('id', 'way', 'days', 'start_time')

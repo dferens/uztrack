@@ -18,15 +18,15 @@ class Way(models.Model):
     Defines abstract directed way between two train stations.
     """
     class Meta:
-        unique_together = (('station_from_id', 'station_till_id'))
+        unique_together = (('station_id_from', 'station_id_to'))
 
+    station_id_from = models.IntegerField()
     station_from = models.CharField(max_length=30)
-    station_till = models.CharField(max_length=30)
-    station_from_id = models.IntegerField()
-    station_till_id = models.IntegerField()
+    station_id_to = models.IntegerField()
+    station_to = models.CharField(max_length=30)
 
     def __unicode__(self):
-        return u'%s - %s' % (self.station_from, self.station_till)
+        return u'%s - %s' % (self.station_from, self.station_to)
 
 
 class TrackedWay(models.Model):
@@ -36,6 +36,12 @@ class TrackedWay(models.Model):
     way = models.ForeignKey(Way)
     days = BitField(flags=utils.WEEKDAYS)
     start_time = models.TimeField(default=lambda: datetime.time(0, 0))
+
+    def __unicode__(self):
+        days = ', '.join(self.selected_weekdays)
+        subs = (self.way.station_from, self.way.station_to,
+                ', '.join(self.selected_weekdays), self.start_time)
+        return '%s-%s on %s at %s' % subs
 
     def next_dates(self, till):
         """
