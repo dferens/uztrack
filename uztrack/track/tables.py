@@ -1,11 +1,13 @@
-import django_tables2 as tables
+from django_tables2 import Table
+from django_tables2 import columns
+from django_tables2.utils import A
 
-from core.tables import DetailLinkTable
+from core import columns as core_columns
 from .models import Way, TrackedWay
 
 
-class WayTable(tables.Table):
-    detail_url = tables.LinkColumn('way_detail', kwargs={'pk': tables.A('pk')})
+class WayTable(Table):
+    detail_url = columns.LinkColumn('way_detail', kwargs={'pk': A('id')})
 
     class Meta:
         model = Way
@@ -13,12 +15,12 @@ class WayTable(tables.Table):
         fields = ('id', 'station_from', 'station_to')
 
 
-class TrackedWayTable(tables.Table):
-    way = tables.LinkColumn('way_detail', kwargs={'pk': tables.A('pk')})
-    days = tables.TemplateColumn(template_name='blocks/bitfield.html')
-    detail_url = tables.LinkColumn('track_detail', kwargs={'pk': tables.A('pk')})
-
+class TrackedWayTable(Table):
     class Meta:
         model = TrackedWay
         attrs = {'class': 'table table-striped table-bordered table-hover'}
-        fields = ('id', 'way', 'days', 'start_time')
+        exclude = ('id',)
+
+    way = columns.LinkColumn('way_detail', kwargs={'pk': A('way.pk')})
+    days = columns.TemplateColumn(template_name='blocks/bitfield.html')
+    detail = core_columns.FixedLinkColumn('track_detail', kwargs={'pk': A('pk')}, text='See tickets')
