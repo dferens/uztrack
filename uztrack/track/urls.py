@@ -9,5 +9,6 @@ urlpatterns = patterns('',
 
     url(r'track/create/$', views.TrackedWayCreateView.as_view(), name='track_create'),
     url(r'track/(?P<pk>\d+)/$', views.TrackedWayDetailView.as_view(), name='track_detail'),
+    url(r'track/(?P<pk>\d+)/edit/$', views.TrackedWayEditView.as_view(), name='track_edit'),
     url(r'track/list/$', views.TrackedWayListView.as_view(), name='track_list'),
 )

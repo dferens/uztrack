@@ -31,9 +31,19 @@ class WayDetailView(UpdateView):
     form_class = WayDetailForm
 
 
-class TrackedWayDetailView(UpdateView):
+class TrackedWayEditView(UpdateView):
     model = TrackedWay
     form_class = TrackedWayDetailForm
+
+
+class TrackedWayDetailView(DetailView):
+    model = TrackedWay
+    template_name = 'track/trackedway_detail.html'
+    context_object_name = 'tracked_way'
+
+    def get_context_data(self, **kwargs):
+        context = super(TrackedWayDetailView, self).get_context_data(**kwargs)
+        return context
 
 
 class WayListView(SingleTableView):

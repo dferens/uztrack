@@ -1,0 +1,35 @@
+{% extends 'track/base.html' %}
+
+{% block content %}
+  {% with way=tracked_way.way %}
+  <div class="row">
+    <div class="col-md-10 col-md-offset-1">
+      <div class="panel panel-default">
+        <p class="panel-heading">Tracked way details</p>
+        <div class="panel-body">
+          <p class="lead">Way: {{ way }}</p>
+          <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
+        </div>
+      </div>
+      <div class="panel-group histories">
+      {% for tickets_history in tracked_way.histories.all %}
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">
+              <a data-toggle="collapse" data-parent=".histories" href=".history{{ forloop.counter }}">
+                Search on (some data)
+              </a>
+            </h4>
+          </div>
+          <div id="history{{ forloop.counter }}" class="panel-collapse collapse">
+            <div class="panel-body">
+              Search data
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endwith %}
+{% endblock %}
