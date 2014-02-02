@@ -107,7 +107,7 @@ class RawApi(object):
 
         data = {
             'station_id_from': station_id_from,
-            'station_id_till': station_id_till,
+            'station_id_till': station_id_to,
             'date_dep': departure_date.strftime('%d.%m.%Y'),     # 05.10.2013
             'time_dep': departure_start_time.strftime('%H:%M'),  # 12:34
         }
