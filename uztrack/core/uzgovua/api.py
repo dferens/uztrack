@@ -1,5 +1,7 @@
 import datetime
 
+from django.utils import timezone
+
 from core.utils import DotDict
 
 from . import raw, data
@@ -38,23 +40,26 @@ class Api(object):
                 way_history.departure_date, tracked_way.start_time)
 
         json_data = self._raw_api.get_stations_routes(*args, token=token)
-        result = data.StationsRoutes._parse(json_data)
-        return result
+        return data.StationsRoutes._parse(json_data)
 
 
-class ApiSession(Api):
-    """
-    Patches some json requests with generated token, use as context manager.
-    """
-    def __enter__(self):
-        self.token = raw.Token()
-        return self
+class SmartApi(Api):
+    # Experimental
+    _token_ttl = datetime.timedelta(minutes=15)
 
-    def __exit__(self, exc_type, exc_value, trace):
-        del self.token
+    def __init__(self):
+        self._token = None
+        self._token_guessed_die = timezone.now()
+
+    @property
+    def token(self):
+        now = timezone.now()
+        if now  > self._token_guessed_die:
+            self._token = raw.Token()
+            self._token_guessed_die = now + self._token_ttl
+
+        return self._token
 
     def get_stations_routes(self, way_history):
-        super_method = super(ApiSession, self).get_stations_routes
+        super_method = super(SmartApi, self).get_stations_routes
         return super_method(way_history, token=self.token)
-
-

@@ -61,7 +61,7 @@ AUTH_USER_MODEL = 'accounts.Profile'
 
 ########## GENERAL CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#time-zone
-TIME_ZONE = 'America/Los_Angeles'
+TIME_ZONE = 'Europe/Kiev'
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#language-code
 LANGUAGE_CODE = 'en-us'
@@ -218,7 +218,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 ########## SITE CONFIGURATION
-TICKETS_SEARCH_RANGE_DAYS = 45
+TICKETS_SEARCH_RANGE = timedelta(days=45)
 SEARCH_BEAT_INTERVAL = timedelta(hours=1)
 ########## END SITE CONFIGURAITON
 
@@ -241,16 +241,32 @@ CELERY_TIMEZONE = 'UTC'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'filters': {
         'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
     },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
         }
     },
     'loggers': {
@@ -259,6 +275,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'poller.tasks': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'filters': ['require_debug_true']
+        }
     }
 }
 ########## END LOGGING CONFIGURATION

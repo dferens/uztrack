@@ -90,6 +90,9 @@ class TrackedWayDayHistory(models.Model):
     on_places_appeared = Signal()
     on_places_disappeared = Signal()
 
+    def __unicode__(self):
+        return u'%s on %s' % (self.tracked_way, self.departure_date)
+
     @property
     def last_snapshot(self):
         return self.snapshots.latest()

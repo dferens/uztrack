@@ -19,12 +19,10 @@ class ParsedObject(object):
 
     @classmethod
     def _check_type(cls, *args):
-        type = args[-1]
+        expected_type = args[-1]
         for obj in args[:-1]:
-            if not isinstance(obj, type):
-                got_type = type(obj)
-                raise TypeError('Expected "%s" type, got "%s"' % 
-                                (str(type), str(got_type)))
+            if not isinstance(obj, expected_type):
+                raise ParseException(obj, expected_type, type(obj))
 
 
 class StationsRoutes(ParsedObject):
@@ -154,7 +152,7 @@ class StationsRoutes(ParsedObject):
         try:
             root = stations_routes_dict['value']
         except KeyError, e: 
-            raise ParseException(e)
+            raise ParseException(e, root)
         else:
             cls._check_type(root, list)
             stations_routes = cls()
