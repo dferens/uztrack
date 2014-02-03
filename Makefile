@@ -3,10 +3,16 @@ TEST_ENV=DJANGO_SETTINGS_MODULE="uztrack.settings.test"
 APPS=accounts core poller track
 
 collectstatic:
-	$(MANAGE) collectstatic
+	$(MANAGE) collectstatic --noinput
 
 run: collectstatic
 	$(MANAGE) runserver
+
+celery:
+	$(MANAGE) celery worker
+
+cleanpyc:
+	@find . -name "*.pyc" -exec rm -rf {} \;
 
 syncdb:
 	$(MANAGE) syncdb --noinput
