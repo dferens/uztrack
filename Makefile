@@ -5,7 +5,7 @@ APPS=accounts core poller track
 collectstatic:
 	$(MANAGE) collectstatic --noinput
 
-run: collectstatic
+run:
 	$(MANAGE) runserver
 
 celery:
