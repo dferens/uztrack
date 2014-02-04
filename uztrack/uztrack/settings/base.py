@@ -231,6 +231,13 @@ CELERY_TIMEZONE = 'UTC'
 ########## END CELERY CONFIGURATION
 
 
+######### REST FRAMEWORK CONFIGURATION
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ('rest_framework.filters.DjangoFilterBackend',)
+}
+######### END REST FRAMEWORK CONFIGURATION
+
+
 ########## LOGGING CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # A sample logging configuration. The only tangible logging

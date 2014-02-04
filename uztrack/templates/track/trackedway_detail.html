@@ -14,7 +14,13 @@
   <script src="{% static 'js/angular.js' %}"></script>
   <script src="{% static 'fullcalendar/fullcalendar.js' %}"></script>
   <script src="{% static 'ui-calendar/calendar.js' %}"></script>
+
   <script src="{% static 'js/trackedway_detail.js' %}"></script>
+  <script>
+    myApp.constant('urls', {
+      histories: "{% url 'api-histories-list' %}",
+    });
+  </script>
 {% endblock %}
 
 {% block content %}
@@ -31,7 +37,7 @@
         </div>
         {% verbatim %}
         <div class="panel panel-default calendar-container">
-          <div ui-calendar="uiConfig.calendar" ng-model="eventSources" calendar="calendar"></div>
+          <div ui-calendar="uiConfig.calendar" ng-model="eventSources"></div>
         </div>
         <div class="panel-group histories">
         {% endverbatim %}

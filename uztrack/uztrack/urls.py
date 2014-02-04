@@ -9,7 +9,7 @@ from track.api import HistoryViewSet
 admin.autodiscover()
 
 router = DefaultRouter()
-router.register(r'histories', HistoryViewSet)
+router.register(r'histories', HistoryViewSet, 'api-histories')
 
 urlpatterns = patterns('',
     (r'^', include('track.urls')),
