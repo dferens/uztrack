@@ -195,11 +195,11 @@ DJANGO_APPS = (
 )
 
 THIRD_PARTY_APPS = (
-    # Database migration helpers:
-    'south',
-    'djcelery',
     'crispy_forms',
     'django_tables2',
+    'djcelery',
+    'rest_framework',
+    'south',
 )
 
 # Apps specific for this project go here.
