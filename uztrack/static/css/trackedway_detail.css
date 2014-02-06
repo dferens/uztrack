@@ -1,3 +1,25 @@
 .calendar-container {
   padding: 10px;
 }
+
+#heatmap {
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+#heatmap rect.highlight {
+    fill: #D6E1FA;
+    stroke: rgba(68, 68, 68, 0.2);
+}
+#heatmap text.highlight {
+    fill: rgba(68, 68, 68, 0.9);
+}
+#heatmap .subdomain-text {
+    font-size: 10px;
+}
+#heatmap .r1~.subdomain-text {fill:white;}
+#heatmap .r2~.subdomain-text {fill:white;}
+#heatmap .r3~.subdomain-text {fill:white;}
+#heatmap .r4~.subdomain-text {fill:white;}
+#heatmap .r5~.subdomain-text {fill:white;}
+#heatmap .r6~.subdomain-text {fill:white;}
+

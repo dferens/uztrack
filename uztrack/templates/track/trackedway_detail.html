@@ -4,16 +4,20 @@
 
 {% block styles %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% static 'fullcalendar/fullcalendar.css' %}">
+  {# <link rel="stylesheet" href="{% static 'fullcalendar/fullcalendar.css' %}"> #}
+  <link rel="stylesheet" type="text/css" href="{% static 'cal-heatmap/cal-heatmap.css' %}">
   <link rel="stylesheet" href="{% static 'css/trackedway_detail.css' %}">
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
-  <script src="{% static 'js/jquery-ui.js' %}"></script>
+  {# <script src="{% static 'js/jquery-ui.js' %}"></script> #}
   <script src="{% static 'js/angular.js' %}"></script>
-  <script src="{% static 'fullcalendar/fullcalendar.js' %}"></script>
-  <script src="{% static 'ui-calendar/calendar.js' %}"></script>
+  <script src="{% static 'd3.v3/d3.v3.js' %}"></script>
+  <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
+  {# <script src="{% static 'fullcalendar/fullcalendar.js' %}"></script> #}
+  {# <script src="{% static 'ui-calendar/calendar.js' %}"></script> #}
+
 
   <script src="{% static 'js/trackedway_detail.js' %}"></script>
   <script>
@@ -26,8 +30,8 @@
 {% block content %}
   {% with way=tracked_way.way %}
   <div class="row" ng-app="myApp">
-    <div class="col-md-10 col-md-offset-1">
-      <div ng-controller="WayDetailCtrl">
+    <div ng-controller="WayDetailCtrl">
+      <div class="col-md-7 col-md-offset-1">
         <div class="panel panel-default">
           <p class="panel-heading">Tracked way details</p>
           <div class="panel-body">
@@ -35,28 +39,15 @@
             <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
           </div>
         </div>
+      </div>
+      <div class="col-md-3">        
         {% verbatim %}
-        <div class="panel panel-default calendar-container">
-          <div ui-calendar="uiConfig.calendar" ng-model="eventSources"></div>
+        <div class="panel panel-default">
+          <p class="panel-heading">Days</p>
+          <div id="heatmap"></div>
         </div>
         <div class="panel-group histories">
         {% endverbatim %}
-        {% for tickets_history in tracked_way.histories.all %}
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h4 class="panel-title">
-                <a data-toggle="collapse" data-parent=".histories" href=".history{{ forloop.counter }}">
-                  Search on (some data)
-                </a>
-              </h4>
-            </div>
-            <div id="history{{ forloop.counter }}" class="panel-collapse collapse">
-              <div class="panel-body">
-                Search data
-              </div>
-            </div>
-          </div>
-        {% endfor %}
         </div>
       </div>
     </div>
