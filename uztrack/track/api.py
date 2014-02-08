@@ -3,18 +3,18 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from .models import TrackedWayDayHistory, TrackedWayDayHistorySnapshot
+from . import models
 
 
 class SnapshotSerializer(serializers.ModelSerializer):
     class Meta:
-        model = TrackedWayDayHistorySnapshot
+        model = models.TrackedWayDayHistorySnapshot
         exclude = ('snapshot_data',)
 
 
 class HistorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = TrackedWayDayHistory
+        model = models.TrackedWayDayHistory
         fields = ('id', 'tracked_way', 'departure_date', 'places_appeared',
                   'places_disappeared', 'last_snapshot')
 
@@ -22,7 +22,7 @@ class HistorySerializer(serializers.ModelSerializer):
 
 
 class HistoryViewSet(ModelViewSet):
-    model = TrackedWayDayHistory
+    model = models.TrackedWayDayHistory
     filter_fields = ('tracked_way',)
     serializer_class = HistorySerializer
     # TODO: set auth

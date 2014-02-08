@@ -4,21 +4,15 @@
 
 {% block styles %}
   {{ block.super }}
-  {# <link rel="stylesheet" href="{% static 'fullcalendar/fullcalendar.css' %}"> #}
   <link rel="stylesheet" type="text/css" href="{% static 'cal-heatmap/cal-heatmap.css' %}">
   <link rel="stylesheet" href="{% static 'css/trackedway_detail.css' %}">
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
-  {# <script src="{% static 'js/jquery-ui.js' %}"></script> #}
   <script src="{% static 'js/angular.js' %}"></script>
   <script src="{% static 'd3.v3/d3.v3.js' %}"></script>
   <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
-  {# <script src="{% static 'fullcalendar/fullcalendar.js' %}"></script> #}
-  {# <script src="{% static 'ui-calendar/calendar.js' %}"></script> #}
-
-
   <script src="{% static 'js/trackedway_detail.js' %}"></script>
   <script>
     myApp.constant('urls', {
@@ -28,9 +22,9 @@
 {% endblock %}
 
 {% block content %}
-  {% with way=tracked_way.way %}
-  <div class="row" ng-app="myApp">
-    <div ng-controller="WayDetailCtrl">
+  <div class ng-app="myApp" ng-controller="WayDetailCtrl">
+    {% with way=tracked_way.way %}
+    <div class="row">
       <div class="col-md-7 col-md-offset-1">
         <div class="panel panel-default">
           <p class="panel-heading">Tracked way details</p>
@@ -39,6 +33,14 @@
             <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
           </div>
         </div>
+        {% verbatim %}
+        <div class="panel panel-default">
+          <p class="panel-heading">Day history</p>
+          <div class="panel-body">
+            <p>{{ dayHistory }}</p>
+          </div>
+        </div>  
+        {% endverbatim %}
       </div>
       <div class="col-md-3">        
         {% verbatim %}
@@ -51,6 +53,7 @@
         </div>
       </div>
     </div>
-  </div>
+    <div class="row">      
+    </div>
   {% endwith %}
 {% endblock %}
