@@ -1,74 +1,52 @@
 var myApp = angular.module('myApp', []);
 
-myApp.controller('WayDetailCtrl', function($scope, $http, $q, urls) {
-    $scope.getDate = function(date_str) {
-        return new Date(Date.parse(date_str));
-    };
+myApp.factory('api', function($http, urls) {
+    return {
+        getHistories: function(trackedWayId) {
+            var cfg = {params: {trackedWay: trackedWayId}};
+            return $http.get(urls.histories, cfg).then(function(result) {
+                return _.map(result.data, function(history) {
+                    return {
+                        id: history.id,
+                        date: new Date(Date.parse(history.departure_date)),
+                        placesCount: history.last_snapshot.total_places_count,
+                    };
+                });
+            });
+        },
+    }
+})
+.controller('WayDetailCtrl', function($scope, api) {
     $scope.getTrackedWayId = function() {
         var temp = window.location.pathname;
         temp = temp.split('/track/')[1];
         return temp.slice(0, -1);
     };
-    $scope.selectHistory = function(history) {
-        $scope.$apply(function() {
-            $scope.dayHistory = history;
-        });
+    $scope.selectHistory = function(history) {        
+        $scope.dayHistory = history;
     };
     $scope.init = function() {
-        $scope.urls = urls;
         $scope.trackedWayId = $scope.getTrackedWayId();
-        $scope.dayHistories = $scope._loadDayHistories()
-
-        $scope.dayHistories.then(function(data) {
+        api.getHistories($scope.trackedWayId).then(function(data) {
             $scope.dayHistories = data;
-            $scope._initHeatmap();
         });
     };
-    $scope._loadDayHistories = function() {
-        var deferred = $q.defer();
-        var cfg = {params: {tracked_way: $scope.trackedWayId}};
-        $http.get(urls.histories, cfg).success(function(data){
-            var result = [];
-            $.each(data, function(i, history) {
-                result.push({
-                    id: history.id,
-                    date: $scope.getDate(history.departure_date),
-                    placesCount: history.last_snapshot.total_places_count,
-                });
-            });
-            deferred.resolve(result);
-        });
-        return deferred.promise;
-    };
-    $scope._initHeatmap = function() {
-        var getStartDate = function() {
-            return $scope.dayHistories[0].date;
-        };
-        var getLastDate = function() {
-            return $scope.dayHistories[$scope.dayHistories.length - 1].date;
-        }
-        var getRange = function() {
-            var lastMonth = getLastDate().getMonth() + 1;
-            var firstMonth = getStartDate().getMonth();
-            return lastMonth - firstMonth;
-        };
-        var calculateLegend = function() {
-            return [50, 100, 250, 500]
-        };
-        var generateCalData = function() {
-            var result = {}, seconds;
-            console.log($scope.dayHistories);
-            $.each($scope.dayHistories, function(i, value) {                
-                seconds = value.date.getTime() / 1000;
-                result[seconds] = value.placesCount;
-            });
-            return result;
-        };
+
+    $scope.init();
+})
+.directive('heatmap', function() {
+    var initHeatmap = function($scope, histories) {
+        var startDate = histories[0].date;
+        var lastDate = histories[_.size(histories) - 1].date;
+
         $scope.heatmap = new CalHeatMap();
         $scope.heatmap.init({
             cellSize: 20,
             considerMissingDataAsZero: false,
-            data: generateCalData(),
+            data: _.reduce(histories, function(res, h) {
+                res[h.date.getTime() / 1000] = h.placesCount;
+                return res;
+            }, {}),
             domain: 'month',
             domainDynamicDimension: true,
             domainGutter: 0,
@@ -76,12 +54,10 @@ myApp.controller('WayDetailCtrl', function($scope, $http, $q, urls) {
             highlight: 'now',
             itemName: 'place',
             itemSelector: '#heatmap',
-            label: {
-                position: 'left',
-                width: 80,
-                offset: {x: 15, y: 80},
-            },
-            legend: calculateLegend(),
+            label: { position: 'left',
+                     width: 80,
+                     offset: { x: 15, y: 80 } },
+            legend: [50, 100, 250, 500],
             legendCellSize: 13,
             legendHorizontalPosition: 'right',
             legendMargin: [15, 3, 0, 0],
@@ -89,20 +65,33 @@ myApp.controller('WayDetailCtrl', function($scope, $http, $q, urls) {
             legendVerticalPosition: 'bottom',
             onClick: function(date, nb) {
                 if (nb !== null) {
-                    $.each($scope.dayHistories, function(i, history) {
-                        if (history.date.toDateString() == date.toDateString()) {
-                            return $scope.selectHistory(history);
-                        }
+                    $scope.$apply(function() {
+                        $scope.$parent.selectHistory(_.find(histories, function(h) {
+                            return h.date.toDateString() == date.toDateString();
+                        }));
                     });
                 }
             },
-            range: getRange(),
-            start: getStartDate(),
+            range: lastDate.getMonth() - startDate.getMonth() + 1,
+            start: startDate,
             subDomain: 'x_day',
             subDomainTextFormat: '%d',
             verticalOrientation: true,
         });
     };
-
-    $scope.init();
+    return {
+        restrict: 'E',
+        template: '<div></div>',
+        transclude: true,
+        replace: true,
+        scope: {histories: '=histories'},
+        link: function(scope, element, attrs) {
+            scope.$watch('histories', function() {
+                var histories = scope.histories;
+                if ((histories != null) && (histories.length > 0)) {
+                    initHeatmap(scope, histories);
+                }
+            });
+        },
+    };
 });
