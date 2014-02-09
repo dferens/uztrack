@@ -1,32 +1,46 @@
-var myApp = angular.module('myApp', []);
+var myApp = angular.module('myApp', ['ui.bootstrap']);
 
 myApp.factory('api', function($http, urls) {
+    var convertHistory = function(rawHistory) {
+        return {
+            id: rawHistory.id,
+            date: new Date(Date.parse(rawHistory.departure_date)),
+            placesCount: rawHistory.last_snapshot.total_places_count,
+            lastSnapshot: convertSnapshot(rawHistory.last_snapshot),
+        };
+    };
+    var convertSnapshot = function(rawSnapshot) {
+        return {
+            id: rawSnapshot.id,
+            date: Date.parse(rawSnapshot.made_on),
+            placesCount: rawSnapshot.total_places_count,
+        };
+    };
     return {
         getHistories: function(trackedWayId) {
             var cfg = { params: { trackedWay: trackedWayId } };
             return $http.get(urls.histories, cfg).then(function(result) {
-                return _.map(result.data, function(history) {
-                    return {
-                        id: history.id,
-                        date: new Date(Date.parse(history.departure_date)),
-                        placesCount: history.last_snapshot.total_places_count,
-                    };
-                });
+                return _.map(result.data, convertHistory);
             });
         },
         getSnaphots: function(dayHistoryId) {
             var cfg = { params: { history: dayHistoryId } };
             return $http.get(urls.snapshots, cfg).then(function(result) {
-                return _.map(result.data, function(snapshot) {
-                    return {
-                        id: snapshot.id,
-                        date: Date.parse(snapshot.made_on),
-                        placesCount: snapshot.total_places_count,
-                    };
-                });
+                return _.map(result.data, convertSnapshot);
             });
         },
     }
+})
+.filter('daysago', function(dateFilter) {
+    return function(input) {
+        if (input == null) {
+            return "~";
+        } else {
+            var delta = Date.now() - input;
+            delta = Math.round(delta / 1000 / 60 / 60 / 24);
+            return delta.toString() + " days ago";
+        }
+    };
 })
 .controller('WayDetailCtrl', function($scope, api) {
     $scope.getTrackedWayId = function() {
@@ -103,7 +117,7 @@ myApp.factory('api', function($http, urls) {
         template: '<div></div>',
         transclude: true,
         replace: true,
-        scope: { histories: '=histories' },
+        scope: { histories: '=' },
         link: linker,
     };
 })
@@ -113,12 +127,22 @@ myApp.factory('api', function($http, urls) {
             renderTo: 'chart',
             shadow: true,
         },
+        credits: { enabled: false },
         legend : {
             enabled: true,
         },
-        rangeSelector: { enabled: false },
+        rangeSelector: {
+            buttons: [{ type: 'all', text: 'All' }],
+            enabled: true,
+            selected: 0,
+        },
         title: { text: 'Places chart' },
         series: [],
+        yAxis: {
+            allowDecimals: false,
+            min: 0,
+            minorTickInterval: 20,
+        },
     };
     return {
         restrict: 'E',
@@ -128,19 +152,21 @@ myApp.factory('api', function($http, urls) {
         controller: function($scope, api) {
             $scope.loadHistorySnaphots = function() {
                 api.getSnaphots($scope.dayHistory.id).then(function(result) {
-                    while($scope.chart.series.length > 0) $scope.chart.series[0].remove(true);
-                    $scope.chart.addSeries({
+                    if ($scope.snapshotsSerie) $scope.snapshotsSerie.remove();
+                    $scope.snapshotsSerie = $scope.chart.addSeries({
                         name: 'Total number of tickets',
                         data: _.map(result, function(s) {return [s.date, s.placesCount]}),
                         tooltip: { valueDecimals: 2 },
                     });
+                    _.each($scope.chart.xAxis, function(axis) {
+                        axis.setExtremes(_.head(result).date, new Date());
+                    });
+                    $scope.dayHistory.snapshots = result;
                 });
             };
-            $scope.initChart = function() {
-                $scope.chart = new Highcharts.StockChart(chartConfig);
-            };
             $scope.chartData = [];
-            $scope.initChart();
+            $scope.chart = new Highcharts.StockChart(chartConfig);
+            $scope.snapshotsSerie = null;
             $scope.$watch('dayHistory', function() {
                 if ($scope.dayHistory != null) $scope.loadHistorySnaphots();
             });

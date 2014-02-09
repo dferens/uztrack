@@ -12,6 +12,8 @@
   {{ block.super }}
   <script src="{% static 'highcharts/highstock.js' %}"></script>
   <script src="{% static 'js/angular.js' %}"></script>
+  <script src="{% static 'bootstrap/js/ui-bootstrap.js' %}"></script>
+  <script src="{% static 'bootstrap/js/ui-bootstrap-tpls.js' %}"></script>
   <script src="{% static 'd3.v3/d3.v3.js' %}"></script>
   <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
   <script src="{% static 'js/trackedway_detail.js' %}"></script>
@@ -28,35 +30,34 @@
     {% with way=tracked_way.way %}
     <div class="row">
       <div class="col-md-7 col-md-offset-1">
-        <div class="panel panel-default">
-          <p class="panel-heading">Tracked way details</p>
-          <div class="panel-body">
+        <accordion close-others="false">
+          <accordion-group heading="Tracked way details" is-open="true">
             <p class="lead">Way: {{ way }}</p>
             <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
-          </div>
-        </div>
+            <div ng-if="dayHistory != null">
+              {% verbatim %}
+              <p>For {{ dayHistory.date|date:"longDate" }}, Last update: {{ dayHistory.lastSnapshot.date|daysago }}</p>
+              {% endverbatim %}
+            </div>
+          </accordion-group>
+        </accordion>
       </div>
       <div class="col-md-3">
-        {% verbatim %}
         <div class="panel panel-default">
           <p class="panel-heading">Days</p>
           <heatmap id="heatmap" histories="dayHistories"></heatmap>
         </div>
         <div class="panel-group histories">
         </div>
-        {% endverbatim %}
       </div>
     </div>
     <div class="row">
       <div class="col-md-10 col-md-offset-1">
-        {% verbatim %}
-        <div class="panel panel-default">
-          <p class="panel-heading">Day history</p>
-          <div class="panel-body">
+        <accordion close-others="oneAtTime">
+          <accordion-group heading="Day history" is-open="dayHistory != null">
             <chart id="chart"></chart>
-          </div>
-        </div>  
-        {% endverbatim %}
+          </accordion-group>
+        </accordion>
       </div>
     </div>
   {% endwith %}

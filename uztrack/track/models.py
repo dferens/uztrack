@@ -123,7 +123,6 @@ class TrackedWayDayHistorySnapshot(models.Model):
     Tickets history snapshot.
     """
     class Meta:
-        ordering = ['made_on']
         get_latest_by = 'made_on'
 
     history = models.ForeignKey(TrackedWayDayHistory, related_name='snapshots')
