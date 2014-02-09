@@ -10,6 +10,7 @@
 
 {% block scripts %}
   {{ block.super }}
+  <script src="{% static 'highcharts/highstock.js' %}"></script>
   <script src="{% static 'js/angular.js' %}"></script>
   <script src="{% static 'd3.v3/d3.v3.js' %}"></script>
   <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
@@ -17,6 +18,7 @@
   <script>
     myApp.constant('urls', {
       histories: "{% url 'api-histories-list' %}",
+      snapshots: "{% url 'api-snapshots-list' %}",
     });
   </script>
 {% endblock %}
@@ -33,16 +35,8 @@
             <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
           </div>
         </div>
-        {% verbatim %}
-        <div class="panel panel-default">
-          <p class="panel-heading">Day history</p>
-          <div class="panel-body">
-            <p>{{ dayHistory }}</p>
-          </div>
-        </div>  
-        {% endverbatim %}
       </div>
-      <div class="col-md-3">        
+      <div class="col-md-3">
         {% verbatim %}
         <div class="panel panel-default">
           <p class="panel-heading">Days</p>
@@ -53,7 +47,17 @@
         {% endverbatim %}
       </div>
     </div>
-    <div class="row">      
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        {% verbatim %}
+        <div class="panel panel-default">
+          <p class="panel-heading">Day history</p>
+          <div class="panel-body">
+            <chart id="chart"></chart>
+          </div>
+        </div>  
+        {% endverbatim %}
+      </div>
     </div>
   {% endwith %}
 {% endblock %}

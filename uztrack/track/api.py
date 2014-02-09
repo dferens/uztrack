@@ -28,3 +28,9 @@ class HistoryViewSet(ModelViewSet):
     # TODO: set auth
     # authentication_classes = (SessionAuthentication,)
     # permission_classes = (IsAuthenticated,)
+
+
+class SnapshotViewSet(ModelViewSet):
+    model = models.TrackedWayDayHistorySnapshot
+    filter_fields = ('history',)
+    serializer_class = SnapshotSerializer
