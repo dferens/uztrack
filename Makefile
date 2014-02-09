@@ -1,4 +1,5 @@
 MANAGE=python uztrack/manage.py
+CELERY=python uztrack/celeryapp.py
 TEST_ENV=DJANGO_SETTINGS_MODULE="uztrack.settings.test"
 APPS=accounts core poller track
 
@@ -9,7 +10,7 @@ run:
 	$(MANAGE) runserver
 
 celery:
-	$(MANAGE) celery worker
+	$(CELERY) worker -l info
 
 cleanpyc:
 	@find . -name "*.pyc" -exec rm -rf {} \;

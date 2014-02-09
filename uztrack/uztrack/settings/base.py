@@ -3,8 +3,6 @@ from sys import path
 from datetime import timedelta
 from os.path import abspath, basename, dirname, join, normpath
 
-import djcelery; djcelery.setup_loader()
-
 
 ########## PATH CONFIGURATION
 # Absolute filesystem path to the Django project directory:
@@ -197,7 +195,6 @@ DJANGO_APPS = (
 THIRD_PARTY_APPS = (
     'crispy_forms',
     'django_tables2',
-    'djcelery',
     'rest_framework',
     'south',
 )
@@ -224,8 +221,6 @@ SEARCH_BEAT_INTERVAL = timedelta(hours=1)
 
 
 ########## CELERY CONFIGURATION
-CELERYBEAT_SCHEDULE = {
-}
 
 CELERY_TIMEZONE = 'UTC'
 ########## END CELERY CONFIGURATION
@@ -284,8 +279,7 @@ LOGGING = {
         },
         'poller.tasks': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'filters': ['require_debug_true']
+            'level': 'INFO',
         }
     }
 }

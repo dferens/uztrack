@@ -4,7 +4,7 @@ from django.contrib import admin
 from rest_framework.routers import DefaultRouter
 
 from track.api import HistoryViewSet, SnapshotViewSet
-
+from poller import startup as poller_startup
 
 admin.autodiscover()
 
@@ -20,3 +20,5 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^grappelli/', include('grappelli.urls')),
 )
+
+poller_startup()
