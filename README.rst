@@ -24,8 +24,11 @@ For production::
 
 Running
 =======
+
 Launch server::
+
     make run
 
 Launch celery::
+
     make celery
