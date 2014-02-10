@@ -217,6 +217,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 ########## SITE CONFIGURATION
 TICKETS_SEARCH_RANGE = timedelta(days=45)
 POLLER_WARMUP = timedelta(minutes=5)
+POLLER_CONNECTION_ERROR_RETRY = timedelta(minutes=5)
 ########## END SITE CONFIGURAITON
 
 
@@ -277,10 +278,6 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-        'poller.tasks': {
-            'handlers': ['console'],
-            'level': 'INFO',
-        }
     }
 }
 ########## END LOGGING CONFIGURATION

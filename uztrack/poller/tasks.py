@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.utils import timezone
 
 from celery.utils.log import get_task_logger
+from requests.exceptions import ConnectionError
 
 from core.uzgovua.exceptions import ParseException
 from celeryapp import app
@@ -20,8 +22,12 @@ def poll_history(history, api, stop_on):
     execution_time = timezone.now()
     try:
         snapshot = poller.poll(history, api)
+    except ConnectionError, e:
+        logger.error('Connection error')
+        next_poll_eta = execution_time + settings.POLLER_CONNECTION_ERROR_RETRY
+        logger.info(u'planned next poll for %s on %s' % (history.id, next_poll_eta))
     except Exception, e:
-        logger.exception(e.message)
+        logger.exception(e)
     else:
         next_poll_eta = poller.calc_next_eta(snapshot, history, execution_time)
 
