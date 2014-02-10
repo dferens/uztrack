@@ -8,6 +8,10 @@ from .tasks import poll_history, logger
 
 
 def run():
+    """
+    Launches polling tasks for each :class:`track.models.TrackedWayDayHistory`
+    history within ``settings.POLLER_WARMUP`` time period.
+    """
     api = SmartApi()
     tracked_ways = TrackedWay.objects.all()
     start = timezone.now()

@@ -12,6 +12,11 @@ logger = get_task_logger(__name__)
 
 @app.task
 def poll_history(history, api):
+    """
+    Polls given :class:`track.models.TrackedWayDayHistory` history with given api
+    instance.
+    Makes api call, saves results, plans next poll.
+    """
     execution_time = timezone.now()
     try:
         snapshot = poller.poll(history, api)
