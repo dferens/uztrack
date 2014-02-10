@@ -15,8 +15,10 @@ def calc_next_eta(snapshot, history, execution_time):
     return execution_time + timedelta(hours=1)
 
 
-def calc_random_eta(**range_kwargs):
-    time_range = timedelta(**range_kwargs)
-    time_range_seconds = time_range.total_seconds()
+def calc_random_eta(start_datetime, stop_datetime):
+    """
+    Returns random datetime within given range.
+    """
+    time_range_seconds = (stop_datetime - start_datetime).total_seconds()
     random_eta_seconds = int(random.random() * time_range_seconds)
-    return timezone.now() + timedelta(seconds=random_eta_seconds)
+    return start_datetime + timedelta(seconds=random_eta_seconds)
