@@ -14,6 +14,7 @@ router.register(r'snapshots', SnapshotViewSet, 'api-snapshots')
 
 urlpatterns = patterns('',
     (r'^', include('track.urls')),
+    (r'^', include('poller.urls')),
 
     (r'^api/', include(router.urls)),
 

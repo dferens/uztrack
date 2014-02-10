@@ -3,16 +3,17 @@ from django_tables2 import columns
 from django_tables2.utils import A
 
 from core import columns as core_columns
-from .models import Way, TrackedWay
+from .models import Way, TrackedWay, TrackedWayDayHistorySnapshot as Snapshot
 
 
 class WayTable(Table):
-    detail_url = columns.LinkColumn('way_detail', kwargs={'pk': A('id')})
-
     class Meta:
         model = Way
         attrs = {'class': 'table table-striped table-bordered table-hover'}
         fields = ('id', 'station_from', 'station_to')
+
+    detail_url = columns.LinkColumn('way_detail', kwargs={'pk': A('id')})
+
 
 
 class TrackedWayTable(Table):

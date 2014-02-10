@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block page_title %}Poller stats{% endblock %}}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-10">
+    <p>Total snapshots count: {{ snapshots_count }}</p>
+    <p>Relevance: {{ relevance }}</p>
+    <table class="table table-stripped table-bordered table-hover">
+      <thead>
+        <tr>
+          <td>Tracked way</td>
+          <td>Snapshots count</td>
+          <td>Relevance</td>
+        </tr>
+      </thead>
+      {% for tracked_way_stats in tracked_ways %}
+      <tr>
+        <td>{{ tracked_way_stats.tracked_way }}</td>
+        <td>{{ tracked_way_stats.snapshots_count }}</td>
+        <td>{{ tracked_way_stats.relevance }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+{% endblock %}
