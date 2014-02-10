@@ -6,7 +6,7 @@ from django_tables2.columns.linkcolumn import LinkColumn
 class FixedLinkColumn(LinkColumn):
     """
     Default :class:`LinkColumn` does not allow to specify custom link text,
-    and when it can get value by accessor it just fails silently.
+    and when it can't get value by accessor it just fails silently.
     """
     def __init__(self, *args, **kwargs):
         self.link_text = kwargs.pop('text', None)
