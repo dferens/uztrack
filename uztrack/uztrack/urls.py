@@ -20,5 +20,4 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^grappelli/', include('grappelli.urls')),
 )
-
-poller_startup()
+poller_startup.run()
