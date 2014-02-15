@@ -50,7 +50,7 @@ SERVER_EMAIL = EMAIL_HOST_USER
 
 ########## DATABASE CONFIGURATION
 DATABASES = {
-    'default': dj_database_url.config(get_env_setting('DATABASE_URL')),
+    'default': dj_database_url.parse(get_env_setting('DATABASE_URL')),
 }
 ########## END DATABASE CONFIGURATION
 
