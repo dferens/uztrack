@@ -1,7 +1,6 @@
-"""Production settings and globals."""
-
-
 from os import environ
+
+import dj_database_url
 
 from base import *
 
@@ -50,13 +49,15 @@ SERVER_EMAIL = EMAIL_HOST_USER
 ########## END EMAIL CONFIGURATION
 
 ########## DATABASE CONFIGURATION
-DATABASES = {}
+DATABASES = {
+    'default': dj_database_url.config(get_env_setting('DATABASE_URL')),
+}
 ########## END DATABASE CONFIGURATION
 
 
 ########## CACHE CONFIGURATION
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
-CACHES = {}
+# CACHES = {}
 ########## END CACHE CONFIGURATION
 
 
