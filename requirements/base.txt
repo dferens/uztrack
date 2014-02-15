@@ -14,6 +14,7 @@ djangorestframework==2.3.12
 jsonfield==0.9.19
 logutils==0.3.3
 python-dateutil==2.1
+psycopg2==2.5.2
 redis==2.8.0
 requests==2.0.0
 South==0.8.1
