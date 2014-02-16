@@ -1,9 +1,15 @@
-import random
+import dateutil.parser
 from datetime import time
+import logging
+import random
 
 from django.utils import timezone
 
+from celeryapp import app
 from track import queries
+
+
+logger = logging.getLogger(__file__)
 
 
 def poll(history, api):
@@ -32,3 +38,12 @@ def calc_stop_eta(history):
     stop_date = history.departure_date + timezone.timedelta(days=1)
     stop_eta_naive = timezone.datetime.combine(stop_date, time(0, 0))
     return timezone.make_aware(stop_eta_naive, timezone.get_current_timezone())
+
+def get_scheduled_polls():
+    inspect = app.control.inspect()
+    result = dict()
+    data = inspect.scheduled()
+    for task in (data.values()[0] if data else tuple()):
+        history_id = int(task['request']['args'].split(',')[0][1:])
+        result[history_id] = dateutil.parser.parse(task['eta'])
+    return result
