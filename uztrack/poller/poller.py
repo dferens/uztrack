@@ -30,4 +30,5 @@ def calc_stop_eta(history):
     instance.
     """
     stop_date = history.departure_date + timezone.timedelta(days=1)
-    return timezone.datetime.combine(stop_date, time(0, 0))
+    stop_eta_naive = timezone.datetime.combine(stop_date, time(0, 0))
+    return timezone.make_aware(stop_eta_naive, timezone.get_current_timezone())
