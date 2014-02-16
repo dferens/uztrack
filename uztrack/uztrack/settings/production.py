@@ -65,3 +65,7 @@ DATABASES = {
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = get_env_setting('SECRET_KEY')
 ########## END SECRET CONFIGURATION
+
+########## CELERY CONFIGURATION
+BROKER_URL = get_env_setting('BROKER_URL')
+########## END CELERY CONFIGURATION
