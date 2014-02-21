@@ -20,7 +20,8 @@ myApp.factory('api', function($http, urls) {
         getHistories: function(trackedWayId) {
             var cfg = { params: { trackedWay: trackedWayId } };
             return $http.get(urls.histories, cfg).then(function(result) {
-                return _.map(result.data, convertHistory);
+                var validator = function(history) { return history.last_snapshot != null; }
+                return _.map(_.filter(result.data, validator), convertHistory);
             });
         },
         getSnaphots: function(dayHistoryId) {
@@ -108,7 +109,7 @@ myApp.factory('api', function($http, urls) {
                 };
 
                 scope.heatmap = new CalHeatMap();
-                scope.heatmap.init(calMapConfig);
+                scope.heatmap.init(calMapConfig);                
             }
         });
     };
