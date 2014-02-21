@@ -1,77 +1,61 @@
-"""Development settings and globals."""
-
-
 from os.path import join, normpath
 
-from base import *
+from .base import *
+from .utils import settings
 
 
-########## DEBUG CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#debug
-DEBUG = True
+@settings
+class Administration(object):
+    def DEBUG(self): return True
+    def INTERNAL_IPS(self): return ('127.0.0.1',)
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#template-debug
-TEMPLATE_DEBUG = DEBUG
-########## END DEBUG CONFIGURATION
+@settings
+class Emails(object):
+    def EMAIL_BACKEND(self):
+        return 'django.core.mail.backends.console.EmailBackend'
 
+@settings
+class Databases(object):
+    def DATABASES(self): return {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': normpath(join(DJANGO_ROOT, 'default.db')),
+                'USER': '',
+                'PASSWORD': '',
+                'HOST': '',
+                'PORT': '',
+            }
+        }
 
-########## EMAIL CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-########## END EMAIL CONFIGURATION
-
-
-########## DATABASE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': normpath(join(DJANGO_ROOT, 'default.db')),
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+@settings
+class Caches(object):
+    def CACHES(self): return {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
     }
-}
-########## END DATABASE CONFIGURATION
 
+@settings
+class Celery(object):
+    def BROKER_URL(self): return 'redis://localhost:6379/0'
 
-########## CACHE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+@settings
+class Apps(Apps):
+    def THIRD_PARTY_APPS(self):
+        return Apps.THIRD_PARTY_APPS(self) + (
+            'debug_toolbar',
+        )
+
+@settings
+class Routing(Routing):
+    def MIDDLEWARE_CLASSES(self):
+        return Routing.MIDDLEWARE_CLASSES(self) + (
+            'debug_toolbar.middleware.DebugToolbarMiddleware',
+        )
+
+@settings
+class DebugToolbar(object):
+    def DEBUG_TOOLBAR_CONFIG(self): return {
+        'INTERCEPT_REDIRECTS': False,
+        'SHOW_TEMPLATE_CONTEXT': True,
     }
-}
-########## END CACHE CONFIGURATION
-
-
-########## SITE CONFIGURATION
-########## END SITE CONFIGURATION
-
-
-########## CELERY CONFIGURATION
-BROKER_URL = 'redis://localhost:6379/0'
-########## END CELERY CONFIGURATION
-
-
-########## TOOLBAR CONFIGURATION
-# See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
-INSTALLED_APPS += (
-    'debug_toolbar',
-)
-
-# See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
-INTERNAL_IPS = ('127.0.0.1',)
-
-# See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
-MIDDLEWARE_CLASSES += (
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
-
-# See: https://github.com/django-debug-toolbar/django-debug-toolbar#installation
-DEBUG_TOOLBAR_CONFIG = {
-    'INTERCEPT_REDIRECTS': False,
-    'SHOW_TEMPLATE_CONTEXT': True,
-}
-########## END TOOLBAR CONFIGURATION

@@ -1,13 +1,14 @@
-from base import *
+from .base import *
+from .utils import *
 
-########## IN-MEMORY TEST DATABASE
-DATABASES = {
-    "default": {
+
+@settings(to_dict=True)
+class DATABASES(object):
+    def default(self): return {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ":memory:",
         "USER": "",
         "PASSWORD": "",
         "HOST": "",
         "PORT": "",
-    },
-}
+    }

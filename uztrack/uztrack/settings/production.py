@@ -1,73 +1,41 @@
-from os import environ
-
 import dj_database_url
 
-from base import *
+from .base import *
+from .utils import *
 
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
 from django.core.exceptions import ImproperlyConfigured
 
 
-def get_env_setting(setting):
-    """ Get the environment setting or return exception """
-    try:
-        return environ[setting]
-    except KeyError:
-        error_msg = "Set the %s env variable" % setting
-        raise ImproperlyConfigured(error_msg)
+@settings
+class Administration(object):
+    def ALLOWED_HOSTS(self): return []
+    @from_env
+    def SECRET_KEY(self): pass
 
-########## HOST CONFIGURATION
-# See: https://docs.djangoproject.com/en/1.5/releases/1.5/#allowed-hosts-required-in-production
-ALLOWED_HOSTS = []
-########## END HOST CONFIGURATION
+@settings
+class Emails(object):
+    def EMAIL_BACKEND(self): return 'django.core.mail.backends.smtp.EmailBackend'
+    @from_env
+    def EMAIL_HOST(self): pass
+    @from_env
+    def EMAIL_HOST_PASSWORD(self): pass
+    @from_env
+    def EMAIL_HOST_USER(self): pass
+    @from_env
+    def EMAIL_PORT(self): return 587
+    def EMAIL_SUBJECT_PREFIX(self): return '[%s] ' % SITE_NAME
+    def EMAIL_USE_TLS(self): return True
+    def SERVER_EMAIL(self): return self.EMAIL_HOST_USER()
 
-########## EMAIL CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+@settings(to_dict=True)
+class DATABASES(object):
+    def default(self): dj_database_url.parse(get_env_setting('DATABASE_URL')),
 
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST = environ.get('EMAIL_HOST', 'smtp.gmail.com')
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-password
-EMAIL_HOST_PASSWORD = environ.get('EMAIL_HOST_PASSWORD', '')
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-host-user
-EMAIL_HOST_USER = environ.get('EMAIL_HOST_USER', 'your_email@example.com')
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT = environ.get('EMAIL_PORT', 587)
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-EMAIL_SUBJECT_PREFIX = '[%s] ' % SITE_NAME
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
-EMAIL_USE_TLS = True
-
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#server-email
-SERVER_EMAIL = EMAIL_HOST_USER
-########## END EMAIL CONFIGURATION
-
-########## DATABASE CONFIGURATION
-DATABASES = {
-    'default': dj_database_url.parse(get_env_setting('DATABASE_URL')),
-}
-########## END DATABASE CONFIGURATION
-
-
-########## CACHE CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#caches
-# CACHES = {}
-########## END CACHE CONFIGURATION
-
-
-########## SECRET CONFIGURATION
-# See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-SECRET_KEY = get_env_setting('SECRET_KEY')
-########## END SECRET CONFIGURATION
-
-########## CELERY CONFIGURATION
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_ACCEPT_CONTENT = ['json']
-BROKER_URL = get_env_setting('BROKER_URL')
-########## END CELERY CONFIGURATION
+@settings
+class Celery(object):
+    def CELERY_TASK_SERIALIZER(self): return 'json'
+    def CELERY_ACCEPT_CONTENT(self): return ['json']
+    @from_env
+    def BROKER_URL(self): pass
