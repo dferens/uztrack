@@ -32,14 +32,24 @@ myApp.factory('api', function($http, urls) {
         },
     }
 })
-.filter('daysago', function(dateFilter) {
+.filter('ago', function(dateFilter) {
+    var _ago = function(delta) {        
+        var days = Math.round(delta / 1000 / 60 / 60 / 24);
+        if (days > 0) return [days, 'days'];
+        var hours = Math.round(delta / 1000 / 60 / 60);
+        if (hours > 0) return [hours, 'hours'];
+        var minutes = Math.round(delta / 1000 / 60);
+        if (minutes > 0) return [minutes, 'minutes'];
+        var seconds = Math.round(delta / 1000);
+        if (seconds > 0) return [seconds, 'seconds'];
+    };
     return function(input) {
         if (input == null) {
             return "~";
         } else {
             var delta = Date.now() - input;
-            delta = Math.round(delta / 1000 / 60 / 60 / 24);
-            return delta.toString() + " days ago";
+            if (Math.round(delta) == 0) return 'just now';
+            return '{0} {1} ago'.format(_ago(delta))
         }
     };
 })

@@ -36,7 +36,7 @@
             <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
             <div ng-if="dayHistory != null">
               {% verbatim %}
-              <p>For {{ dayHistory.date|date:"longDate" }}, Last update: {{ dayHistory.lastSnapshot.date|daysago }}</p>
+              <p>For {{ dayHistory.date|date:"longDate" }}, Last update: {{ dayHistory.lastSnapshot.date|ago }}</p>
               {% endverbatim %}
             </div>
           </accordion-group>
