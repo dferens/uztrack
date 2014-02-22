@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.utils import timezone
 
 from core.uzgovua.api import SmartApi
@@ -18,8 +19,12 @@ def run():
     tracked_ways = TrackedWay.objects.all()
     start = timezone.now()
     stop = start + settings.POLLER_WARMUP
-    scheduled_polls = poller.get_scheduled_polls()
+
     planned_polls = total_polls = 0
+    scheduled_polls = poller.get_scheduled_polls()    
+    if scheduled_polls is None:
+        raise ImproperlyConfigured("Could not inspect celery workers.")
+
     for tracked_way in tracked_ways:
         for history in queries.get_closest_histories(tracked_way):
             total_polls += 1

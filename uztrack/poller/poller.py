@@ -43,7 +43,9 @@ def get_scheduled_polls():
     inspect = app.control.inspect()
     result = dict()
     data = inspect.scheduled()
-    for task in (data.values()[0] if data else tuple()):
-        history_id = int(task['request']['args'].split(',')[0][1:])
-        result[history_id] = dateutil.parser.parse(task['eta'])
-    return result
+    if data is None: return data
+    else:
+        for task in data.values()[0]:
+            history_id = int(task['request']['args'].split(',')[0][1:])
+            result[history_id] = dateutil.parser.parse(task['eta'])
+        return result
