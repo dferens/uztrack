@@ -10,7 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 @settings
 class Administration(object):
-    def ALLOWED_HOSTS(self): return []
+    def ALLOWED_HOSTS(self): return ['.swinemaker.org']
     @from_env
     def SECRET_KEY(self): pass
 
