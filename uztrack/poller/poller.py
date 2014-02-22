@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from celeryapp import app
 from track import queries
+from .utils import total_seconds
 
 
 logger = logging.getLogger(__file__)
@@ -35,7 +36,7 @@ def calc_random_eta(start, stop):
     :type start: :class:`timezone.datetime`
     :type stop: :class:`timezone.datetime`
     """
-    time_range_seconds = (stop - start).total_seconds()
+    time_range_seconds = total_seconds(stop - start)
     random_eta_seconds = int(random.random() * time_range_seconds)
     return start + timezone.timedelta(seconds=random_eta_seconds)
 
