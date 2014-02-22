@@ -31,7 +31,7 @@ class Emails(object):
 
 @settings(to_dict=True)
 class DATABASES(object):
-    def default(self): dj_database_url.parse(get_env_setting('DATABASE_URL')),
+    def default(self): return dj_database_url.parse(get_env_setting('DATABASE_URL'))
 
 @settings
 class Celery(object):
