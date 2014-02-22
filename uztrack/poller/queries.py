@@ -1,14 +1,12 @@
 from django.conf import settings
 from django.utils import timezone
 
-from core.uzgovua.api import SmartApi
 from track import queries
 from .tasks import poll_history
 from . import poller
 
 
 logger = poller.logger
-api = SmartApi()
 
 
 def poll_tracked_way(tracked_way, celery_scheduled_polls=None):
@@ -34,7 +32,7 @@ def poll_tracked_way(tracked_way, celery_scheduled_polls=None):
             starter_eta = poller.calc_random_eta(start, stop)
             stop_on = poller.calc_stop_eta(history)
             logger.info(u'- planned start to poll %s on %s', history.id, starter_eta)
-            poll_history.apply_async(args=(history.id, api, stop_on), eta=starter_eta)
+            poll_history.apply_async(args=(history.id, stop_on), eta=starter_eta)
             planned_polls += 1
 
     return planned_polls, total_polls

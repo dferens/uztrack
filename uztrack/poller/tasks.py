@@ -4,17 +4,19 @@ from django.utils import timezone
 from celery.utils.log import get_task_logger
 from requests.exceptions import ConnectionError
 
+from core.uzgovua.api import SmartApi
 from core.uzgovua.exceptions import ParseException
 from celeryapp import app
 from track.models import TrackedWayDayHistory as History
 from . import poller
 
 
+api = SmartApi()
 logger = get_task_logger(__name__)
 
 
 @app.task
-def poll_history(history_id, api, stop_on):
+def poll_history(history_id, stop_on):
     """
     Polls given :class:`track.models.TrackedWayDayHistory` history with given api
     instance.
@@ -34,7 +36,7 @@ def poll_history(history_id, api, stop_on):
         next_poll_eta = poller.calc_next_eta(snapshot, history)
 
         if next_poll_eta < stop_on:
-            poll_history.apply_async(args=(history_id, api, stop_on), eta=next_poll_eta)
+            poll_history.apply_async(args=(history_id, stop_on), eta=next_poll_eta)
             logger.info(u'planned next poll for %s on %s' % (history_id, next_poll_eta))
         else:
             logger.info(u'stopped poll service for %s' % (history_id))
