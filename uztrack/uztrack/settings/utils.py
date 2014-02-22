@@ -7,9 +7,6 @@ from operator import itemgetter
 from django.core.exceptions import ImproperlyConfigured
 
 
-__all__ = ['settings', 'from_env']
-
-
 def defaultargs(func):
     """
     Calls parameterized decorator automatically if no args were
