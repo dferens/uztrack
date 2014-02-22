@@ -31,7 +31,7 @@ def poll_history(history_id, api, stop_on):
     except Exception, e:
         logger.exception(e)
     else:
-        next_poll_eta = poller.calc_next_eta(snapshot, history, execution_time)
+        next_poll_eta = poller.calc_next_eta(snapshot, history)
 
         if next_poll_eta < stop_on:
             poll_history.apply_async(args=(history_id, api, stop_on), eta=next_poll_eta)
