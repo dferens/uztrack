@@ -18,7 +18,7 @@ myApp.factory('api', function($http, urls) {
     };
     return {
         getHistories: function(trackedWayId) {
-            var cfg = { params: { trackedWay: trackedWayId } };
+            var cfg = { params: { tracked_way: trackedWayId } };
             return $http.get(urls.histories, cfg).then(function(result) {
                 var validator = function(history) { return history.last_snapshot != null; }
                 return _.map(_.filter(result.data, validator), convertHistory);
