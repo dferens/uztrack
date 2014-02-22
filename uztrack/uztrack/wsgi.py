@@ -26,6 +26,8 @@ path.append(SITE_ROOT)
 # os.environ["DJANGO_SETTINGS_MODULE"] = "jajaja.settings"
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "uztrack.settings.production")
 
+import poller.startup; poller.startup.run()
+
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
 # setting points here.
