@@ -58,6 +58,6 @@ def get_scheduled_polls():
     if data is None: return
     else:
         for task in data.values()[0]:
-            history_id = int(task['request']['args'].split(',')[0][1:])
+            history_id = eval(task['request']['args'])[0]
             result[history_id] = dateutil.parser.parse(task['eta'])
         return result
