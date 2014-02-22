@@ -32,7 +32,7 @@ def deploy(target='master'):
             run('pip install -r requirements.txt')
 
         with cd(env.django_dir):
-            run('make cleanpyc init static')
+            run('make cleanpyc init collectstatic')
 
     # TODO: reload nginx
     # TODO: reload uwsgi

@@ -13,7 +13,8 @@ migrate:
 test:
 	$(TEST_ENV) $(MANAGE) test --pattern="test_*.py" --top-level="./"
 
-static:
+collectstatic:
+	rm -rf assets/
 	$(MANAGE) collectstatic --noinput
 
 run:
