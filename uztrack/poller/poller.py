@@ -37,7 +37,7 @@ def calc_random_eta(start, stop):
     """
     time_range_seconds = (stop - start).total_seconds()
     random_eta_seconds = int(random.random() * time_range_seconds)
-    return start_datetime + timezone.timedelta(seconds=random_eta_seconds)
+    return start + timezone.timedelta(seconds=random_eta_seconds)
 
 
 def calc_stop_eta(history):

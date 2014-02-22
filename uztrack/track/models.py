@@ -67,6 +67,13 @@ class TrackedWay(models.Model):
         """
         return (wday for wday, is_set in self.days if is_set)
 
+    def save(self):
+        import poller.queries
+        
+        created = self.pk is None
+        super(TrackedWay, self).save()
+        if created: poller.queries.poll_tracked_way(self)
+
 
 class TrackedWayDayHistory(models.Model):
     """
