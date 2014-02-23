@@ -4,7 +4,7 @@ from bitfield import BitField
 from bitfield.forms import BitFieldCheckboxSelectMultiple
 from bitfield.admin import BitFieldListFilter
 
-from .models import Way, TrackedWay
+from . import models
 
 
 class WayAdmin(admin.ModelAdmin):
@@ -26,9 +26,31 @@ class TrackedWayAdmin(admin.ModelAdmin):
     start_time_24h.short_description = 'Start time'
 
     def days_list(self, obj):
-        return  ','.join([x[0] for x in obj.days if x[1]])
+        return  ','.join(obj.selected_weekdays)
     days_list.short_description = 'Days'
 
 
-admin.site.register(Way, WayAdmin)
-admin.site.register(TrackedWay, TrackedWayAdmin)
+class HistoryAdmin(admin.ModelAdmin):
+    ordering = ('tracked_way__way__id', 'tracked_way__days',
+                'tracked_way__start_time', 'departure_date')
+    list_display = ('way', 'weekdays', 'start_time', 'departure_date')
+
+    def way(self, obj):
+        return obj.tracked_way.way
+
+    def weekdays(self, obj):
+        return ', '.join(obj.tracked_way.selected_weekdays)
+
+    def start_time(self, obj):
+        return obj.tracked_way.start_time
+
+
+class SnapshotAdmin(admin.ModelAdmin):
+    ordering = ('history', '-made_on',)
+    list_display = ('history', 'made_on')
+
+
+admin.site.register(models.Way, WayAdmin)
+admin.site.register(models.TrackedWay, TrackedWayAdmin)
+admin.site.register(models.TrackedWayDayHistory, HistoryAdmin)
+admin.site.register(models.TrackedWayDayHistorySnapshot, SnapshotAdmin)

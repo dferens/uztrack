@@ -39,9 +39,8 @@ class TrackedWay(models.Model):
 
     def __unicode__(self):
         days = ', '.join(self.selected_weekdays)
-        subs = (self.way.station_from, self.way.station_to,
-                ', '.join(self.selected_weekdays), self.start_time)
-        return '%s-%s on %s at %s' % subs
+        return '%s-%s on %s' % (self.way.station_from, self.way.station_to,
+                                ', '.join(self.selected_weekdays))
 
     def next_dates(self, till):
         """
@@ -85,6 +84,8 @@ class TrackedWayDayHistory(models.Model):
     snapshot, when tickets were not been found for the first time.
     """
     class Meta:
+        verbose_name = u'tracked way history'
+        verbose_name_plural = u'tracked way histories'
         unique_together = (('tracked_way', 'departure_date'))
 
     tracked_way = models.ForeignKey(TrackedWay, related_name='histories')
@@ -130,6 +131,8 @@ class TrackedWayDayHistorySnapshot(models.Model):
     Tickets history snapshot.
     """
     class Meta:
+        verbose_name = u'history snapshot'
+        verbose_name_plural = u'history snapshots'
         get_latest_by = 'made_on'
 
     history = models.ForeignKey(TrackedWayDayHistory, related_name='snapshots')
