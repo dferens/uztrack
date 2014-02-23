@@ -13,6 +13,8 @@ django-tables2==0.14.0
 djangorestframework==2.3.12
 jsonfield==0.9.19
 logutils==0.3.3
+mock==1.0.1
+model-mommy==1.2
 python-dateutil==2.1
 psycopg2==2.5.2
 redis==2.8.0
