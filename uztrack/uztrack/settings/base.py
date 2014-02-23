@@ -204,5 +204,9 @@ class Logging(object):
                 'level': 'ERROR',
                 'propagate': True,
             },
+            'poller.poller': {
+                'handlers': ['console', 'mail_admins'],
+                'level': 'INFO',
+            },
         }
     }

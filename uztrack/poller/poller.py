@@ -10,7 +10,7 @@ from track import queries
 from .utils import total_seconds
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger('poller.poller')
 
 
 def poll(history, api):
