@@ -1,0 +1,18 @@
+[run]
+branch = True
+data_file = .coverage_data
+source = ./
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+
+omit =
+    */migrations/*.py
+    fabfile.py
+    celeryapp.py
+
+[html]
+directory = ../coverage_html

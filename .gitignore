@@ -20,7 +20,12 @@ build
 # Logs:
 *.log
 
+# System files
 *.DS_Store
+
+# Coverage data
+.coverage_data
+coverage_html/
 
 # Project files
 uztrack/assets/

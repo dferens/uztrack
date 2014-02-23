@@ -1,5 +1,6 @@
 MANAGE=python manage.py
 TEST_ENV=DJANGO_SETTINGS_MODULE="uztrack.settings.test"
+TEST_CMD=manage.py test --pattern="test_*.py" --top-level="./"
 
 cleanpyc:
 	@find . -name "*.pyc" -exec rm -rf {} \;
@@ -11,7 +12,11 @@ migrate:
 	$(MANAGE) migrate
 
 test:
-	$(TEST_ENV) $(MANAGE) test --pattern="test_*.py" --top-level="./"
+	$(TEST_ENV) python $(TEST_CMD)
+
+testcover:
+	$(TEST_ENV) coverage run $(TEST_CMD)
+	coverage report
 
 collectstatic:
 	rm -rf assets/
