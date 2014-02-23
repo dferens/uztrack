@@ -150,13 +150,13 @@ class OwnApps(object):
     def TICKETS_SEARCH_RANGE(self): return timedelta(days=45)
 
     def POLLER_WARMUP(self): return timedelta(minutes=5)
-
+    def POLLER_AUTOSTART(self): return True
+    def POLLER_AUTOSTART_NEW(self): return True
     def POLLER_CONNECTION_ERROR_RETRY(self): return timedelta(minutes=5)
 
 @settings
 class Celery(object):
     def CELERY_TIMEZONE(self): return 'Europe/Kiev'
-
     def CELERY_ENABLE_UTC(self): return True
 
 @settings(to_dict=True)

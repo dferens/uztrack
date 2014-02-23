@@ -16,22 +16,25 @@ def poll_tracked_way(tracked_way, celery_scheduled_polls=None):
     :type tracked_way: :class:`track.models.TrackedWay`.
     :param celery_scheduled_polls: dict of "history_id:datetime".
     """
-    logger.info(u'* Launching poller service for %d', tracked_way.id)
-    start = timezone.now()
-    stop = start + settings.POLLER_WARMUP
-    planned_polls = total_polls = 0
+    if settings.POLLER_AUTOSTART_NEW:
+        logger.info('launching poller service for %d', tracked_way.id)
+        start = timezone.now()
+        stop = start + settings.POLLER_WARMUP
+        planned_polls = total_polls = 0
 
-    for history in queries.get_closest_histories(tracked_way):
-        total_polls += 1
-        if celery_scheduled_polls:
-            if celery_scheduled_polls.get(history.id) is not None:
-                logger.info(u'- skipping poll for %s', history.id)
-                continue
+        for history in queries.get_closest_histories(tracked_way):
+            total_polls += 1
+            if celery_scheduled_polls:
+                if celery_scheduled_polls.get(history.id) is not None:
+                    logger.debug('- skipping poll for %s', history.id)
+                    continue
 
-        starter_eta = poller.calc_random_eta(start, stop)
-        logger.info(u'- planned start to poll %s on %s', history.id, starter_eta)
-        poll_history.apply_async(args=(history.id,), eta=starter_eta)
-        planned_polls += 1
+            starter_eta = poller.calc_random_eta(start, stop)
+            logger.debug('- planned start to poll %s on %s', history.id, starter_eta)
+            poll_history.apply_async(args=(history.id,), eta=starter_eta)
+            planned_polls += 1
 
-    return planned_polls, total_polls
+        return planned_polls, total_polls
+    else:
+        logger.info('poller service autostart is disabled by settings')
 

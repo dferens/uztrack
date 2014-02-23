@@ -12,3 +12,9 @@ class DATABASES(object):
         "HOST": "",
         "PORT": "",
     }
+
+
+@settings
+class OwnApps(object):
+    def POLLER_AUTOSTART(self): return False
+    def POLLER_AUTOSTART_NEW(self): return False
