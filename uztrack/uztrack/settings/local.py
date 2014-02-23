@@ -1,7 +1,7 @@
 from os.path import join, normpath
 
 from .base import *
-from .utils import settings
+from core.utils.settings import settings
 
 
 @settings

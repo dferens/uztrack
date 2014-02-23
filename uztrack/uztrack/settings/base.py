@@ -3,7 +3,7 @@ from datetime import timedelta
 from sys import path
 from os.path import abspath, basename, dirname, join, normpath
 
-from .utils import settings
+from core.utils.settings import settings
 
 
 @settings

@@ -1,5 +1,5 @@
 from .base import *
-from .utils import *
+from core.utils.settings import settings
 
 
 @settings(to_dict=True)

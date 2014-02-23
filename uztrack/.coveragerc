@@ -13,6 +13,8 @@ omit =
     */migrations/*.py
     fabfile.py
     celeryapp.py
+    uztrack/settings/local.py
+    uztrack/settings/production.py
 
 [html]
 directory = ../coverage_html

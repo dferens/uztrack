@@ -1,7 +1,7 @@
 import dj_database_url
 
 from .base import *
-from .utils import *
+from core.utils.settings import *
 
 # Normally you should not import ANYTHING from Django directly
 # into your settings, but ImproperlyConfigured is an exception.
