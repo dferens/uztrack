@@ -33,6 +33,8 @@ def deploy(target='master'):
 
         with cd(env.django_dir):
             run('make cleanpyc init collectstatic')
+            run('celery purge -A "celeryapp.app" -f')
+
 
     # TODO: reload nginx
     # TODO: reload uwsgi
