@@ -5,8 +5,8 @@ from django.views.generic.edit import CreateView, UpdateView
 from django_tables2 import SingleTableView
 
 from .models import Way, TrackedWay
-from .forms import WayCreateForm, TrackedWayCreateForm, \
-                   WayDetailForm, TrackedWayDetailForm
+from track.forms import WayCreateForm, TrackedWayCreateForm, \
+                        WayDetailForm, TrackedWayDetailForm
 from .tables import WayTable, TrackedWayTable
 
 
@@ -15,7 +15,7 @@ class WayCreateView(CreateView):
     template_name = 'track/way_create.html'
 
     def get_success_url(self):
-        return reverse('way_list')
+        return reverse('way-list')
 
 
 class TrackedWayCreateView(CreateView):
@@ -23,7 +23,7 @@ class TrackedWayCreateView(CreateView):
     template_name = 'track/trackedway_create.html'
 
     def get_success_url(self):
-        return reverse('track_list')
+        return reverse('trackedway-list')
 
 
 class WayDetailView(UpdateView):

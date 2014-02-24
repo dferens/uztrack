@@ -12,7 +12,7 @@ class WayTable(Table):
         attrs = {'class': 'table table-striped table-bordered table-hover'}
         fields = ('id', 'station_from', 'station_to')
 
-    detail_url = columns.LinkColumn('way_detail', kwargs={'pk': A('id')})
+    detail_url = columns.LinkColumn('way-detail', kwargs={'pk': A('id')})
 
 
 
@@ -22,6 +22,6 @@ class TrackedWayTable(Table):
         attrs = {'class': 'table table-striped table-bordered table-hover'}
         exclude = ('id',)
 
-    way = columns.LinkColumn('way_detail', kwargs={'pk': A('way.pk')})
+    way = columns.LinkColumn('way-detail', kwargs={'pk': A('way.pk')})
     days = columns.TemplateColumn(template_name='blocks/bitfield.html')
-    detail = core_columns.FixedLinkColumn('track_detail', kwargs={'pk': A('pk')}, text='See tickets')
+    detail = core_columns.FixedLinkColumn('trackedway-detail', kwargs={'pk': A('pk')}, text='See tickets')

@@ -1,6 +1,5 @@
-from datetime import date
-
 from django.conf import settings
+from django.utils import timezone
 
 from .models import TrackedWayDayHistory as History, \
                     TrackedWayDayHistorySnapshot as Snapshot
@@ -11,8 +10,7 @@ def get_closest_histories(tracked_way):
     Returns collection of closest :class:`History` objects for a given way.
     Creates new records if needed.
     """
-    till_date = date.today() + settings.TICKETS_SEARCH_RANGE
-    closest_dates = tracked_way.next_dates(till_date)
+    closest_dates = tracked_way.next_dates(get_search_till_date())
     found_histories = History.objects.filter(departure_date__in=closest_dates)
     found_dates = found_histories.values_list('departure_date', flat=True)
     not_found_dates = filter(lambda d: d not in found_dates, closest_dates)
@@ -35,3 +33,7 @@ def create_snapshot(history, stations_routes):
     return Snapshot.objects.create(history=history,
                                    total_places_count=stations_routes.seats_count,
                                    snapshot_data=stations_routes._raw)
+
+def get_search_till_date():
+    today = timezone.datetime.today().date()
+    return today + settings.TICKETS_SEARCH_RANGE

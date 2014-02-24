@@ -1,5 +1,6 @@
 import operator
 from functools import partial
+from itertools import izip
 
 from django import forms
 
@@ -7,11 +8,11 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 
 from core.uzgovua.api import Api
-from core.forms import SubmitForm
+from core.forms import SubmitFormMixin
 from .models import Way, TrackedWay
 
 
-class WayCreateForm(SubmitForm):
+class WayCreateForm(SubmitFormMixin, forms.ModelForm):
     class Meta:
         model = Way
 
@@ -19,30 +20,29 @@ class WayCreateForm(SubmitForm):
         super(WayCreateForm, self).__init__(*args, **kwargs)
         self.fields['station_id_from'].widget = forms.HiddenInput()
         self.fields['station_id_to'].widget = forms.HiddenInput()
+        for key in self.fields:
+            self.fields[key].required = True
 
-    def clean(self):
+    def _clean_station_attr(self, name_attr, id_attr):
         api = Api()
-        del self.errors['station_id_from']
-        del self.errors['station_id_to']
+        station_name = self.cleaned_data[name_attr]
+        station_id = api.get_station_id(station_name)
 
-        cleaned_data = self.cleaned_data
-        station_from = cleaned_data['station_from']
-        station_to = cleaned_data['station_to']
-        station_id_from = api.get_station_id(station_from)
-        station_id_to = api.get_station_id(station_to)
+        if station_id is None:
+            raise forms.ValidationError('Station "%s" does not exist' % station_name)
 
-        if station_id_from is None:
-            raise forms.ValidationError('Station "%s" does not exists' % station_from)
-        
-        if station_id_to is None:
-            raise forms.ValidationError('Station "%s" does not exists' % station_to)
+        del self.errors[id_attr]
+        self.cleaned_data[id_attr] = station_id
+        return station_name
 
-        cleaned_data['station_id_from'] = station_id_from
-        cleaned_data['station_id_to'] = station_id_to
-        return cleaned_data
+    def clean_station_from(self):
+        return self._clean_station_attr('station_from', 'station_id_from')
+
+    def clean_station_to(self):
+        return self._clean_station_attr('station_to', 'station_id_to')
 
 
-class TrackedWayCreateForm(SubmitForm):
+class TrackedWayCreateForm(SubmitFormMixin, forms.ModelForm):
     class Meta:
         model = TrackedWay
 

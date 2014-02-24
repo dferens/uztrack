@@ -1,11 +1,12 @@
-import datetime
 import operator
 from dateutil import rrule
+from datetime import time
 
 from django.db import models
 from django.dispatch import Signal
 from django.contrib import admin
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 from bitfield import BitField
 from jsonfield import JSONField
@@ -35,7 +36,7 @@ class TrackedWay(models.Model):
     """
     way = models.ForeignKey(Way)
     days = BitField(flags=utils.WEEKDAYS)
-    start_time = models.TimeField(default=lambda: datetime.time(0, 0))
+    start_time = models.TimeField(default=time(0, 0))
 
     def __unicode__(self):
         days = ', '.join(self.selected_weekdays)
@@ -49,13 +50,10 @@ class TrackedWay(models.Model):
         :param till: :class:`datetime.date` object, specified upper limit
         :return: list of :class:`datetime.date` objects
         """
-        starts_from = datetime.datetime.now()
+        starts_from = timezone.now()
         dateutil_weekdays = map(utils.get_dateutil_weekday, self.selected_weekdays)
         rule = rrule.rrule(rrule.WEEKLY, byweekday=dateutil_weekdays, until=till)
-        dates = [x.date() for x in rule]
-        if starts_from in dates:
-            dates.remove(starts_from.date())
-        return dates
+        return [x.date() for x in rule]
 
     @property
     def selected_weekdays(self):
@@ -66,11 +64,11 @@ class TrackedWay(models.Model):
         """
         return (wday for wday, is_set in self.days if is_set)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         import poller.queries
         
         created = self.pk is None
-        super(TrackedWay, self).save()
+        super(TrackedWay, self).save(*args, **kwargs)
         if created: poller.queries.poll_tracked_way(self)
 
 

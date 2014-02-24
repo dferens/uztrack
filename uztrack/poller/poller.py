@@ -3,6 +3,7 @@ from datetime import time
 import logging
 import random
 
+from django.conf import settings
 from django.utils import timezone
 
 from celeryapp import app
@@ -18,6 +19,9 @@ def poll(history, api):
     Makes api call for a given history and saves results within
     :class:`events.models.TrackedWayDayHistory` snapshot.
     """
+    if settings.POLLER_DRY_RUN:
+        logger.debug('poller is disabled')
+
     stations_routes = api.get_stations_routes(history)    
     return queries.create_snapshot(history, stations_routes)
 
