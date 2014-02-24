@@ -103,7 +103,7 @@ class RawApi(object):
         departure_start_time = kwargs.get('departure_start_time', departure_start_time)
 
         if token is None:
-            raise APIException('Token is required')
+            raise ApiException('Token is required')
 
         data = {
             'station_id_from': station_id_from,

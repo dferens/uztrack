@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 
 from django.utils import timezone
@@ -5,11 +6,22 @@ from django.utils import timezone
 from core.utils import DotDict
 
 from . import raw, data
+from .exceptions import ApiException, BannedApiException
 
 
 class Api(object):
 
     _raw_api = raw.RawApi()
+
+    def _check_for_errors(self, json_data):
+        if json_data['error']:
+            message = json_data['value']
+            if message.startswith(u'Перевищено кількість запитів'):
+                ExceptionClass = BannedApiException
+            else:
+                ExceptionClass = ApiException
+
+            raise ExceptionClass(message)
 
     def get_station_id(self, station_name):
         """
@@ -40,6 +52,7 @@ class Api(object):
                 way_history.departure_date, tracked_way.start_time)
 
         json_data = self._raw_api.get_stations_routes(*args, token=token)
+        self._check_for_errors(json_data)
         return data.StationsRoutes._parse(json_data)
 
 
@@ -51,15 +64,32 @@ class SmartApi(Api):
         self._token = None
         self._token_guessed_die = timezone.now()
 
+    def _refresh_token(self, now=None):
+        self._token = raw.Token()
+        now = timezone.now() if now is None else now
+        self._token_guessed_die = now + self._token_ttl
+
     @property
     def token(self):
         now = timezone.now()
-        if now  > self._token_guessed_die:
-            self._token = raw.Token()
-            self._token_guessed_die = now + self._token_ttl
+        if now > self._token_guessed_die:
+            self._refresh_token(now)
 
         return self._token
 
     def get_stations_routes(self, way_history):
         super_method = super(SmartApi, self).get_stations_routes
-        return super_method(way_history, token=self.token)
+        try:
+            first_try = super_method(way_history, token=self.token)
+        except BannedApiException, e:
+            self._refresh_token()
+            try:
+                second_try = super_method(way_history, token=self.token)
+            except BannedApiException, e:
+                logger.error('could not pass site protection, '
+                             'banned for %s minutes', e.banned_for)
+            else:
+                logger.info('passed site protection')
+                return second_try
+        else:
+            return first_try
