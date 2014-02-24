@@ -149,6 +149,7 @@ class CrispyForms(object):
 class OwnApps(object):
     def TICKETS_SEARCH_RANGE(self): return timedelta(days=45)
 
+    def POLLER_DRY_RUN(self): return False
     def POLLER_WARMUP(self): return timedelta(minutes=5)
     def POLLER_AUTOSTART(self): return True
     def POLLER_AUTOSTART_NEW(self): return True
