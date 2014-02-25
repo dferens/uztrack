@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.utils import timezone
 
@@ -12,7 +14,7 @@ from . import poller
 
 
 api = SmartApi()
-logger = get_task_logger(__name__)
+logger = logging.getLogger('celery')
 
 
 @app.task
@@ -30,6 +32,7 @@ def poll_history(history_id):
         logger.error('Connection error')
         next_poll_eta = execution_time + settings.POLLER_CONNECTION_ERROR_RETRY
         logger.info(u'planned next poll for %s on %s' % (history_id, next_poll_eta))
+        poll_history.apply_async(args=(history_id,), eta=next_poll_eta)
     except Exception, e:
         logger.exception(e)
     else:

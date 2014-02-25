@@ -170,7 +170,7 @@ class REST_FRAMEWORK(object):
 class Logging(object):
     def LOGGING(self): return {
         'version': 1,
-        'disable_existing_loggers': False,
+        'disable_existing_loggers': True,
         'formatters': {
             'verbose': {
                 'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
@@ -196,8 +196,15 @@ class Logging(object):
             'console': {
                 'level': 'DEBUG',
                 'class': 'logging.StreamHandler',
-                'formatter': 'simple'
-            }
+                'formatter': 'verbose'
+            },
+            'celery': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'filename': 'celery.log',
+                'formatter': 'simple',
+                'maxBytes': 1024 * 1024 * 100,  # 100 mb
+            },
         },
         'loggers': {
             'django.request': {
@@ -207,6 +214,10 @@ class Logging(object):
             },
             'poller.poller': {
                 'handlers': ['console', 'mail_admins'],
+                'level': 'INFO',
+            },
+            'celery': {
+                'handlers': ['celery'],
                 'level': 'INFO',
             },
         }
