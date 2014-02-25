@@ -6,7 +6,7 @@ from django.utils import timezone
 class ApiException(Exception):
 
     def __init__(self, message):
-        pass
+        super(ApiException, self).__init__(message)
 
 
 class BannedApiException(ApiException):

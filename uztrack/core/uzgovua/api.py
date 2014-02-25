@@ -16,8 +16,13 @@ class Api(object):
     def _check_for_errors(self, json_data):
         if json_data['error']:
             message = json_data['value']
+            # Too many requests
             if message.startswith(u'Перевищено кількість запитів'):
                 ExceptionClass = BannedApiException
+            # Nothing found
+            elif message.startswith(u'За заданими Вами значенням нічого не знайдено'):
+                return
+            # Unexpected error
             else:
                 ExceptionClass = ApiException
 
