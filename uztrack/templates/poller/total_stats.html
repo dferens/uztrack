@@ -5,9 +5,7 @@
 {% block content %}
 <div class="row">
   <div class="col-md-10">
-    <p>Total snapshots count: {{ snapshots_count }}</p>
-    <p>Relevance: {{ relevance }}</p>
-    <table class="table table-stripped table-bordered table-hover">
+    <table class="table table-striped table-bordered table-hover">
       <thead>
         <tr>
           <td>Tracked way</td>
@@ -15,11 +13,16 @@
           <td>Relevance</td>
         </tr>
       </thead>
+      <tr class="warning">
+        <td>All ways</td>
+        <td>{{ snapshots_count }}</td>
+        <td>{{ relevance|timesince }}</td>
+      </tr>
       {% for tracked_way_stats in tracked_ways %}
       <tr>
         <td>{{ tracked_way_stats.tracked_way }}</td>
         <td>{{ tracked_way_stats.snapshots_count }}</td>
-        <td>{{ tracked_way_stats.relevance }}</td>
+        <td>{{ tracked_way_stats.relevance|timesince }}</td>
       </tr>
       {% endfor %}
     </table>
