@@ -22,6 +22,9 @@ class Api(object):
             # Nothing found
             elif message.startswith(u'За заданими Вами значенням нічого не знайдено'):
                 return
+            # Service is temporarily unavailable
+            elif message.startswith(u'Сервіс тимчасово недоступний'):
+                return
             # Unexpected error
             else:
                 ExceptionClass = ApiException
