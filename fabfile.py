@@ -19,7 +19,7 @@ def deploy(target='master'):
             run('git pull')
     else:
         with cd(env.project_base_dir):
-            run('git clone %(project_git)s' % env)
+            run('git clone %(project_git)s www' % env)
 
     with cd(env.project_dir):
         run('git checkout %s' % target)

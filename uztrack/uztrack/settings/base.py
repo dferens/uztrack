@@ -11,7 +11,7 @@ class Pathes(Settings):
     def DJANGO_ROOT(self):  return dirname(dirname(dirname(abspath(__file__))))
     # Absolute filesystem path to the top-level project folder:
     def SITE_ROOT(self): return dirname(self.DJANGO_ROOT())
-    def SITE_NAME(self): return basename(self.SITE_ROOT())
+    def SITE_NAME(self): return basename(self.DJANGO_ROOT())
 
 # Add our project to our pythonpath, this way we don't need to type our project
 # name in our dotted import paths:
