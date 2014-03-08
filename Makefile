@@ -19,7 +19,6 @@ testcover:
 	coverage report
 
 collectstatic:
-	rm -rf assets/
 	$(MANAGE) collectstatic --noinput
 
 run:
