@@ -7,7 +7,7 @@ env.hosts = ['swinemaker.org:22712']
 env.user = 'dmytro'
 env.project_name = os.path.split(os.path.dirname(__file__))[1]
 env.project_base_dir = '/srv/uztrack'
-env.project_dir = os.path.join(env.project_base_dir, 'www/')
+env.project_dir = os.path.join(env.project_base_dir, env.project_name)
 env.django_dir = os.path.join(env.project_dir, env.project_name)
 env.project_git = 'git://github.com/dferens/%(project_name)s.git' % env
 env.virtualenv_name = 'venv'
@@ -19,7 +19,7 @@ def deploy(target='master'):
             run('git pull')
     else:
         with cd(env.project_base_dir):
-            run('git clone %(project_git)s www' % env)
+            run('git clone %(project_git)s' % env)
 
     with cd(env.project_dir):
         run('git checkout %s' % target)
