@@ -10,8 +10,8 @@ class Pathes(Settings):
     # Absolute filesystem path to the Django project directory:
     def DJANGO_ROOT(self):  return dirname(dirname(dirname(abspath(__file__))))
     # Absolute filesystem path to the top-level project folder:
-    def SITE_ROOT(self): return self.DJANGO_ROOT()
-    def SITE_NAME(self): return basename(self.DJANGO_ROOT())
+    def SITE_ROOT(self): return dirname(self.DJANGO_ROOT())
+    def SITE_NAME(self): return basename(self.SITE_ROOT())
 
 # Add our project to our pythonpath, this way we don't need to type our project
 # name in our dotted import paths:
@@ -57,7 +57,7 @@ class Static(Settings):
     def STATIC_ROOT(self): return normpath(join(SITE_ROOT, 'assets'))
     def STATIC_URL(self): return '/static/'
     def STATICFILES_DIRS(self): return (
-        normpath(join(SITE_ROOT, 'static')),
+        normpath(join(DJANGO_ROOT, 'static')),
     )
     def STATICFILES_FINDERS(self): return (
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
@@ -66,7 +66,7 @@ class Static(Settings):
 
 class Fixtures(Settings):
     def FIXTURE_DIRS(self): return (
-        normpath(join(SITE_ROOT, 'fixtures')),
+        normpath(join(DJANGO_ROOT, 'fixtures')),
     )
 
 class Templates(Settings):
@@ -85,7 +85,7 @@ class Templates(Settings):
         'django.template.loaders.app_directories.Loader',
     )
     def TEMPLATE_DIRS(self): return (
-        normpath(join(SITE_ROOT, 'templates')),
+        normpath(join(DJANGO_ROOT, 'templates')),
     )
 
 class Routing(Settings):

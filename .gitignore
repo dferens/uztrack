@@ -28,4 +28,4 @@ build
 coverage_html/
 
 # Project files
-uztrack/assets/
+assets/
