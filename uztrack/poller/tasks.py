@@ -27,6 +27,7 @@ def poll_history(history_id):
     history = History.objects.get(id=history_id)
     execution_time = timezone.now()
     try:
+        logger.info('Polling %d history', history_id)
         snapshot = poller.poll(history, api)
     except ConnectionError, e:
         logger.error('Connection error')
@@ -34,6 +35,8 @@ def poll_history(history_id):
         logger.info(u'planned next poll for %s on %s' % (history_id, next_poll_eta))
         poll_history.apply_async(args=(history_id,), eta=next_poll_eta)
     except Exception, e:
+        logger.warning('Exception occured during poll task execution:'
+                       'History id: %d', history_id)
         logger.exception(e)
     else:
         next_poll_eta = poller.calc_next_eta(snapshot, history)

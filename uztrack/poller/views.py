@@ -1,6 +1,9 @@
+from datetime import datetime
+
 from django.views.generic import TemplateView
 from django.utils import timezone
 
+from .utils import total_seconds
 from track.models import TrackedWay, \
                          TrackedWayDayHistorySnapshot as Snapshot 
 

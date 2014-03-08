@@ -24,10 +24,10 @@ def poll_tracked_way(tracked_way, celery_scheduled_polls=None):
 
         for history in queries.get_closest_histories(tracked_way):
             total_polls += 1
-            if celery_scheduled_polls:
-                if celery_scheduled_polls.get(history.id) is not None:
-                    logger.debug('- skipping poll for %s', history.id)
-                    continue
+            if celery_scheduled_polls and \
+               celery_scheduled_polls.get(history.id) is not None:
+                logger.debug('- skipping poll for %s', history.id)
+                continue
 
             starter_eta = poller.calc_random_eta(start, stop)
             logger.debug('- planned start to poll %s on %s', history.id, starter_eta)

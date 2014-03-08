@@ -21,9 +21,9 @@ def poll(history, api):
     """
     if settings.POLLER_DRY_RUN:
         logger.debug('poller is disabled')
-
-    stations_routes = api.get_stations_routes(history)    
-    return queries.create_snapshot(history, stations_routes)
+    else:
+        stations_routes = api.get_stations_routes(history)    
+        return queries.create_snapshot(history, stations_routes)
 
 
 def calc_next_eta(snapshot, history):
@@ -47,8 +47,10 @@ def calc_random_eta(start, stop):
 
 def calc_stop_eta(history):
     """
-    Returns last suitable poll time for a given :class:`TrackedWayDayHistory`
-    instance.
+    Returns last suitable poll time for a given history.
+    
+    :type history: :class:`TrackedWayDayHistory`
+    :rtype: :class:`timezone.datetime`
     """
     stop_date = history.departure_date + timezone.timedelta(days=1)
     stop_eta_naive = timezone.datetime.combine(stop_date, time(0, 0))
@@ -56,9 +58,11 @@ def calc_stop_eta(history):
 
 
 def get_scheduled_polls():
-    inspect = app.control.inspect()
+    """
+    :rtype: :class:`dict`
+    """
     result = dict()
-    data = inspect.scheduled()
+    data = app.control.inspect().scheduled()
     if data is None: return
     else:
         for task in data.values()[0]:
