@@ -3,11 +3,10 @@ from datetime import timedelta
 from sys import path
 from os.path import abspath, basename, dirname, join, normpath
 
-from core.utils.settings import settings
+from classsettings import Settings, Config, from_env
 
 
-@settings
-class Pathes(object):
+class Pathes(Settings):
     # Absolute filesystem path to the Django project directory:
     def DJANGO_ROOT(self):  return dirname(dirname(dirname(abspath(__file__))))
     # Absolute filesystem path to the top-level project folder:
@@ -18,20 +17,18 @@ class Pathes(object):
 # name in our dotted import paths:
 path.append(DJANGO_ROOT)
 
-@settings
-class Administration(object):
+class Administration(Settings):
     def ADMINS(self): return (
         ('Your Name', 'your_email@example.com'),
     )
     def ALLOWED_HOSTS(self): return []
     def DEBUG(self): return False
-    def MANAGERS(self): return self.ADMINS
+    def MANAGERS(self): return self.ADMINS()
     def SECRET_KEY(self): return "gj_(9d1j(@8bm3lm&b!0c4vkuw2(@3@(3r6d!8m1=48h7"
-    def TEMPLATE_DEBUG(self): return self.DEBUG
+    def TEMPLATE_DEBUG(self): return self.DEBUG()
     def WSGI_APPLICATION(self): return '%s.wsgi.application' % SITE_NAME
 
-@settings
-class Databases(object):
+class Databases(Settings):
     def DATABASES(self): return {
         'default': {
             'ENGINE': 'django.db.backends.',
@@ -44,8 +41,7 @@ class Databases(object):
     }
     def AUTH_USER_MODEL(self): return 'accounts.Profile'
 
-@settings
-class TimeLang(object):
+class TimeLang(Settings):
     def TIME_ZONE(self): return 'Europe/Kiev'
     def LANGUAGE_CODE(self): return 'en-us'
     def SITE_ID(self): return 1
@@ -53,13 +49,11 @@ class TimeLang(object):
     def USE_L10N(self): return True
     def USE_TZ(self): return True
 
-@settings
-class Media(object):
+class Media(Settings):
     def MEDIA_ROOT(self): return normpath(join(SITE_ROOT, 'media'))
     def MEDIA_URL(self): return '/media/'
 
-@settings
-class Static(object):
+class Static(Settings):
     def STATIC_ROOT(self): return normpath(join(SITE_ROOT, 'assets'))
     def STATIC_URL(self): return '/static/'
     def STATICFILES_DIRS(self): return (
@@ -70,14 +64,12 @@ class Static(object):
         'django.contrib.staticfiles.finders.FileSystemFinder',
     )
 
-@settings
-class Fixtures(object):
+class Fixtures(Settings):
     def FIXTURE_DIRS(self): return (
         normpath(join(SITE_ROOT, 'fixtures')),
     )
 
-@settings
-class Templates(object):
+class Templates(Settings):
     def TEMPLATE_CONTEXT_PROCESSORS(self): return (
         'django.contrib.auth.context_processors.auth',
         'django.core.context_processors.debug',
@@ -96,8 +88,7 @@ class Templates(object):
         normpath(join(SITE_ROOT, 'templates')),
     )
 
-@settings
-class Routing(object):
+class Routing(Settings):
     def ROOT_URLCONF(self): return '%s.urls' % SITE_NAME
     def MIDDLEWARE_CLASSES(self): return (
         # Default Django middleware.
@@ -109,8 +100,7 @@ class Routing(object):
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     )
 
-@settings
-class Apps(object):
+class Apps(Settings):
     def DJANGO_APPS(self): return (
         # Default Django apps:
         'django.contrib.auth',
@@ -141,33 +131,27 @@ class Apps(object):
     def INSTALLED_APPS(self):
         return self.DJANGO_APPS() + self.THIRD_PARTY_APPS() + self.OWN_APPS()
 
-@settings
-class CrispyForms(object):
+class CrispyForms(Settings):
     def CRISPY_TEMPLATE_PACK(self): return 'bootstrap3'
 
-@settings
-class OwnApps(object):
+class OwnApps(Settings):
     def TICKETS_SEARCH_RANGE(self): return timedelta(days=45)
-
     def POLLER_DRY_RUN(self): return False
     def POLLER_WARMUP(self): return timedelta(minutes=5)
     def POLLER_AUTOSTART(self): return True
     def POLLER_AUTOSTART_NEW(self): return True
     def POLLER_CONNECTION_ERROR_RETRY(self): return timedelta(minutes=5)
 
-@settings
-class Celery(object):
+class Celery(Settings):
     def CELERY_TIMEZONE(self): return 'Europe/Kiev'
     def CELERY_ENABLE_UTC(self): return True
 
-@settings(to_dict=True)
-class REST_FRAMEWORK(object):
+class REST_FRAMEWORK(Config):
     def DEFAULT_FILTER_BACKENDS(self): return (
         'rest_framework.filters.DjangoFilterBackend',
     )
 
-@settings
-class Logging(object):
+class Logging(Settings):
     def LOGGING(self): return {
         'version': 1,
         'disable_existing_loggers': True,

@@ -1,8 +1,9 @@
-from .base import *
-from core.utils.settings import settings
+from classsettings import Settings, Config
 
-@settings(to_dict=True)
-class DATABASES(object):
+from .base import *
+
+
+class DATABASES(Config):
     def default(self): return {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": ":memory:",
@@ -12,17 +13,14 @@ class DATABASES(object):
         "PORT": "",
     }
 
-@settings
-class OwnApps(object):
+class OwnApps(Settings):
     def POLLER_DRY_RUN(self): return True
     def POLLER_AUTOSTART(self): return False
     def POLLER_AUTOSTART_NEW(self): return False
 
-
-@settings
 class Logging(Logging):
     def LOGGING(self):
-        result = Logging.LOGGING(self)
+        result = super(type(self), self).LOGGING()
         for logger in result['loggers']:
             result['loggers'][logger]['level'] = 'ERROR'
 
