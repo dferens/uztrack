@@ -54,7 +54,7 @@ class Media(Settings):
     def MEDIA_URL(self): return '/media/'
 
 class Static(Settings):
-    def STATIC_ROOT(self): return normpath(join(SITE_ROOT, 'assets'))
+    def STATIC_ROOT(self): return normpath(join(SITE_ROOT, 'static'))
     def STATIC_URL(self): return '/static/'
     def STATICFILES_DIRS(self): return (
         normpath(join(DJANGO_ROOT, 'static')),
@@ -185,7 +185,7 @@ class Logging(Settings):
             'celery': {
                 'level': 'DEBUG',
                 'class': 'logging.handlers.RotatingFileHandler',
-                'filename': 'celery.log',
+                'filename': '%s/log/celery.log' % SITE_ROOT,
                 'formatter': 'simple',
                 'maxBytes': 1024 * 1024 * 100,  # 100 mb
             },
