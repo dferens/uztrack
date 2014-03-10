@@ -1,4 +1,4 @@
-MANAGE=python uztrack/manage.py
+MANAGE=uztrack/manage.py
 TEST_CMD=$(MANAGE) test --pattern="test_*.py" --top-level-dir="uztrack/" uztrack
 TEST_ENV=DJANGO_SETTINGS_MODULE="uztrack.settings.test"
 
