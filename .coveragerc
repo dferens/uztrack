@@ -17,4 +17,4 @@ omit =
     uztrack/settings/production.py
 
 [html]
-directory = ../coverage_html
+directory = coverage_html
