@@ -21,14 +21,10 @@ For production::
 
     $ pip install -r requirements.txt
 
-
 Running
 =======
 
-Launch server::
+You can use foreman/honcho to run it locally::
 
-    make run
-
-Launch celery::
-
-    make celery
+    $ cp .env.default .env
+    $ foreman start

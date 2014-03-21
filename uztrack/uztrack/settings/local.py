@@ -37,6 +37,9 @@ class Apps(Apps):
             'debug_toolbar',
         )
 
+class OwnApps(Settings):
+    def POLLER_WAIT_FOR_CELERY(self): return 1
+
 class Routing(Routing):
     def MIDDLEWARE_CLASSES(self):
         return Routing.MIDDLEWARE_CLASSES(self) + (

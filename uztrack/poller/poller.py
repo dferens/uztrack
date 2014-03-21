@@ -62,6 +62,9 @@ def get_scheduled_polls():
     :rtype: :class:`dict`
     """
     result = dict()
+    if settings.POLLER_WAIT_FOR_CELERY is not False:
+        import time; time.sleep(settings.POLLER_WAIT_FOR_CELERY)
+
     data = app.control.inspect().scheduled()
     if data is None: return
     else:

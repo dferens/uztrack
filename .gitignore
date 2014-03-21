@@ -29,3 +29,6 @@ coverage_html/
 
 # Project files
 assets/
+
+# Env. vars container
+.env

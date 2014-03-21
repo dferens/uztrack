@@ -21,12 +21,6 @@ testcover:
 collectstatic:
 	$(MANAGE) collectstatic --noinput
 
-run:
-	$(MANAGE) runserver
-
-celery:
-	DJANGO_SETTINGS_MODULE="uztrack.settings.local" python celeryapp.py worker -l info
-
 shell:
 	$(MANAGE) shell
 
