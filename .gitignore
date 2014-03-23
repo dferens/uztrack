@@ -32,3 +32,6 @@ assets/
 
 # Env. vars container
 .env
+
+# Procfile
+Procfile
