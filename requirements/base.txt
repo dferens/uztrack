@@ -21,4 +21,5 @@ PyYAML==3.10
 psycopg2==2.5.2
 redis==2.8.0
 requests==2.0.0
+schematics==0.9-4
 South==0.8.1
