@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 
 from django.conf import settings
@@ -7,14 +8,13 @@ from celery.utils.log import get_task_logger
 from requests.exceptions import ConnectionError
 
 from core.uzgovua.api import SmartApi
-from core.uzgovua.exceptions import ParseException
 from celeryapp import app
 from track.models import TrackedWayDayHistory as History
 from . import poller
 
 
 api = SmartApi()
-logger = logging.getLogger('celery')
+logger = get_task_logger(__name__)
 
 
 @app.task

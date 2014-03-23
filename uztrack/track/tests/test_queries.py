@@ -3,7 +3,7 @@ from datetime import date
 from model_mommy import mommy
 
 from core.tests import TestCase
-from core.uzgovua.data import StationsRoutes
+from core.uzgovua.data import RouteTrains
 from .helpers import TrackedWayFactory
 from .. import models, queries
 
@@ -19,8 +19,7 @@ class QueriesTestCase(TestCase):
 
     def test_create_snapshot(self):
         history = mommy.make(models.TrackedWayDayHistory)
-        stations_routes = StationsRoutes()
-        stations_routes.seats_count = 0
+        stations_routes = RouteTrains()
 
         snapshot = queries.create_snapshot(history, stations_routes)
         self.assertEqual(snapshot.history, history)

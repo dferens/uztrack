@@ -183,13 +183,6 @@ class Logging(Settings):
                 'class': 'logging.StreamHandler',
                 'formatter': 'verbose'
             },
-            'celery': {
-                'level': 'DEBUG',
-                'class': 'logging.handlers.RotatingFileHandler',
-                'filename': '%s/log/celery.log' % SITE_ROOT,
-                'formatter': 'simple',
-                'maxBytes': 1024 * 1024 * 100,  # 100 mb
-            },
         },
         'loggers': {
             'django.request': {
@@ -197,13 +190,9 @@ class Logging(Settings):
                 'level': 'ERROR',
                 'propagate': True,
             },
-            'poller.poller': {
+            'poller': {
                 'handlers': ['console', 'mail_admins'],
                 'level': 'INFO',
-            },
-            'celery': {
-                'handlers': ['celery'],
-                'level': 'INFO',
-            },
+            }
         }
     }

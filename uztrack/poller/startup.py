@@ -1,3 +1,4 @@
+import logging
 import functools
 
 from django.conf import settings
@@ -8,7 +9,7 @@ from track.models import TrackedWay
 from . import poller, queries
 
 
-logger = poller.logger
+logger = logging.getLogger('poller')
 
 
 def run():

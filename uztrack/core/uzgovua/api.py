@@ -30,6 +30,8 @@ class Api(object):
                 ExceptionClass = ApiException
 
             raise ExceptionClass(message)
+        else:
+            return data.StationsRoutes._parse(json_data)
 
     def get_station_id(self, station_name):
         """
@@ -60,8 +62,7 @@ class Api(object):
                 way_history.departure_date, tracked_way.start_time)
 
         json_data = self._raw_api.get_stations_routes(*args, token=token)
-        self._check_for_errors(json_data)
-        return data.StationsRoutes._parse(json_data)
+        return self._check_for_errors(json_data)
 
 
 class SmartApi(Api):
