@@ -1,7 +1,7 @@
 [run]
 branch = True
 data_file = .coverage_data
-source = ./
+source = uztrack/
 
 [report]
 exclude_lines =
@@ -13,8 +13,8 @@ omit =
     */migrations/*.py
     fabfile.py
     celeryapp.py
-    uztrack/settings/local.py
-    uztrack/settings/production.py
+    uztrack/uztrack/settings/local.py
+    uztrack/uztrack/settings/production.py
 
 [html]
 directory = coverage_html

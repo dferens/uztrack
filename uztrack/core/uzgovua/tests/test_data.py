@@ -73,3 +73,8 @@ class RouteTrainsTestCase(TestCase):
         self.assertEqual(self.data[0][0].name, u'С1')
         self.assertEqual(self.data[0][0].seats_count, 1)
         self.assertEqual(self.data[0][1].seats_count, 246)
+        
+        for train in self.data:
+            self.assertIsInstance(train, data.RouteTrain)
+            for seats in train:
+                self.assertIsInstance(seats, data.SeatsData)

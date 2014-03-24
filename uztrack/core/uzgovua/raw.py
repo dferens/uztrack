@@ -1,5 +1,6 @@
 import re
 import datetime
+import functools
 from urlparse import urljoin
 
 import requests
@@ -82,6 +83,17 @@ class Token(object):
         return request_method(*args, **kwargs)
 
 
+def requires_token(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if not isinstance(kwargs.get('token'), Token):
+            raise exceptions.TokenRequiredException()
+        else:
+            return func(*args, **kwargs)
+
+    return wrapper
+
+
 class RawApi(object):
 
     _URLS = {
@@ -89,22 +101,15 @@ class RawApi(object):
         'search_routes': urljoin(HOST_URL, 'purchase/search/'),
     }
 
+    @requires_token
     def get_stations_routes(self, station_id_from, station_id_to,
-                            departure_date, departure_start_time, token=None, **kwargs):
+                            departure_date, departure_start_time, token=None):
         """
         :type station_id_from: int
         :type station_id_to: int
         :type departure_date: date | datetime
         :type departure_start_time: time | datetime
         """
-        station_id_from = kwargs.get('station_id_from', station_id_from)
-        station_id_to = kwargs.get('station_id_to', station_id_to)
-        departure_date = kwargs.get('departure_date', departure_date)
-        departure_start_time = kwargs.get('departure_start_time', departure_start_time)
-
-        if token is None:
-            raise exceptions.TokenRequiredException()
-
         data = {
             'station_id_from': station_id_from,
             'station_id_till': station_id_to,
