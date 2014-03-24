@@ -9,7 +9,13 @@ from .helpers import TrackedWayFactory, tracked_way_days_generator
 from .. models import Way, TrackedWay
 
 
-class WayTestCase(TestCase):
+class AuthorizedTestCase(TestCase):
+
+    def setUp(self):
+        super(AuthorizedTestCase, self).setUp()
+        self.auth('testuser', 'password')
+
+class WayTestCase(AuthorizedTestCase):
 
     def test_list(self):
         way = mommy.make(Way, station_from='Station from', station_to='Station to')
@@ -39,7 +45,7 @@ class WayTestCase(TestCase):
         self.assertContains(resp, way.station_to)
 
 
-class TrackedWayTestCase(TestCase):
+class TrackedWayTestCase(AuthorizedTestCase):
 
     def test_list(self):
         tracked_way = TrackedWayFactory()

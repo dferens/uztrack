@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 
 from django_tables2 import SingleTableView
+from braces.views import LoginRequiredMixin
 
 from .models import Way, TrackedWay
 from track.forms import WayCreateForm, TrackedWayCreateForm, \
@@ -10,7 +11,7 @@ from track.forms import WayCreateForm, TrackedWayCreateForm, \
 from .tables import WayTable, TrackedWayTable
 
 
-class WayCreateView(CreateView):
+class WayCreateView(LoginRequiredMixin, CreateView):
     form_class = WayCreateForm
     template_name = 'track/way_create.html'
 
@@ -18,7 +19,7 @@ class WayCreateView(CreateView):
         return reverse('way-list')
 
 
-class TrackedWayCreateView(CreateView):
+class TrackedWayCreateView(LoginRequiredMixin, CreateView):
     form_class = TrackedWayCreateForm
     template_name = 'track/trackedway_create.html'
 
@@ -26,17 +27,17 @@ class TrackedWayCreateView(CreateView):
         return reverse('trackedway-list')
 
 
-class WayDetailView(UpdateView):
+class WayDetailView(LoginRequiredMixin, UpdateView):
     model = Way
     form_class = WayDetailForm
 
 
-class TrackedWayEditView(UpdateView):
+class TrackedWayEditView(LoginRequiredMixin, UpdateView):
     model = TrackedWay
     form_class = TrackedWayDetailForm
 
 
-class TrackedWayDetailView(DetailView):
+class TrackedWayDetailView(LoginRequiredMixin, DetailView):
     model = TrackedWay
     template_name = 'track/trackedway_detail.html'
     context_object_name = 'tracked_way'
@@ -46,11 +47,11 @@ class TrackedWayDetailView(DetailView):
         return context
 
 
-class WayListView(SingleTableView):
+class WayListView(LoginRequiredMixin, SingleTableView):
     model = Way
     table_class = WayTable
 
 
-class TrackedWayListView(SingleTableView):
+class TrackedWayListView(SingleTableView, LoginRequiredMixin):
     model = TrackedWay
     table_class = TrackedWayTable
