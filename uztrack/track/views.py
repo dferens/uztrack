@@ -52,6 +52,6 @@ class WayListView(LoginRequiredMixin, SingleTableView):
     table_class = WayTable
 
 
-class TrackedWayListView(SingleTableView, LoginRequiredMixin):
+class TrackedWayListView(LoginRequiredMixin, SingleTableView):
     model = TrackedWay
     table_class = TrackedWayTable

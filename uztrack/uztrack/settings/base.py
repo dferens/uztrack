@@ -89,6 +89,7 @@ class Templates(Settings):
     )
 
 class Routing(Settings):
+    def LOGIN_URL(self): return '/admin/'
     def ROOT_URLCONF(self): return '%s.urls' % SITE_NAME
     def MIDDLEWARE_CLASSES(self): return (
         # Default Django middleware.
