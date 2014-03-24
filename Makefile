@@ -1,6 +1,7 @@
-MANAGE=uztrack/manage.py
-TEST_CMD=$(MANAGE) test --pattern="test_*.py" --top-level-dir="uztrack/" uztrack
-TEST_ENV=DJANGO_SETTINGS_MODULE="uztrack.settings.test"
+HONCHO=honcho run
+TEST_HONCHO=honcho -e .env.test run
+MANAGE=$(HONCHO) uztrack/manage.py
+TEST_CMD=uztrack/manage.py test --pattern="test_*.py" --top-level-dir="uztrack/" uztrack
 
 cleanpyc:
 	@find . -name "*.pyc" -exec rm -rf {} \;
@@ -12,10 +13,10 @@ migrate:
 	$(MANAGE) migrate
 
 test:
-	$(TEST_ENV) $(TEST_CMD)
+	$(TEST_HONCHO) $(TEST_CMD)
 
 testcover:
-	$(TEST_ENV) coverage run $(TEST_CMD)
+	$(TEST_HONCHO) coverage run $(TEST_CMD)
 	coverage report
 
 collectstatic:
