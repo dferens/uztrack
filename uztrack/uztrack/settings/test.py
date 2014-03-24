@@ -22,6 +22,6 @@ class Logging(Logging):
     def LOGGING(self):
         result = super(type(self), self).LOGGING()
         for logger in result['loggers']:
-            result['loggers'][logger]['level'] = 'ERROR'
+            result['loggers'][logger]['level'] = 'CRITICAL'
 
         return result

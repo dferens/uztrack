@@ -193,6 +193,10 @@ class Logging(Settings):
             'poller': {
                 'handlers': ['console', 'mail_admins'],
                 'level': 'INFO',
+            },
+            'core.uzgovua': {
+                'handlers': ['console', 'mail_admins'],
+                'level': 'INFO'
             }
         }
     }
