@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import datetime
+import functools
+import logging
 
 from django.utils import timezone
 
 from core.utils import DotDict
+from . import data, exceptions, raw
 
-from . import raw, data
-from .exceptions import ApiException, BannedApiException
+
+logger = logging.getLogger(__name__)
 
 
 class Api(object):
@@ -15,23 +18,17 @@ class Api(object):
 
     def _check_for_errors(self, json_data):
         if json_data['error']:
-            message = json_data['value']
-            # Too many requests
-            if message.startswith(u'Перевищено кількість запитів'):
-                ExceptionClass = BannedApiException
-            # Nothing found
-            elif message.startswith(u'За заданими Вами значенням нічого не знайдено'):
-                return
-            # Service is temporarily unavailable
-            elif message.startswith(u'Сервіс тимчасово недоступний'):
-                return
-            # Unexpected error
-            else:
-                ExceptionClass = ApiException
+            code = json_data['value']
 
-            raise ExceptionClass(message)
-        else:
-            return data.StationsRoutes._parse(json_data)
+            if code in (u'По заданому Вами напрямку поїздів немає',
+                        u'За заданими Вами значенням нічого не знайдено'):
+                raise exceptions.NothingFoundException()
+            elif code == u'Сервіс тимчасово недоступний':
+                raise exceptions.ServiceNotAvailableException()
+            elif u'Перевищено кількість запитів' in code:
+                raise exceptions.BannedApiException(code)
+            else:
+                raise exceptions.ApiException()
 
     def get_station_id(self, station_name):
         """
@@ -62,10 +59,17 @@ class Api(object):
                 way_history.departure_date, tracked_way.start_time)
 
         json_data = self._raw_api.get_stations_routes(*args, token=token)
-        return self._check_for_errors(json_data)
+        
+        try:
+            self._check_for_errors(json_data)
+        except exceptions.NothingFoundException:
+            return data.RouteTrains()
+        else:
+            return data.RouteTrains(json_data)
 
 
 class SmartApi(Api):
+
     # Experimental
     _token_ttl = datetime.timedelta(minutes=15)
 
@@ -78,6 +82,27 @@ class SmartApi(Api):
         now = timezone.now() if now is None else now
         self._token_guessed_die = now + self._token_ttl
 
+    def __handle_ban(method):
+        @functools.wraps(method)
+        def decorated(self, *args, **kwargs):
+            try:
+                first_try = method(self, *args, **kwargs)
+            except exceptions.BannedApiException, e:
+                self._refresh_token()
+                try:
+                    second_try = method(self, *args, **kwargs)
+                except exceptions.BannedApiException, e:
+                    logger.error('could not pass site protection, '
+                             'banned for %s minutes', e.banned_for)
+                    raise e
+                else:
+                    logger.info('passed site protection')
+                    return second_try   
+            else:
+                return first_try
+
+        return decorated
+
     @property
     def token(self):
         now = timezone.now()
@@ -86,19 +111,7 @@ class SmartApi(Api):
 
         return self._token
 
+    @__handle_ban
     def get_stations_routes(self, way_history):
         super_method = super(SmartApi, self).get_stations_routes
-        try:
-            first_try = super_method(way_history, token=self.token)
-        except BannedApiException, e:
-            self._refresh_token()
-            try:
-                second_try = super_method(way_history, token=self.token)
-            except BannedApiException, e:
-                logger.error('could not pass site protection, '
-                             'banned for %s minutes', e.banned_for)
-            else:
-                logger.info('passed site protection')
-                return second_try
-        else:
-            return first_try
+        return super_method(way_history, token=self.token)

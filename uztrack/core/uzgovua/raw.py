@@ -1,10 +1,10 @@
 import re
-import requests
 import datetime
 from urlparse import urljoin
 
-from . import utils
-from .exceptions import *
+import requests
+
+from . import exceptions
 
 
 HOST_URL = 'http://booking.uz.gov.ua/'
@@ -103,13 +103,13 @@ class RawApi(object):
         departure_start_time = kwargs.get('departure_start_time', departure_start_time)
 
         if token is None:
-            raise ApiException('Token is required')
+            raise exceptions.TokenRequiredException()
 
         data = {
             'station_id_from': station_id_from,
             'station_id_till': station_id_to,
-            'date_dep': departure_date.strftime('%d.%m.%Y'),     # 05.10.2013
-            'time_dep': departure_start_time.strftime('%H:%M'),  # 12:34
+            'date_dep': departure_date.strftime('%d.%m.%Y'),
+            'time_dep': departure_start_time.strftime('%H:%M'),
         }
         response = token.patch_request(requests.post,
                                        self._URLS['search_routes'],
