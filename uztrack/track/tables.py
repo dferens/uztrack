@@ -20,7 +20,7 @@ class TrackedWayTable(Table):
     class Meta:
         model = TrackedWay
         attrs = {'class': 'table table-striped table-bordered table-hover'}
-        exclude = ('id',)
+        exclude = ('id', 'owner')
 
     way = columns.LinkColumn('way-detail', kwargs={'pk': A('way.pk')})
     days = columns.TemplateColumn(template_name='blocks/bitfield.html')

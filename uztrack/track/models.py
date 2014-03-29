@@ -4,6 +4,7 @@ from datetime import time
 
 from django.db import models
 from django.dispatch import Signal
+from django.conf import settings
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -37,6 +38,7 @@ class TrackedWay(models.Model):
     way = models.ForeignKey(Way)
     days = BitField(flags=utils.WEEKDAYS)
     start_time = models.TimeField(default=time(0, 0))
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     def __unicode__(self):
         days = ', '.join(self.selected_weekdays)

@@ -45,6 +45,7 @@ class WayCreateForm(SubmitFormMixin, forms.ModelForm):
 class TrackedWayCreateForm(SubmitFormMixin, forms.ModelForm):
     class Meta:
         model = TrackedWay
+        exclude = ('owner',)
 
     start_time = forms.TimeField(initial='00:00')
 

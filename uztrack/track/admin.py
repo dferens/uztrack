@@ -19,7 +19,7 @@ class TrackedWayAdmin(admin.ModelAdmin):
     list_filter = (
         ('days', BitFieldListFilter),
     )
-    list_display = ('way', 'days_list', 'start_time_24h')
+    list_display = ('way', 'owner', 'days_list', 'start_time_24h')
 
     def start_time_24h(self, obj):
         return obj.start_time.strftime('%H:%M')

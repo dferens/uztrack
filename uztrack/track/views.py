@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 
@@ -23,6 +24,12 @@ class TrackedWayCreateView(LoginRequiredMixin, CreateView):
     form_class = TrackedWayCreateForm
     template_name = 'track/trackedway_create.html'
 
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.owner = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
+
     def get_success_url(self):
         return reverse('trackedway-list')
 
@@ -41,10 +48,6 @@ class TrackedWayDetailView(LoginRequiredMixin, DetailView):
     model = TrackedWay
     template_name = 'track/trackedway_detail.html'
     context_object_name = 'tracked_way'
-
-    def get_context_data(self, **kwargs):
-        context = super(TrackedWayDetailView, self).get_context_data(**kwargs)
-        return context
 
 
 class WayListView(LoginRequiredMixin, SingleTableView):
