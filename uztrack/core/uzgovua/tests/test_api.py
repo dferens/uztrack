@@ -34,7 +34,7 @@ class ApiTestCase(TestCase):
     def test_nothing_found_2(self):
         response_data = yaml.safe_load(textwrap.dedent('''
           ---
-            value: "За заданими Вами значенням нічого не знайдено"
+            value: "За заданими Вами значенням нічого не знайдено."
             error: true
             data: null
         '''))
@@ -81,7 +81,7 @@ class ApiTestCase(TestCase):
         self.api._raw_api.get_stations_routes.return_value = response_data
         way_history = HistoryFactory()
 
-        with self.assertRaises(exceptions.ApiException):
+        with self.assertRaisesRegexp(exceptions.ApiException, r'^\?\?\?$'):
             self.api.get_stations_routes(way_history, 'token')
 
     def test_get_station_id(self):

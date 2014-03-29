@@ -25,4 +25,7 @@ collectstatic:
 shell:
 	$(MANAGE) shell
 
+run:
+	honcho start
+
 init: syncdb migrate test

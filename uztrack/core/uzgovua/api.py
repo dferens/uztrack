@@ -16,19 +16,22 @@ class Api(object):
 
     _raw_api = raw.RawApi()
 
+    NOT_FOUND = (u'По заданому Вами напрямку поїздів немає',
+                 u'За заданими Вами значенням нічого не знайдено.')
+    NOT_AVAILABLE = (u'Сервіс тимчасово недоступний',)
+    BANNED = u'Перевищено кількість запитів'
+
     def _check_for_errors(self, json_data):
         if json_data['error']:
             code = json_data['value']
-
-            if code in (u'По заданому Вами напрямку поїздів немає',
-                        u'За заданими Вами значенням нічого не знайдено'):
+            if code in self.NOT_FOUND:
                 raise exceptions.NothingFoundException()
-            elif code == u'Сервіс тимчасово недоступний':
+            elif code in self.NOT_AVAILABLE:
                 raise exceptions.ServiceNotAvailableException()
-            elif u'Перевищено кількість запитів' in code:
+            elif self.BANNED in code:
                 raise exceptions.BannedApiException(code)
             else:
-                raise exceptions.ApiException()
+                raise exceptions.ApiException(code)
 
     def get_station_id(self, station_name):
         """
