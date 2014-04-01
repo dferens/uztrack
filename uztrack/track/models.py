@@ -84,6 +84,7 @@ class TrackedWayDayHistory(models.Model):
     snapshot, when tickets were not been found for the first time.
     """
     class Meta:
+        ordering = ['-departure_date']
         verbose_name = u'tracked way history'
         verbose_name_plural = u'tracked way histories'
         unique_together = (('tracked_way', 'departure_date'))
@@ -130,7 +131,7 @@ class TrackedWayDayHistorySnapshot(models.Model):
     """
     Tickets history snapshot.
     """
-    class Meta:
+    class Meta:        
         verbose_name = u'history snapshot'
         verbose_name_plural = u'history snapshots'
         get_latest_by = 'made_on'

@@ -1,0 +1,17 @@
+{% extends 'track/base.html' %}
+
+{% block scripts %}
+  {{ block.super }}
+  <script>
+    myApp.constant('urls', {
+      histories: "{% url 'api-histories-list' %}",
+      snapshots: "{% url 'api-snapshots-list' %}",
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div>
+    {{ tracked_}}
+  </div>
+{% endblock %}

@@ -21,7 +21,8 @@ myApp.factory('api', function($http, urls) {
             var cfg = { params: { tracked_way: trackedWayId } };
             return $http.get(urls.histories, cfg).then(function(result) {
                 var validator = function(history) { return history.last_snapshot != null; }
-                return _.map(_.filter(result.data, validator), convertHistory);
+                var result =_.map(_.filter(result.data, validator), convertHistory);
+                return _.sortBy(result, function(h) { return h.date; });
             });
         },
         getSnaphots: function(dayHistoryId) {
@@ -101,9 +102,10 @@ myApp.factory('api', function($http, urls) {
             if ((histories != null) && (histories.length > 0)) {
                 var startDate = histories[0].date;
                 var lastDate = histories[_.size(histories) - 1].date;
+                var range = lastDate.getMonth() - startDate.getMonth() + 1;
                 
                 calMapConfig.start = startDate;
-                calMapConfig.range = lastDate.getMonth() - startDate.getMonth() + 1;
+                calMapConfig.range = range;
                 calMapConfig.data = _.reduce(histories, function(res, h) {
                     res[h.date.getTime() / 1000] = h.placesCount;
                     return res;

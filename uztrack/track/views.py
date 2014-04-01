@@ -1,12 +1,14 @@
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
+from django.utils import timezone
 
 from django_tables2 import SingleTableView
 from braces.views import LoginRequiredMixin
 
-from .models import Way, TrackedWay
+from .models import Way, TrackedWay, TrackedWayDayHistory
 from track.forms import WayCreateForm, TrackedWayCreateForm, \
                         WayDetailForm, TrackedWayDetailForm
 from .tables import WayTable, TrackedWayTable
@@ -58,3 +60,16 @@ class WayListView(LoginRequiredMixin, SingleTableView):
 class TrackedWayListView(LoginRequiredMixin, SingleTableView):
     model = TrackedWay
     table_class = TrackedWayTable
+
+
+class TrackedWayHistoryDetailView(LoginRequiredMixin, DetailView):
+    context_object_name = 'history'
+    date_format = '%Y-%m-%d'
+    model = TrackedWayDayHistory
+    template_name = 'track/trackedway_history_detail.html'
+
+    def get_object(self, queryset=None):
+        dt = timezone.datetime.strptime(self.kwargs['date'], self.date_format)
+        return get_object_or_404(self.model,
+                                 tracked_way_id=self.kwargs['pk'],
+                                 departure_date=dt.date())

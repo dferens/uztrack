@@ -36,6 +36,7 @@
             <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
             <div ng-if="dayHistory != null">
               {% verbatim %}
+              <a href="{{ dayHistory.date|date:'yyyy-MM-dd' }}" class="btn btn-success pull-right">Details</a>
               <p>For {{ dayHistory.date|date:"longDate" }}, Last update: {{ dayHistory.lastSnapshot.date|ago }}</p>
               {% endverbatim %}
             </div>
