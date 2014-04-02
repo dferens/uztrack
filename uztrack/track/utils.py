@@ -1,13 +1,15 @@
+from collections import OrderedDict
 from dateutil import rrule
 
 
-WEEKDAYS = ('Monday',
-            'Tuesday',
-            'Wednesday',
-            'Thursday',
-            'Friday',
-            'Saturday',
-            'Sunday')
+WEEKDAYS = OrderedDict()
+WEEKDAYS['Monday'] = 'Mo'
+WEEKDAYS['Tuesday'] = 'Tu'
+WEEKDAYS['Wednesday'] = 'We'
+WEEKDAYS['Thursday'] = 'Th'
+WEEKDAYS['Friday'] = 'Fr'
+WEEKDAYS['Saturday'] = 'Sa'
+WEEKDAYS['Sunday'] = 'Su'
 
 
 def get_dateutil_weekday(weekday):

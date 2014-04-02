@@ -7,8 +7,8 @@ from django.conf import settings
 from django.utils import timezone
 
 from celeryapp import app
+from core.utils import total_seconds
 from track import queries
-from .utils import total_seconds
 
 
 logger = logging.getLogger('poller.poller')
@@ -30,7 +30,7 @@ def calc_next_eta(snapshot, history):
     """
     Calculates eta for next poll basing on previous poll's results.
     """
-    return snapshot.made_on + timezone.timedelta(hours=1)
+    return snapshot.made_on + settings.POLLER_INTERVAL
 
 
 def calc_random_eta(start, stop):

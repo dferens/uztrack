@@ -2,8 +2,9 @@ import sys
 
 from django.utils import timezone
 
-from core.tests import TestCase
+from .helpers import TestCase
 from .. import utils
+
 
 class UtilsTestCase(TestCase):
 

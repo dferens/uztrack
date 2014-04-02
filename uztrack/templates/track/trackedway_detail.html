@@ -1,6 +1,7 @@
 {% extends 'track/base.html' %}
 
 {% load staticfiles %}
+{% load track %}
 
 {% block styles %}
   {{ block.super }}
@@ -18,48 +19,116 @@
   <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
   <script src="{% static 'js/trackedway_detail.js' %}"></script>
   <script>
-    myApp.constant('urls', {
-      histories: "{% url 'api-histories-list' %}",
-      snapshots: "{% url 'api-snapshots-list' %}",
-    });
+    // Histories data
+    var historiesCalendarData = {
+    {% for history in tracked_way.histories.all %}
+      {% with last_snapshot=history.last_snapshot %}
+        {% if last_snapshot %}
+          '{{ history.departure_date|date:'U' }}': {{ last_snapshot.total_places_count }},
+        {% endif %}
+      {% endwith %}
+    {% endfor %}
+    };
   </script>
 {% endblock %}
 
 {% block content %}
-  <div class ng-app="myApp" ng-controller="WayDetailCtrl">
+  <div class="trackedway">
     {% with way=tracked_way.way %}
     <div class="row">
-      <div class="col-md-7 col-md-offset-1">
-        <accordion close-others="false">
-          <accordion-group heading="Tracked way details" is-open="true">
-            <p class="lead">Way: {{ way }}</p>
-            <p class="lead">Days: {{ tracked_way.selected_weekdays|join:',' }}</p>
-            <div ng-if="dayHistory != null">
-              {% verbatim %}
-              <a href="{{ dayHistory.date|date:'yyyy-MM-dd' }}" class="btn btn-success pull-right">Details</a>
-              <p>For {{ dayHistory.date|date:"longDate" }}, Last update: {{ dayHistory.lastSnapshot.date|ago }}</p>
-              {% endverbatim %}
+      <div class="col-md-4">
+        <ul class="list-group">
+          <li class="list-group-item tnrackedway-station">
+            <span class="badge">
+              <span class="glyphicon glyphicon-time"></span>
+              {{ tracked_way.start_time|date:"G:i" }} - &infin;
+            </span>
+            <p class="lead">{{ way.station_from }} <span class="glyphicon glyphicon-arrow-right"></span></p>
+          </li>
+          <li class="list-group-item trackedway-station">
+            <span class="badge">
+              <span class="glyphicon glyphicon-time"></span>
+              {{ tracked_way.start_time|date:"G:i" }} - 19:00
+            </span>
+            <p class="lead">{{ way.station_to }} <span class="glyphicon glyphicon-arrow-left"></span></p>
+          </li>
+          <li class="list-group-item">
+            <ul class="pagination pagination daysbar">            
+            {% for day_name, enabled in tracked_way.days.items %}
+              <li {% if not enabled %}class="disabled"{% endif %}><a>{{ day_name|short_day_name }}</a></li>
+            {% endfor %}
+            </ul>
+          </li>
+          <li class="list-group-item">
+            <div class="btn-group btn-group-justified">
+              <a href="{{ tracked_way.get_edit_url }}" class="btn btn-success">Edit</a>
+              <a href="{{ tracked_way.get_delete_url }}" class="btn btn-info">Delete</a>
             </div>
-          </accordion-group>
-        </accordion>
+          </li>
+        </ul>
       </div>
-      <div class="col-md-3">
-        <div class="panel panel-default">
-          <p class="panel-heading">Days</p>
-          <heatmap id="heatmap" histories="dayHistories"></heatmap>
-        </div>
-        <div class="panel-group histories">
-        </div>
+      <div class="col-md-8">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <div id="cal-heatmap"></div>
+          </li>
+        </ul>
       </div>
     </div>
     <div class="row">
-      <div class="col-md-10 col-md-offset-1">
-        <accordion close-others="oneAtTime">
-          <accordion-group heading="Day history" is-open="dayHistory != null">
-            <chart id="chart"></chart>
-          </accordion-group>
-        </accordion>
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <table class="table table-hover trackedway-histories">
+            <thead>
+              <tr>
+                <th class="col-md-1">Day</th>
+                <th>Date</th>
+                <th>Seats</th>
+                <th class="col-md-5">Relevance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for history in tracked_way.histories.all %}
+              {% with day_name=history.departure_date|date:"l"|short_day_name %}
+              <tr>
+                <td>
+                  {% with label_class=day_name|lower %}
+                  <div class="daylabel daylabel-{{label_class}}">
+                    {{ day_name }}
+                  </div>
+                  {% endwith %}
+                </td>
+                <td>{{ history.departure_date|date:"F, jS" }}</td>
+                {% with last_snapshot=history.last_snapshot %}
+                <td>
+                  <p class="lead">
+                    {% if last_snapshot %}{{ last_snapshot.total_places_count }}
+                    {% else %}unknown{% endif %}
+                  </p>
+                </td>
+                {% endwith %}
+                <td>
+                  <div class="progress">
+                    {% with relevance=history.relevance %}
+                    <div class="progress-bar" role="progressbar" aria-valuenow="{{ relevance.1 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ relevance.1 }}%;">{{ history.last_snapshot.made_on|timesince }} ago</div>
+                    {% endwith %}
+                  </div>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <a class="btn btn-success">Subscribe</a>
+                    <a href="{{ history.get_absolute_url }}" class="btn btn-primary">Details</a>
+                  </div>
+                </td>
+              </tr>
+              {% endwith %}
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  {% endwith %}
+    {% endwith %}
+  </div>
 {% endblock %}

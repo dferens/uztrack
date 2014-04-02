@@ -26,8 +26,9 @@ class TrackedWayTestCase(TestCase):
         possible_days = [day for day in tracked_way.days._keys
                          if getattr(tracked_way.days, day)]
         dates = tracked_way.next_dates(now + timedelta(days=31))
+        weekdays = utils.WEEKDAYS.keys()
         for date in dates:
-            self.assertIn(utils.WEEKDAYS[date.weekday()], possible_days)
+            self.assertIn(weekdays[date.weekday()], possible_days)
 
     @patch.object(poller_queries, 'poll_tracked_way')
     def test_save(self, mock_poll_tracked_way):

@@ -12,6 +12,7 @@ from django.utils import timezone
 from bitfield import BitField
 from jsonfield import JSONField
 
+from core.utils import total_seconds
 from . import utils
 
 
@@ -36,7 +37,7 @@ class TrackedWay(models.Model):
     Says that particular way should be checked for tickets on given departure weekdays.
     """
     way = models.ForeignKey(Way)
-    days = BitField(flags=utils.WEEKDAYS)
+    days = BitField(flags=utils.WEEKDAYS.keys())
     start_time = models.TimeField(default=time(0, 0))
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
 
@@ -44,6 +45,13 @@ class TrackedWay(models.Model):
         days = ', '.join(self.selected_weekdays)
         return '%s-%s on %s' % (self.way.station_from, self.way.station_to,
                                 ', '.join(self.selected_weekdays))
+
+
+    def get_edit_url(self):
+        return reverse('trackedway-edit', kwargs=dict(pk=self.pk))
+
+    def get_delete_url(self):
+        return '#'
 
     def next_dates(self, till):
         """
@@ -84,10 +92,12 @@ class TrackedWayDayHistory(models.Model):
     snapshot, when tickets were not been found for the first time.
     """
     class Meta:
-        ordering = ['-departure_date']
+        ordering = ['departure_date']
         verbose_name = u'tracked way history'
         verbose_name_plural = u'tracked way histories'
         unique_together = (('tracked_way', 'departure_date'))
+    
+    ABSOLUTE_URL_DATE_FORMAT = '%Y-%m-%d'
 
     tracked_way = models.ForeignKey(TrackedWay, related_name='histories')
     departure_date = models.DateField()
@@ -101,6 +111,22 @@ class TrackedWayDayHistory(models.Model):
 
     def __unicode__(self):
         return u'%s on %s' % (self.tracked_way, self.departure_date)
+
+    def get_absolute_url(self):
+        date = self.departure_date.strftime(self.ABSOLUTE_URL_DATE_FORMAT)
+        kwargs = dict(pk=self.tracked_way_id, date=date)
+        return reverse('trackedway-history-detail', kwargs=kwargs)
+
+    @property
+    def active(self):
+        return timezone.now() <= self.departure_date
+
+    @property
+    def relevance(self):
+        elapsed = timezone.now() - self.last_snapshot.made_on
+        elapsed_percentage = (total_seconds(elapsed) * 100 /
+                              total_seconds(settings.POLLER_INTERVAL))
+        return (elapsed, elapsed_percentage)
 
     @property
     def last_snapshot(self):

@@ -63,13 +63,13 @@ class TrackedWayListView(LoginRequiredMixin, SingleTableView):
 
 
 class TrackedWayHistoryDetailView(LoginRequiredMixin, DetailView):
-    context_object_name = 'history'
-    date_format = '%Y-%m-%d'
+    context_object_name = 'history'    
     model = TrackedWayDayHistory
     template_name = 'track/trackedway_history_detail.html'
 
     def get_object(self, queryset=None):
-        dt = timezone.datetime.strptime(self.kwargs['date'], self.date_format)
+        date_format = self.model.ABSOLUTE_URL_DATE_FORMAT
+        dt = timezone.datetime.strptime(self.kwargs['date'], date_format)
         return get_object_or_404(self.model,
                                  tracked_way_id=self.kwargs['pk'],
                                  departure_date=dt.date())

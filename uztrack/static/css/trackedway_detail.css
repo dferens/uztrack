@@ -1,25 +1,51 @@
-.calendar-container {
-  padding: 10px;
-}
+#cal-heatmap {
+    margin-top: 20px;}
 
-#heatmap {
-    padding-top: 10px;
-    padding-bottom: 20px;
-}
-#heatmap rect.highlight {
-    fill: #D6E1FA;
-    stroke: rgba(68, 68, 68, 0.2);
-}
-#heatmap text.highlight {
-    fill: rgba(68, 68, 68, 0.9);
-}
-#heatmap .subdomain-text {
+#cal-heatmap .subdomain-text {
     font-size: 10px;
 }
-#heatmap .r1~.subdomain-text {fill:white;}
-#heatmap .r2~.subdomain-text {fill:white;}
-#heatmap .r3~.subdomain-text {fill:white;}
-#heatmap .r4~.subdomain-text {fill:white;}
-#heatmap .r5~.subdomain-text {fill:white;}
-#heatmap .r6~.subdomain-text {fill:white;}
 
+.trackedway .trackedway-station .badge {
+    margin-top: 4px;
+}
+.trackedway .trackedway-station p.lead {
+    margin-bottom: 0;
+}
+.trackedway .trackedway-histories tbody tr td {
+    vertical-align: middle;
+}
+.trackedway .trackedway-histories tbody tr td .lead {
+    margin: 0;
+}
+
+.daysbar {
+    margin: 0 0 -5px 0;
+}
+.daysbar li {
+    text-indent: -3px;
+}
+.daysbar li a {
+    width: 47px;
+    text-align: center;
+}
+
+.daylabel {
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    padding: 7px;
+    margin: 2px;
+    border-radius: 20px;
+    width: 35px;
+    height: 35px;
+    line-height: 23px;
+}
+
+.daylabel-mo {background-color: #5cb85c;}
+.daylabel-tu {background-color: #5bc0de;}
+.daylabel-fr {background-color: #428bca;}
+.daylabel-we {background-color: #f0ad4e;}
+.daylabel-th {background-color: #d9534f;}
+.daylabel-su {background-color: #d9534f;}
+.daylabel-sa {background-color: #d9534f;}

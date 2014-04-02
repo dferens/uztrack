@@ -141,6 +141,7 @@ class OwnApps(Settings):
     def POLLER_WARMUP(self): return timedelta(minutes=5)
     def POLLER_AUTOSTART(self): return True
     def POLLER_AUTOSTART_NEW(self): return True
+    def POLLER_INTERVAL(self): return timedelta(hours=1)
     def POLLER_CONNECTION_ERROR_RETRY(self): return timedelta(minutes=5)
     def POLLER_WAIT_FOR_CELERY(self): return False
 

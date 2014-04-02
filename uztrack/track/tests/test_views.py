@@ -7,6 +7,7 @@ from model_mommy import mommy
 from core.tests import TestCase
 from .helpers import TrackedWayFactory, tracked_way_days_generator
 from .. models import Way, TrackedWay
+from .. import utils
 
 
 class AuthorizedTestCase(TestCase):
@@ -71,6 +72,7 @@ class TrackedWayTestCase(AuthorizedTestCase):
     def test_detail(self):
         tracked_way = TrackedWayFactory()
         resp = self.client.get(self.url('trackedway-detail', pk=tracked_way.pk))
-        self.assertContains(resp, tracked_way.way)
+        self.assertContains(resp, tracked_way.way.station_from)
+        self.assertContains(resp, tracked_way.way.station_to)
         for weekday in tracked_way.selected_weekdays:
-            self.assertContains(resp, weekday)
+            self.assertContains(resp, utils.WEEKDAYS[weekday])
