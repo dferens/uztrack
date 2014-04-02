@@ -15,10 +15,10 @@ class Emails(Settings):
 
 class DATABASES(Config):
     def default(self): return {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': normpath(join(SITE_ROOT, 'default.db')),
-        'USER': '',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': SITE_NAME,
+        'USER': SITE_NAME,
+        'PASSWORD': SITE_NAME,
         'HOST': '',
         'PORT': '',
     }
