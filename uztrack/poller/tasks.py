@@ -44,7 +44,10 @@ def poll_history(history_id):
         next_poll_eta = poller.calc_next_eta(snapshot, history)
         stop_on = poller.calc_stop_eta(history)
         if next_poll_eta < stop_on:
+            next_poll_eta = timezone.localtime(next_poll_eta)
             poll_history.apply_async(args=(history_id,), eta=next_poll_eta)
             logger.info(u'planned next poll for %s on %s' % (history_id, next_poll_eta))
         else:
+            history.active = False
+            history.save()
             logger.info(u'stopped poll service for %s' % (history_id))

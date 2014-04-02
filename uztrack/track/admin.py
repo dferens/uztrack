@@ -33,7 +33,7 @@ class TrackedWayAdmin(admin.ModelAdmin):
 class HistoryAdmin(admin.ModelAdmin):
     ordering = ('tracked_way__way__id', 'tracked_way__days',
                 'tracked_way__start_time', 'departure_date')
-    list_display = ('way', 'weekdays', 'start_time', 'departure_date')
+    list_display = ('way', 'weekdays', 'active', 'start_time', 'departure_date')
 
     def way(self, obj):
         return obj.tracked_way.way

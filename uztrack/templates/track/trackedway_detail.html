@@ -89,7 +89,7 @@
               </tr>
             </thead>
             <tbody>
-            {% for history in tracked_way.histories.all %}
+            {% for history in tracked_way.active_histories %}
               {% with day_name=history.departure_date|date:"l"|short_day_name %}
               <tr>
                 <td>

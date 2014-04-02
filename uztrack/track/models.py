@@ -74,6 +74,10 @@ class TrackedWay(models.Model):
         """
         return (wday for wday, is_set in self.days if is_set)
 
+    @property
+    def active_histories(self):
+        return self.histories.filter(active=True)
+
     def save(self, *args, **kwargs):
         import poller.queries
         
@@ -99,6 +103,7 @@ class TrackedWayDayHistory(models.Model):
     
     ABSOLUTE_URL_DATE_FORMAT = '%Y-%m-%d'
 
+    active = models.BooleanField(default=True)
     tracked_way = models.ForeignKey(TrackedWay, related_name='histories')
     departure_date = models.DateField()
     places_appeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
@@ -116,10 +121,6 @@ class TrackedWayDayHistory(models.Model):
         date = self.departure_date.strftime(self.ABSOLUTE_URL_DATE_FORMAT)
         kwargs = dict(pk=self.tracked_way_id, date=date)
         return reverse('trackedway-history-detail', kwargs=kwargs)
-
-    @property
-    def active(self):
-        return timezone.now() <= self.departure_date
 
     @property
     def relevance(self):
