@@ -18,7 +18,7 @@ def poll_tracked_way(tracked_way, celery_scheduled_polls=None):
     """
     if settings.POLLER_AUTOSTART_NEW:
         logger.info('launching poller service for %d', tracked_way.id)
-        start = timezone.now()
+        start = timezone.localtime(timezone.now())
         stop = start + settings.POLLER_WARMUP
         planned_polls = total_polls = 0
 
@@ -26,11 +26,11 @@ def poll_tracked_way(tracked_way, celery_scheduled_polls=None):
             total_polls += 1
             if celery_scheduled_polls and \
                celery_scheduled_polls.get(history.id) is not None:
-                logger.debug('- skipping poll for %s', history.id)
+                logger.info('- skipping poll for %s', history.id)
                 continue
 
             starter_eta = poller.calc_random_eta(start, stop)
-            logger.debug('- planned start to poll %s on %s', history.id, starter_eta)
+            logger.info('- planned start to poll %s on %s', history.id, starter_eta)
             poll_history.apply_async(args=(history.id,), eta=starter_eta)
             planned_polls += 1
 

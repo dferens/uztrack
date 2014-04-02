@@ -38,7 +38,7 @@ class Apps(Apps):
         )
 
 class OwnApps(Settings):
-    def POLLER_WAIT_FOR_CELERY(self): return 1
+    def POLLER_WAIT_FOR_CELERY(self): return 2
 
 class Routing(Routing):
     def MIDDLEWARE_CLASSES(self):

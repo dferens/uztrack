@@ -22,9 +22,14 @@ def run():
         tracked_ways = TrackedWay.objects.all()
         planned_polls = total_polls = 0
 
+        if settings.POLLER_WAIT_FOR_CELERY is not False:
+            import time; time.sleep(settings.POLLER_WAIT_FOR_CELERY)
+
         scheduled_polls = poller.get_scheduled_polls()    
         if scheduled_polls is None:
             raise ImproperlyConfigured("Could not inspect celery workers.")
+        elif not scheduled_polls:
+            logger.warning('No scheduled tasks')
 
         poll = functools.partial(queries.poll_tracked_way,
                                  celery_scheduled_polls=scheduled_polls)
