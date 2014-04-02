@@ -1,9 +1,9 @@
-/*! cal-heatmap v3.4.0 (Sun Feb 02 2014 13:03:14)
+/*! cal-heatmap v3.3.10 (Tue Dec 03 2013 19:30:01)
  *  ---------------------------------------------
  *  Cal-Heatmap is a javascript module to create calendar heatmap to visualize time series data
  *  https://github.com/kamisama/cal-heatmap
  *  Licensed under the MIT license
- *  Copyright 2014 Wan Qi Chen
+ *  Copyright 2013 Wan Qi Chen
  */
 
 var CalHeatMap = function() {
@@ -995,9 +995,7 @@ var CalHeatMap = function() {
 				.attr("y", function(d) { return self.positionSubDomainY(d.t) + options.cellSize/2; })
 				.attr("text-anchor", "middle")
 				.attr("dominant-baseline", "central")
-				.text(function(d){
-					return self.formatDate(new Date(d.t), options.subDomainTextFormat);
-				})
+				.text(function(d){ return self.formatDate(new Date(d.t), options.subDomainTextFormat); })
 			;
 		}
 
@@ -1392,8 +1390,7 @@ CalHeatMap.prototype = {
 
 				if (d.v !== null) {
 					htmlClass += " " + parent.Legend.getClass(d.v, (parent.legendScale === null));
-				} else if (options.considerMissingDataAsZero &&
-					parent.dateIsLessThan(d.t, new Date())) {
+				} else if (options.considerMissingDataAsZero) {
 					htmlClass += " " + parent.Legend.getClass(0, (parent.legendScale === null));
 				}
 
@@ -1408,22 +1405,6 @@ CalHeatMap.prototype = {
 
 		rect.transition().duration(options.animationDuration).select("title")
 			.text(function(d) { return parent.getSubDomainTitle(d); })
-		;
-
-		function formatSubDomainText(element) {
-			if (typeof options.subDomainTextFormat === "function") {
-				element.text(function(d) { return options.subDomainTextFormat(d.t, d.v); });
-			}
-		}
-
-		/**
-		 * Change the subDomainText class if necessary
-		 * Also change the text, e.g when text is representing the value
-		 * instead of the date
-		 */
-		rect.transition().duration(options.animationDuration).select("text")
-			.attr("class", function(d) { return "subdomain-text" + parent.getHighlightClassName(d.t); })
-			.call(formatSubDomainText)
 		;
 	},
 
@@ -1895,51 +1876,6 @@ CalHeatMap.prototype = {
 			return false;
 		}
 	},
-
-
-	/**
-	 * Returns weather or not dateA is less than or equal to dateB. This function is subdomain aware.
-	 * Performs automatic conversion of values.
-	 * @param dateA may be a number or a Date
-	 * @param dateB may be a number or a Date
-	 * @returns {boolean}
-	 */
-	dateIsLessThan: function(dateA, dateB) {
-		"use strict";
-
-		if(!(dateA instanceof Date)) {
-			dateA = new Date(dateA);
-		}
-
-		if (!(dateB instanceof Date)) {
-			dateB = new Date(dateB);
-		}
-
-
-		function normalizedMillis(date, subdomain) {
-			switch(subdomain) {
-			case "x_min":
-			case "min":
-				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes()).getTime();
-			case "x_hour":
-			case "hour":
-				return new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours()).getTime();
-			case "x_day":
-			case "day":
-				return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-			case "x_week":
-			case "week":
-			case "x_month":
-			case "month":
-				return new Date(date.getFullYear(), date.getMonth()).getTime();
-			default:
-				return date.getTime();
-			}
-		}
-
-		return normalizedMillis(dateA, this.options.subDomain) < normalizedMillis(dateB, this.options.subDomain);
-	},
-
 
 	// =========================================================================//
 	// DATE COMPUTATION															//
@@ -3374,30 +3310,30 @@ function mergeRecursive(obj1, obj2) {
 function arrayEquals(arrayA, arrayB) {
 	"use strict";
 
-	// if the other array is a falsy value, return
-	if (!arrayB || !arrayA) {
-		return false;
-	}
+    // if the other array is a falsy value, return
+    if (!arrayB || !arrayA) {
+        return false;
+    }
 
-	// compare lengths - can save a lot of time
-	if (arrayA.length !== arrayB.length) {
-		return false;
-	}
+    // compare lengths - can save a lot of time
+    if (arrayA.length !== arrayB.length) {
+        return false;
+    }
 
-	for (var i = 0; i < arrayA.length; i++) {
-		// Check if we have nested arrays
-		if (arrayA[i] instanceof Array && arrayB[i] instanceof Array) {
-			// recurse into the nested arrays
-			if (!arrayEquals(arrayA[i], arrayB[i])) {
-				return false;
-			}
-		}
-		else if (arrayA[i] !== arrayB[i]) {
-			// Warning - two different object instances will never be equal: {x:20} != {x:20}
-			return false;
-		}
-	}
-	return true;
+    for (var i = 0; i < arrayA.length; i++) {
+        // Check if we have nested arrays
+        if (arrayA[i] instanceof Array && arrayB[i] instanceof Array) {
+            // recurse into the nested arrays
+            if (!arrayEquals(arrayA[i], arrayB[i])) {
+                return false;
+            }
+        }
+        else if (arrayA[i] !== arrayB[i]) {
+            // Warning - two different object instances will never be equal: {x:20} != {x:20}
+            return false;
+        }
+    }
+    return true;
 }
 
 /**

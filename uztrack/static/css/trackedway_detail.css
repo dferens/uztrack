@@ -1,8 +1,15 @@
 #cal-heatmap {
-    margin-top: 20px;}
+    margin-bottom: 15px;
+}
 
 #cal-heatmap .subdomain-text {
     font-size: 10px;
+}
+.q0 {
+
+}
+.q1 {
+
 }
 
 .trackedway .trackedway-station .badge {
