@@ -3,6 +3,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
+from core.uzgovua.api import SmartApi
 from . import models
 
 
@@ -34,3 +35,13 @@ class SnapshotViewSet(ModelViewSet):
     model = models.TrackedWayDayHistorySnapshot
     filter_fields = ('history',)
     serializer_class = SnapshotSerializer
+
+
+class Api(SmartApi):
+
+    def get_stations_routes(self, history):
+        way = history.tracked_way.way
+        tracked_way = history.tracked_way
+        args = (way.station_id_from, way.station_id_to,
+                history.departure_date, tracked_way.start_time)
+        return super(Api, self).get_stations_routes(*args)

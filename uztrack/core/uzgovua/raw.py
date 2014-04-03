@@ -1,7 +1,6 @@
 import re
 import datetime
 import functools
-from urlparse import urljoin
 
 import requests
 
@@ -39,12 +38,10 @@ class Token(object):
         '__$': '1',
         '___': '0'
     }
-    _URLS = {
-        'token_source': HOST_URL,
-    }
+    _TOKEN_SOURCE_URL = HOST_URL
 
     def __init__(self):
-        response = requests.get(self._URLS['token_source'])
+        response = requests.get(self._TOKEN_SOURCE_URL)
         content = response.content
         token_encoded = self._pat_token.search(content).group('token')
         token_symbols_encoded = [x.split('$$_.')[1] for x in token_encoded.split('+')]
@@ -62,11 +59,9 @@ class Token(object):
         """
         Additional http headers we need to pass for making specific json requests.
         """
-        return {
-            'GV-Ajax': 1,
-            'GV-Token': self.token,
-            'GV-Referer': self._URLS['token_source']
-        }
+        return {'GV-Ajax': 1,
+                'GV-Token': self.token,
+                'GV-Referer': self._TOKEN_SOURCE_URL}
 
     @property
     def access_cookies(self):
@@ -81,47 +76,3 @@ class Token(object):
 
         kwargs['cookies'] = self.access_cookies
         return request_method(*args, **kwargs)
-
-
-def requires_token(func):
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        if not isinstance(kwargs.get('token'), Token):
-            raise exceptions.TokenRequiredException()
-        else:
-            return func(*args, **kwargs)
-
-    return wrapper
-
-
-class RawApi(object):
-
-    _URLS = {
-        'station': urljoin(HOST_URL, 'purchase/station/'),
-        'search_routes': urljoin(HOST_URL, 'purchase/search/'),
-    }
-
-    @requires_token
-    def get_stations_routes(self, station_id_from, station_id_to,
-                            departure_date, departure_start_time, token=None):
-        """
-        :type station_id_from: int
-        :type station_id_to: int
-        :type departure_date: date | datetime
-        :type departure_start_time: time | datetime
-        """
-        data = {
-            'station_id_from': station_id_from,
-            'station_id_till': station_id_to,
-            'date_dep': departure_date.strftime('%d.%m.%Y'),
-            'time_dep': departure_start_time.strftime('%H:%M'),
-        }
-        response = token.patch_request(requests.post,
-                                       self._URLS['search_routes'],
-                                       data=data)
-        return response.json()
-
-    def get_station_id(self, station_name, token=None):
-        url = urljoin(self._URLS['station'], station_name)
-        response = requests.post(url)
-        return response.json()

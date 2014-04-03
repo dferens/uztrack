@@ -81,36 +81,3 @@ class TokenTestCase(TestCase):
             mock_request_method.call_args[1]['headers']
         )
         mock_request_method.reset_mock()
-
-
-class RawApiTestCase(TestCase):
-
-    def test_token_requires(self):
-        @raw.requires_token
-        def testfunc(*args, **kwargs):
-            return 'ok'
-
-        with self.assertRaises(exceptions.TokenRequiredException):
-            testfunc()
-
-        self.assertEqual(testfunc(token=TokenMock()), 'ok')
-
-    @mock.patch('core.uzgovua.raw.requests')
-    def test_get_stations_routes(self, mock_requests):
-        api = raw.RawApi()
-
-        api.get_stations_routes(1, 2, datetime.date.today(),
-                                      datetime.datetime.now(),
-                                      token=TokenMock())
-        self.assertEqual(mock_requests.post.call_count, 1)
-        post_data_dict = mock_requests.post.call_args[1]['data']
-        expected_data_dict = dict(station_id_from=1, station_id_till=2)
-        self.assertDictContainsSubset(expected_data_dict, post_data_dict)
-
-    @mock.patch('core.uzgovua.raw.requests')
-    def test_get_station_id(self, mock_requests):
-        api = raw.RawApi()
-        mock_requests.post.return_value.json.return_value = 'json'
-        self.assertEqual(api.get_station_id('station123'), 'json')
-        self.assertEqual(mock_requests.post.call_count, 1)
-        self.assertTrue('123' in mock_requests.post.call_args[0][0])

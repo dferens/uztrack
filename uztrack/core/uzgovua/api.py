@@ -3,18 +3,34 @@ import datetime
 import functools
 import logging
 
+import requests
+from urlparse import urljoin
+
 from django.utils import timezone
 
 from core.utils import DotDict
-from . import data, exceptions, raw
+from . import exceptions, raw
+from .data import RouteTrains
 
 
 logger = logging.getLogger(__name__)
 
 
+def token_required(func):
+    @functools.wraps(func)
+    def decorated(self, *args, **kwargs):
+        if kwargs.get('token') is None:
+            raise exceptions.TokenRequiredException()
+        return func(self, *args, **kwargs)
+    return decorated
+
+
 class Api(object):
 
-    _raw_api = raw.RawApi()
+    _URLS = {
+        'station': urljoin(raw.HOST_URL, 'purchase/station/'),
+        'search_routes': urljoin(raw.HOST_URL, 'purchase/search/'),
+    }
 
     NOT_FOUND = (u'По заданому Вами напрямку поїздів немає',
                  u'За заданими Вами значенням нічого не знайдено.')
@@ -40,7 +56,8 @@ class Api(object):
         :type station_name: str or unicode
         :rtype: int or None
         """
-        json_data = self._raw_api.get_station_id(station_name)
+        url = urljoin(self._URLS['station'], station_name)
+        json_data = requests.post(url).json()
         results = json_data['value']
         if len(results) == 0:
             return None
@@ -55,20 +72,43 @@ class Api(object):
                 # Closest match
                 return results[0]['station_id']
 
-    def get_stations_routes(self, way_history, token=None):
-        token = raw.Token() if token is None else token
-        tracked_way = way_history.tracked_way
-        args = (tracked_way.way.station_id_from, tracked_way.way.station_id_to,
-                way_history.departure_date, tracked_way.start_time)
-
-        json_data = self._raw_api.get_stations_routes(*args, token=token)
-        
+    @token_required
+    def get_stations_routes(self, station_id_from, station_id_to,
+                                  departure_date, start_time, token=None):
+        url = self._URLS['search_routes']
+        data = {'station_id_from': station_id_from,
+                'station_id_till': station_id_to,
+                'date_dep': departure_date.strftime('%d.%m.%Y'),
+                'time_dep': start_time.strftime('%H:%M')}
+        json_data = token.patch_request(requests.post, url, data=data).json()
         try:
             self._check_for_errors(json_data)
         except exceptions.NothingFoundException:
-            return data.RouteTrains()
+            return RouteTrains()
         else:
-            return data.RouteTrains(json_data)
+            return RouteTrains(json_data)
+
+
+def handle_ban(method):
+    @functools.wraps(method)
+    def decorated(self, *args, **kwargs):
+        try:
+            first_try = method(self, *args, **kwargs)
+        except exceptions.BannedApiException, e:
+            self._refresh_token()
+            try:
+                second_try = method(self, *args, **kwargs)
+            except exceptions.BannedApiException, e:
+                logger.error('could not pass site protection, '
+                             'banned for %s minutes', e.banned_for)
+                raise e
+            else:
+                logger.info('passed site protection')
+                return second_try   
+        else:
+            return first_try
+
+    return decorated
 
 
 class SmartApi(Api):
@@ -85,27 +125,6 @@ class SmartApi(Api):
         now = timezone.now() if now is None else now
         self._token_guessed_die = now + self._token_ttl
 
-    def __handle_ban(method):
-        @functools.wraps(method)
-        def decorated(self, *args, **kwargs):
-            try:
-                first_try = method(self, *args, **kwargs)
-            except exceptions.BannedApiException, e:
-                self._refresh_token()
-                try:
-                    second_try = method(self, *args, **kwargs)
-                except exceptions.BannedApiException, e:
-                    logger.error('could not pass site protection, '
-                             'banned for %s minutes', e.banned_for)
-                    raise e
-                else:
-                    logger.info('passed site protection')
-                    return second_try   
-            else:
-                return first_try
-
-        return decorated
-
     @property
     def token(self):
         now = timezone.now()
@@ -114,7 +133,9 @@ class SmartApi(Api):
 
         return self._token
 
-    @__handle_ban
-    def get_stations_routes(self, way_history):
+    @handle_ban
+    def get_stations_routes(self, station_id_from, station_id_to,
+                                  departure_date, start_time):
         super_method = super(SmartApi, self).get_stations_routes
-        return super_method(way_history, token=self.token)
+        return super_method(station_id_from, station_id_to,
+                            departure_date, start_time, token=self.token)

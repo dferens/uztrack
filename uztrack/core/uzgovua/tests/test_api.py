@@ -8,6 +8,74 @@ import yaml
 from core.tests import TestCase
 from track.tests.helpers import TrackedWayDayHistoryFactory as HistoryFactory
 from .. import api, data, exceptions
+from .test_raw import TokenMock
+
+
+def get_test_stations_routes(api_obj):
+    today, time = datetime.date.today(), datetime.time()
+    kwargs = {} if isinstance(api_obj, api.SmartApi) else dict(token=TokenMock())
+    return api_obj.get_stations_routes(1, 1, today, time, **kwargs)
+
+
+class UtilsTestCase(TestCase):
+
+    def test_token_requires(self):
+        @api.token_required
+        def testfunc(*args, **kwargs):
+            return 'ok'
+
+        with self.assertRaises(exceptions.TokenRequiredException):
+            testfunc('instance')
+
+        self.assertEqual(testfunc('instance', token='token'), 'ok')
+
+
+class HandleBanTestCase(TestCase):
+
+    def test_ok(self):
+        globals = dict(call_count=0)
+
+        @api.handle_ban
+        def do(self, *args, **kwargs):
+            globals['call_count'] = globals['call_count'] + 1
+
+        do('instance')
+        self.assertEqual(globals['call_count'], 1)
+
+    def test_passed(self):
+        class MockApi(object):
+            call_count = 0
+            refreshed = False
+            
+            def _refresh_token(self):
+                MockApi.refreshed = True
+
+            @api.handle_ban
+            def do(self, *args, **kwargs):
+                MockApi.call_count += 1
+
+                if MockApi.call_count == 1:
+                    message = u'Перевищено кількість запитів, 10 хвилин'
+                    raise exceptions.BannedApiException(message)
+                else:
+                    return 'ok'
+
+        MockApi().do()
+        self.assertEqual(MockApi.call_count, 2)
+        self.assertTrue(MockApi.refreshed)
+
+    def test_didnt_passed(self):
+        @api.handle_ban
+        def do(self, *args, **kwargs):
+            raise exceptions.BannedApiException(
+                u'Перевищено кількість запитів, 10 хвилин'
+            )
+
+        instance = mock.MagicMock()
+        with self.assertRaises(exceptions.BannedApiException):
+            do(instance)
+        
+        self.assertEqual(instance._refresh_token.call_count, 1)
 
 
 class ApiTestCase(TestCase):
@@ -15,7 +83,22 @@ class ApiTestCase(TestCase):
     def setUp(self):
         super(ApiTestCase, self).setUp()
         self.api = api.Api()
-        self.api._raw_api = mock.MagicMock()
+        self.api._token = TokenMock()
+
+    def test_ok(self):
+        response_data = yaml.safe_load(textwrap.dedent('''
+          ---
+            error: false
+            data: null
+        '''))
+        response_data['value'] = {}
+        with mock.patch('requests.post') as mock_post:
+            mock_post.return_value.json.return_value = response_data
+
+            trains = get_test_stations_routes(self.api)
+            self.assertIsInstance(trains, data.RouteTrains)
+
+        self.assertEqual(trains.seats_count, 0)
 
     def test_nothing_found_1(self):
         response_data = yaml.safe_load(textwrap.dedent('''
@@ -24,12 +107,12 @@ class ApiTestCase(TestCase):
             error: true
             data: null
         '''))
-        self.api._raw_api.get_stations_routes.return_value = response_data
-        way_history = HistoryFactory()
+        with mock.patch('requests.post') as mock_post:
+            mock_post.return_value.json.return_value = response_data
 
-        trains = self.api.get_stations_routes(way_history, 'token')
-        self.assertIsInstance(trains, data.RouteTrains)
-        self.assertEqual(trains.seats_count, 0)
+            trains = get_test_stations_routes(self.api)
+            self.assertIsInstance(trains, data.RouteTrains)
+            self.assertEqual(trains.seats_count, 0)
 
     def test_nothing_found_2(self):
         response_data = yaml.safe_load(textwrap.dedent('''
@@ -38,12 +121,11 @@ class ApiTestCase(TestCase):
             error: true
             data: null
         '''))
-        self.api._raw_api.get_stations_routes.return_value = response_data
-        way_history = HistoryFactory()
-
-        trains = self.api.get_stations_routes(way_history, 'token')
-        self.assertIsInstance(trains, data.RouteTrains)
-        self.assertEqual(trains.seats_count, 0)
+        with mock.patch('core.uzgovua.api.requests.post') as mock_post:
+            mock_post.return_value.json.return_value = response_data
+            trains = get_test_stations_routes(self.api)
+            self.assertIsInstance(trains, data.RouteTrains)
+            self.assertEqual(trains.seats_count, 0)
 
     def test_not_available(self):
         response_data = yaml.safe_load(textwrap.dedent('''
@@ -52,11 +134,10 @@ class ApiTestCase(TestCase):
             error: true
             data: null
         '''))
-        self.api._raw_api.get_stations_routes.return_value = response_data
-        way_history = HistoryFactory()
-
-        with self.assertRaises(exceptions.ServiceNotAvailableException):
-            self.api.get_stations_routes(way_history, 'token')
+        with mock.patch('core.uzgovua.api.requests.post') as mock_post:
+            mock_post.return_value.json.return_value = response_data
+            with self.assertRaises(exceptions.ServiceNotAvailableException):
+                get_test_stations_routes(self.api)
 
     def test_banned(self):
         response_data = yaml.safe_load(textwrap.dedent('''
@@ -65,11 +146,10 @@ class ApiTestCase(TestCase):
             error: true
             data: null
         '''))
-        self.api._raw_api.get_stations_routes.return_value = response_data
-        way_history = HistoryFactory()
-
-        with self.assertRaises(exceptions.BannedApiException):
-            self.api.get_stations_routes(way_history, 'token')
+        with mock.patch('core.uzgovua.api.requests.post') as mock_post:
+            mock_post.return_value.json.return_value = response_data
+            with self.assertRaises(exceptions.BannedApiException):
+                get_test_stations_routes(self.api)
 
     def test_unknown_error(self):
         response_data = yaml.safe_load(textwrap.dedent('''
@@ -78,20 +158,18 @@ class ApiTestCase(TestCase):
             error: true
             data: null
         '''))
-        self.api._raw_api.get_stations_routes.return_value = response_data
-        way_history = HistoryFactory()
-
-        with self.assertRaisesRegexp(exceptions.ApiException, r'^\?\?\?$'):
-            self.api.get_stations_routes(way_history, 'token')
+        with mock.patch('core.uzgovua.api.requests.post') as mock_post:
+            mock_post.return_value.json.return_value = response_data
+            with self.assertRaisesRegexp(exceptions.ApiException, r'^\?\?\?$'):
+                get_test_stations_routes(self.api)
 
     def test_get_station_id(self):
         api_object = api.Api()
-        api_object._raw_api = mock.MagicMock()
 
         # Nothing found
-        resp = dict(value=[])
-        api_object._raw_api.get_station_id.return_value = resp
-        self.assertIsNone(api_object.get_station_id('test'))
+        with mock.patch('requests.post') as mock_post:
+            mock_post.return_value.json.return_value = dict(value=[])
+            self.assertIsNone(api_object.get_station_id('test'))
 
         # No exact match
         resp = {
@@ -100,11 +178,12 @@ class ApiTestCase(TestCase):
                 {'title': 'station 2', 'station_id': 2},
             ]
         }
-        api_object._raw_api.get_station_id.return_value = resp
-        self.assertEqual(api_object.get_station_id('station'), 1)
+        with mock.patch('core.uzgovua.api.requests.post') as mock_post:
+            mock_post.return_value.json.return_value = resp
+            self.assertEqual(api_object.get_station_id('station'), 1)
 
-        # Exact match
-        self.assertEqual(api_object.get_station_id('station 2'), 2)
+            # Exact match
+            self.assertEqual(api_object.get_station_id('station 2'), 2)
 
 
 class SmartApiTestCase(TestCase):
@@ -131,49 +210,3 @@ class SmartApiTestCase(TestCase):
 
         token = api_object.token
         MockToken.assert_called_once_with()
-
-    @mock.patch('core.uzgovua.raw.Token')
-    @mock.patch.object(api.Api, 'get_stations_routes')
-    def test_handle_ban_ok(self, mock_get_stations_routes, MockToken):
-        api_object = api.SmartApi()
-        api_object._refresh_token = mock.MagicMock()
-        api_object._token = 'token'
-
-        api_object.get_stations_routes('asd')
-        mock_get_stations_routes.assert_called_once_with('asd', token='token')
-
-    @mock.patch('core.uzgovua.raw.Token')
-    def test_handle_ban_passed(self, MockToken):
-        api_object = api.SmartApi()
-        api_object._raw_api = mock.MagicMock()
-        api_object._refresh_token()
-        api_object._token = 'expired'
-
-        def mocked_refresh_token(*args, **kwargs):
-            api_object._token = 'refreshed'
-
-        def mocked_get_stations_routes(*args, **kwargs):
-            token = kwargs.get('token')
-            if token == 'expired':
-                message = u'Перевищено кількість запитів, 10 хвилин'
-                raise exceptions.BannedApiException(message)
-            elif token == 'refreshed':
-                return dict(error=False)
-
-        api_object._refresh_token = mocked_refresh_token
-        api_object._raw_api.get_stations_routes = mocked_get_stations_routes
-
-        history = HistoryFactory()
-        result = api_object.get_stations_routes(history)
-        self.assertIsNotNone(result)
-
-    @mock.patch('core.uzgovua.raw.Token')
-    def test_handle_ban_didnt_passed(self, MockToken):
-        api_object = api.SmartApi()
-        api_object._raw_api = mock.MagicMock()
-        api_object._raw_api.get_stations_routes.side_effect = \
-            exceptions.BannedApiException(u'Перевищено кількість запитів, 10 хвилин')
-
-        history = HistoryFactory()
-        with self.assertRaises(exceptions.BannedApiException):
-            api_object.get_stations_routes(history)

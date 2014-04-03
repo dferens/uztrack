@@ -7,13 +7,13 @@ from django.utils import timezone
 from celery.utils.log import get_task_logger
 from requests.exceptions import ConnectionError
 
-from core.uzgovua.api import SmartApi
 from celeryapp import app
+from track.api import Api
 from track.models import TrackedWayDayHistory as History
 from . import poller
 
 
-api = SmartApi()
+api = Api()
 logger = get_task_logger(__name__)
 
 
