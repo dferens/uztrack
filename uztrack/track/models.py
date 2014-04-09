@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from bitfield import BitField
 from jsonfield import JSONField
+from annoying.fields import AutoOneToOneField
 
 from core.utils import total_seconds
 from . import utils
@@ -110,7 +111,7 @@ class TrackedWayDayHistory(models.Model):
 
     active = models.BooleanField(default=True)
     tracked_way = models.ForeignKey(TrackedWay, related_name='histories')
-    departure_date = models.DateField()
+    departure_date = models.DateField()    
     places_appeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
                                             related_name='marks_appear', null=True)
     places_disappeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
@@ -122,10 +123,17 @@ class TrackedWayDayHistory(models.Model):
     def __unicode__(self):
         return u'%s on %s' % (self.tracked_way, self.departure_date)
 
-    def get_absolute_url(self):
+    def get_url_kwargs(self):
         date = self.departure_date.strftime(self.ABSOLUTE_URL_DATE_FORMAT)
-        kwargs = dict(pk=self.tracked_way_id, date=date)
-        return reverse('trackedway-history-detail', kwargs=kwargs)
+        return dict(pk=self.tracked_way_id, date=date)
+
+    def get_absolute_url(self):
+        return reverse('trackedway-history-detail',
+                        kwargs=self.get_url_kwargs())
+
+    def get_subscription_url(self):
+        return reverse('history-subscription-detail',
+                        kwargs=self.get_url_kwargs())
 
     @property
     def relevance(self):
@@ -157,6 +165,15 @@ class TrackedWayDayHistory(models.Model):
         else:
             # Regular snapshot
             pass
+
+
+class HistorySubscription(models.Model):
+
+    enabled = models.BooleanField(default=False)
+    history = AutoOneToOneField(TrackedWayDayHistory, related_name='subscription')
+
+    def get_absolute_url(self):
+        return self.history.get_subscription_url()
 
 
 class TrackedWayDayHistorySnapshot(models.Model):

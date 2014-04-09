@@ -17,5 +17,8 @@ urlpatterns = patterns('',
         name='trackedway-edit'),
     url(r'^track/(?P<pk>\d+)/(?P<date>\d{4}-\d{2}-\d{2})/$',
         views.TrackedWayHistoryDetailView.as_view(),
-        name='trackedway-history-detail')
+        name='trackedway-history-detail'),
+    url(r'track/(?P<pk>\d+)/(?P<date>\d{4}-\d{2}-\d{2})/subscribe/$',
+        views.HistorySubscriptionDetailView.as_view(),
+        name='history-subscription-detail'),
 )

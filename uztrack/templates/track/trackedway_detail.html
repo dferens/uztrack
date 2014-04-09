@@ -117,7 +117,11 @@
                 </td>
                 <td>
                   <div class="btn-group">
-                    <a class="btn btn-success">Subscribe</a>
+                  {% if history.subscription.enabled %}
+                    <a href="{{ history.get_subscription_url }}" class="btn btn-success">Subscribed</a>
+                  {% else %}
+                    <a href="{{ history.get_subscription_url }}" class="btn btn-default">Not subscribed</a>
+                  {% endif %}
                     <a href="{{ history.get_absolute_url }}" class="btn btn-primary">Details</a>
                   </div>
                 </td>

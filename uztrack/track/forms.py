@@ -9,12 +9,12 @@ from crispy_forms.layout import Submit
 
 from core.uzgovua.api import Api
 from core.forms import SubmitFormMixin
-from .models import Way, TrackedWay
+from . import models
 
 
 class WayCreateForm(SubmitFormMixin, forms.ModelForm):
     class Meta:
-        model = Way
+        model = models.Way
 
     def __init__(self, *args, **kwargs):
         super(WayCreateForm, self).__init__(*args, **kwargs)
@@ -42,9 +42,13 @@ class WayCreateForm(SubmitFormMixin, forms.ModelForm):
         return self._clean_station_attr('station_to', 'station_id_to')
 
 
+class WayDetailForm(WayCreateForm):
+    pass
+
+
 class TrackedWayCreateForm(SubmitFormMixin, forms.ModelForm):
     class Meta:
-        model = TrackedWay
+        model = models.TrackedWay
         exclude = ('owner',)
 
     def __init__(self, *args, **kwargs):
@@ -53,9 +57,11 @@ class TrackedWayCreateForm(SubmitFormMixin, forms.ModelForm):
             self.fields[field_name].required = False
 
 
-class WayDetailForm(WayCreateForm):
-    pass
-
-
 class TrackedWayDetailForm(TrackedWayCreateForm):
     pass
+
+
+class HistorySubscriptionForm(SubmitFormMixin, forms.ModelForm):
+    class Meta:
+        model = models.HistorySubscription
+        exclude = ('history',)
