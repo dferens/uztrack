@@ -38,14 +38,19 @@ class TrackedWay(models.Model):
     """
     way = models.ForeignKey(Way)
     days = BitField(flags=utils.WEEKDAYS.keys())
-    dep_min_time = models.TimeField(null=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
+    dep_min_time = models.TimeField(null=True, verbose_name=u'departure min time')
+    dep_max_time = models.TimeField(null=True, verbose_name=u'departure max time')
+    arr_min_time = models.TimeField(null=True, verbose_name=u'arrival min time')
+    arr_max_time = models.TimeField(null=True, verbose_name=u'arrival max time')
 
     def __unicode__(self):
         days = ', '.join(self.selected_weekdays)
         return '%s-%s on %s' % (self.way.station_from, self.way.station_to,
                                 ', '.join(self.selected_weekdays))
 
+    def get_absolute_url(self):
+        return reverse('trackedway-detail', kwargs=dict(pk=self.pk))
 
     def get_edit_url(self):
         return reverse('trackedway-edit', kwargs=dict(pk=self.pk))

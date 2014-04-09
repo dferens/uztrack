@@ -41,14 +41,14 @@
           <li class="list-group-item trackedway-station">
             <span class="badge">
               <span class="glyphicon glyphicon-time"></span>
-              {{ tracked_way.start_time|date:"G:i" }} - &infin;
+              {{ tracked_way.dep_min_time|time_24h }} - {{ tracked_way.dep_max_time|time_24h }}
             </span>
             <p class="lead">{{ way.station_from }} <span class="glyphicon glyphicon-arrow-right"></span></p>
           </li>
           <li class="list-group-item trackedway-station">
             <span class="badge">
               <span class="glyphicon glyphicon-time"></span>
-              {{ tracked_way.start_time|date:"G:i" }} - 19:00
+              {{ tracked_way.arr_min_time|time_24h }} - {{ tracked_way.arr_min_time|time_24h }}
             </span>
             <p class="lead">{{ way.station_to }} <span class="glyphicon glyphicon-arrow-left"></span></p>
           </li>

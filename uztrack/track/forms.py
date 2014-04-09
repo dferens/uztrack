@@ -47,7 +47,10 @@ class TrackedWayCreateForm(SubmitFormMixin, forms.ModelForm):
         model = TrackedWay
         exclude = ('owner',)
 
-    dep_min_time = forms.TimeField(required=False)
+    def __init__(self, *args, **kwargs):
+        super(TrackedWayCreateForm, self).__init__(*args, **kwargs)
+        for field_name in ('arr_min_time', 'arr_max_time', 'dep_min_time', 'dep_max_time'):
+            self.fields[field_name].required = False
 
 
 class WayDetailForm(WayCreateForm):

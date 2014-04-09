@@ -19,14 +19,28 @@ class TrackedWayAdmin(admin.ModelAdmin):
     list_filter = (
         ('days', BitFieldListFilter),
     )
-    list_display = ('way', 'owner', 'days_list', 'dep_min_time_24h')
+    list_display = ('way', 'owner', 'days_list', 'departure_time', 'arrival_time')
 
-    def dep_min_time_24h(self, obj):
-        return obj.dep_min_time.strftime('%H:%M') if obj.dep_min_time else ''
-    dep_min_time_24h.short_description = 'Start time'
+    def _render_time(self, value):
+        return value.strftime('%H:%M') if value else '...'
+
+    def departure_time(self, obj):
+        min = self._render_time(obj.dep_min_time)
+        max = self._render_time(obj.dep_max_time)
+        return '%s - %s' % (min, max)
+
+    def arrival_time(self, obj):
+        min = self._render_time(obj.arr_min_time)
+        max = self._render_time(obj.arr_max_time)
+        return '%s - %s' % (min, max)
 
     def days_list(self, obj):
         return  ','.join(obj.selected_weekdays)
+
+    departure_time.short_description = 'Departure time'
+    departure_time.admin_order_field = 'dep_min_time'
+    arrival_time.short_description = 'Arrival time'
+    arrival_time.admin_order_field = 'arr_min_time'
     days_list.short_description = 'Days'
 
 
