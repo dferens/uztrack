@@ -65,7 +65,7 @@ class TrackedWayTestCase(AuthorizedTestCase):
         random_days_handler = tracked_way_days_generator(as_integer=False)
         random_days = [name for (name, is_set) in random_days_handler]
         data = dict(submit='Submit', way=unicode(tracked_way.id),
-                    start_time=u'00:00', days=random_days)
+                    arr_min_time=u'00:00', days=random_days)
         resp = self.client.post(self.url('trackedway-create'), data=data)
         self.assertRedirects(resp, self.url('trackedway-list'))
 

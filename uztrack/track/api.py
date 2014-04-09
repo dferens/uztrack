@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -42,6 +44,10 @@ class Api(SmartApi):
     def get_stations_routes(self, history):
         way = history.tracked_way.way
         tracked_way = history.tracked_way
+        dep_min_time = tracked_way.dep_min_time
+        if dep_min_time is None:
+            dep_min_time = timezone.datetime.time(0, 0)
+
         args = (way.station_id_from, way.station_id_to,
-                history.departure_date, tracked_way.start_time)
+                history.departure_date, dep_min_time)
         return super(Api, self).get_stations_routes(*args)

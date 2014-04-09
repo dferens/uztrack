@@ -38,7 +38,7 @@ class TrackedWay(models.Model):
     """
     way = models.ForeignKey(Way)
     days = BitField(flags=utils.WEEKDAYS.keys())
-    start_time = models.TimeField(default=time(0, 0))
+    dep_min_time = models.TimeField(null=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     def __unicode__(self):

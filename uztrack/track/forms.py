@@ -47,7 +47,7 @@ class TrackedWayCreateForm(SubmitFormMixin, forms.ModelForm):
         model = TrackedWay
         exclude = ('owner',)
 
-    start_time = forms.TimeField(initial='00:00')
+    dep_min_time = forms.TimeField(required=False)
 
 
 class WayDetailForm(WayCreateForm):
