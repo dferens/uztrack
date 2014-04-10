@@ -63,7 +63,8 @@ def get_scheduled_polls():
     """
     result = dict()
     scheduled = app.control.inspect().scheduled()
-    revoked_ids = app.control.inspect().revoked().values()[0]
+    revoked = app.control.inspect().revoked()
+    revoked_ids = revoked.values()[0] if revoked else tuple()
     if scheduled is None: return
     else:
         tasks = scheduled.values()[0]
