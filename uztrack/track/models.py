@@ -46,9 +46,7 @@ class TrackedWay(models.Model):
     arr_max_time = models.TimeField(null=True, verbose_name=u'arrival max time')
 
     def __unicode__(self):
-        days = ', '.join(self.selected_weekdays)
-        return '%s-%s on %s' % (self.way.station_from, self.way.station_to,
-                                ', '.join(self.selected_weekdays))
+        return self.way.__unicode__()
 
     def get_absolute_url(self):
         return reverse('trackedway-detail', kwargs=dict(pk=self.pk))

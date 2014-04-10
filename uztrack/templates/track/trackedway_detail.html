@@ -32,6 +32,12 @@
   </script>
 {% endblock %}
 
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li><a href="{% url 'trackedway-list' %}">Tracked ways</a></li>
+  <li class="active">{{ tracked_way }}</li>
+{% endblock %}
+
 {% block content %}
   <div class="trackedway">
     {% with way=tracked_way.way %}

@@ -10,8 +10,14 @@
   </script>
 {% endblock %}
 
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li><a href="{% url 'trackedway-list' %}">Tracked ways</a></li>
+  <li><a href="{{ history.tracked_way.get_absolute_url }}">{{ history.tracked_way }}</a></li>
+  <li class="active">{{ history.departure_date }}</li>
+  <li><a href="{{ history.get_subscription_url }}">Subscription</a></li>
+{% endblock %}
+
 {% block content %}
-  <div>
-    {{ tracked_}}
-  </div>
+  DETAILS
 {% endblock %}

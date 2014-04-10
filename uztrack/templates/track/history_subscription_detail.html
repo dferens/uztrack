@@ -11,6 +11,16 @@
   <script src="{% static 'js/history_subscription_detail.js' %}"></script>
 {% endblock %}
 
+{% block breadcrumbs %}
+  {{ block.super }}
+  {% with tracked_way=subscription.history.tracked_way %}
+  <li><a href="{% url 'trackedway-list' %}">Tracked ways</a></li>
+  <li><a href="{{ tracked_way.get_absolute_url }}">{{ tracked_way }}</a></li>
+  <li><a href="{{ subscription.history.get_absolute_url }}">{{ subscription.history.departure_date }}</a></li>
+  <li class="active">Subscription</li>
+  {% endwith %}
+{% endblock %}
+
 {% block content %}
   <div class="row">
     <div class="col-md-12">
