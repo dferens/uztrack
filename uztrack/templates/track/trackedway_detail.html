@@ -1,7 +1,7 @@
 {% extends 'track/base.html' %}
 
 {% load staticfiles %}
-{% load track %}
+{% load core track %}
 
 {% block styles %}
   {{ block.super }}
@@ -87,7 +87,7 @@
           <table class="table table-hover trackedway-histories">
             <thead>
               <tr>
-                <th class="col-md-1">Day</th>
+                <th>Day</th>
                 <th>Date</th>
                 <th>Seats</th>
                 <th class="col-md-5">Relevance</th>
@@ -105,7 +105,13 @@
                   </div>
                   {% endwith %}
                 </td>
-                <td>{{ history.departure_date|date:"F, jS" }}</td>
+                <td>
+                  <h4>{{ history.departure_date|date:"F, jS" }}
+                    <span class="label label-{% if history.days_left > 4 %}default{% else %}success{% endif %} pull-right">
+                      {{ history.departure_date|naturaldate }}
+                    </span>
+                  </h4>
+                </td>
                 {% with last_snapshot=history.last_snapshot %}
                 <td>
                   <p class="lead">

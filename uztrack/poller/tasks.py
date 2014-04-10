@@ -11,12 +11,12 @@ from requests.exceptions import ConnectionError
 
 from celeryapp import app
 import track
-from track.api import SmartApi
+from track.api import Api
 from track.models import TrackedWay, TrackedWayDayHistory as History
 from . import poller
 
 
-api = SmartApi()
+api = Api()
 logger = get_task_logger(__name__)
 
 

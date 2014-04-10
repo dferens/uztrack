@@ -109,13 +109,11 @@ class Apps(Settings):
         'grappelli',
         'django.contrib.admin',
         'django.contrib.contenttypes',
+        'django.contrib.humanize',
+        'django.contrib.messages',
         'django.contrib.sessions',
         'django.contrib.sites',
-        'django.contrib.messages',
         'django.contrib.staticfiles',
-
-        # Useful template tags:
-        # 'django.contrib.humanize',
     )
     def THIRD_PARTY_APPS(self): return (
         'crispy_forms',

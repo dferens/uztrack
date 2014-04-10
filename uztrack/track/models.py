@@ -144,6 +144,11 @@ class TrackedWayDayHistory(models.Model):
     def last_snapshot(self):
         return self.snapshots.latest()
 
+    @property
+    def days_left(self):
+        today =  timezone.datetime.today().date()
+        return (self.departure_date - today).days
+
     def check_snapshot(self, snapshot):
         """
         Checks that places for current way history were appeared or disappeared
