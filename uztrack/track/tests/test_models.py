@@ -2,7 +2,7 @@ from datetime import timedelta, datetime
 from mock import patch
 
 from core.tests import TestCase
-from poller import queries as poller_queries
+import poller.tasks
 from .. import utils
 from ..models import TrackedWayDayHistory as History
 from .helpers import TrackedWayFactory, \
@@ -30,10 +30,10 @@ class TrackedWayTestCase(TestCase):
         for date in dates:
             self.assertIn(weekdays[date.weekday()], possible_days)
 
-    @patch.object(poller_queries, 'poll_tracked_way')
-    def test_save(self, mock_poll_tracked_way):
+    @patch.object(poller.tasks, 'startup_tracked_way')
+    def test_save(self, mock_startup_tracked_way):
         tracked_way = TrackedWayFactory()
-        mock_poll_tracked_way.assert_called_once_with(tracked_way)
+        mock_startup_tracked_way.assert_called_once_with(tracked_way)
 
 
 class HistoryCheckSnapshotTestCase(TestCase):
