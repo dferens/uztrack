@@ -3,6 +3,11 @@
 
 {% block page_title %}List of regitered ways{% endblock %}
 
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li class="active">Registered ways</li>
+{% endblock %}
+
 {% block content %}
   {% render_table table %}
   <a class="btn btn-success" href="{% url 'trackedway-create' %}">Create new</a>

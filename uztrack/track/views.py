@@ -23,8 +23,9 @@ class WayCreateView(LoginRequiredMixin, CreateView):
 
 
 class WayDetailView(LoginRequiredMixin, UpdateView):
-    model = models.Way
+    context_object_name = 'way'
     form_class = forms.WayDetailForm
+    model = models.Way
 
 
 class WayListView(LoginRequiredMixin, SingleTableView):

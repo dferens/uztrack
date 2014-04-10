@@ -2,10 +2,16 @@
 
 {% load crispy_forms_tags %}
 
+{% block breadcrumbs %}
+  {{ block.super }}
+  <li><a href="{% url 'way-list' %}">Registered ways</a></li>
+  <li class="active">{{ way }}</li>
+{% endblock %}
+
 {% block content %}
   <div class="row">
     <div class="col-md-4 col-md-offset-4">
-      <h3>Edit way "{{ object }}"</h3>
+      <h3>Edit way "{{ way }}"</h3>
       {% crispy form %}
     </div>
   </div>
