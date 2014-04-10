@@ -62,10 +62,17 @@ def get_scheduled_polls():
     :rtype: :class:`dict`
     """
     result = dict()
-    data = app.control.inspect().scheduled()
-    if data is None: return
+    scheduled = app.control.inspect().scheduled()
+    revoked_ids = app.control.inspect().revoked().values()[0]
+    if scheduled is None: return
     else:
-        for task in data.values()[0]:
+        tasks = scheduled.values()[0]
+        for task in tasks:
+            task_id = task['request']['id']
             history_id = eval(task['request']['args'])[0]
-            result[history_id] = dateutil.parser.parse(task['eta'])
+            if (history_id in result) and (task_id not in revoked_ids):
+                app.control.revoke(task_id)
+            else:
+                result[history_id] = dateutil.parser.parse(task['eta'])
+        
         return result

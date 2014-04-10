@@ -29,14 +29,14 @@ def run():
         if scheduled_polls is None:
             raise ImproperlyConfigured("Could not inspect celery workers.")
         elif not scheduled_polls:
-            logger.warning('No scheduled tasks')
+            logger.warning('No scheduled tasks found')
 
         poll = functools.partial(queries.poll_tracked_way,
                                  celery_scheduled_polls=scheduled_polls)
         for (planned, total) in map(poll, tracked_ways):
             planned_polls += planned; total_polls += total;
 
-        logger.info('poller service started (spawned %d/%d) polls',
+        logger.info('poller service started, spawned (%d/%d) poll processes',
                     planned_polls, total_polls)
     else:
         logger.info('poller service autostart is disabled')
