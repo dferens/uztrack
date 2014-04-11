@@ -27,4 +27,5 @@ Running
 You can use foreman/honcho to run it locally::
 
     $ cp .env.default .env
-    $ foreman start
+    $ ln -s Procfile.dev Procfile
+    $ make run
