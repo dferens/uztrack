@@ -1,2 +1,2 @@
-celery: uztrack/celeryapp.py worker -l info
+celery: uztrack/celeryapp.py worker -l info -B
 web: uztrack/manage.py runserver 127.0.0.1:8000

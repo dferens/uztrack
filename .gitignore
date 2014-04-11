@@ -35,3 +35,6 @@ assets/
 
 # Procfile
 Procfile
+
+# Celery
+celerybeat-schedule
