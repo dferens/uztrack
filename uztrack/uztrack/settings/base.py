@@ -3,6 +3,7 @@ from datetime import timedelta
 from sys import path
 from os.path import abspath, basename, dirname, join, normpath
 
+from celery.schedules import crontab
 from classsettings import Settings, Config, from_env
 
 
@@ -146,6 +147,12 @@ class OwnApps(Settings):
 class Celery(Settings):
     def CELERY_TIMEZONE(self): return 'Europe/Kiev'
     def CELERY_ENABLE_UTC(self): return True
+    def CELERYBEAT_SCHEDULE(self): return {
+        'midnight-synchronise': {
+            'task': 'poller.tasks.synchronize',
+            'schedule': crontab(minute=0, hour=0),
+        },
+    }
 
 class REST_FRAMEWORK(Config):
     def DEFAULT_FILTER_BACKENDS(self): return (

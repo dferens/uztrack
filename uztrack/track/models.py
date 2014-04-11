@@ -83,11 +83,12 @@ class TrackedWay(models.Model):
         return self.histories.filter(active=True)
 
     def save(self, *args, **kwargs):
-        import poller.tasks
-        
         created = self.pk is None
         super(TrackedWay, self).save(*args, **kwargs)
-        if created: poller.tasks.startup_tracked_way(self)
+
+        if created and settings.POLLER_AUTOSTART_NEW:
+            import poller.tasks
+            poller.tasks.startup_tracked_way.delay(self)
 
 
 class TrackedWayDayHistory(models.Model):

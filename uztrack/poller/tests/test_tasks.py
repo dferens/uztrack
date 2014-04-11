@@ -111,7 +111,7 @@ class StartupTaskTestCase(TestCase):
 
 
 @override_settings(POLLER_AUTOSTART_NEW=False)
-class StartupTrackedWayTestCase(TestCase):
+class SynchronizeTestCase(TestCase):
 
     def setUp(self):
         self.tracked_way = TrackedWayFactory()
@@ -120,12 +120,11 @@ class StartupTrackedWayTestCase(TestCase):
             HistoryFactory(tracked_way=self.tracked_way,
                            departure_date=date)
 
-    @patch.object(tasks, 'poll_history')
-    def test_autostart_disabled(self, mock_poll_history_task):
-        tasks.startup_tracked_way(self.tracked_way, {})
-        self.assertFalse(mock_poll_history_task.apply_async.called)
+    @patch('poller.tasks.track')
+    def test_checks_expired_histories(self, mock_track):
+        tasks.synchronize()
+        mock_track.queries.check_expired_histories.assert_called_once_with()
 
-    @override_settings(POLLER_AUTOSTART_NEW=True)
     @patch.object(track.queries, 'get_closest_histories')
     @patch('poller.tasks.poll_history')
     def test_no_or_empty_inspections(self, mock_poll_history_task,
@@ -144,7 +143,6 @@ class StartupTrackedWayTestCase(TestCase):
                 history_id = call_kwargs['args'][0]
                 self.assertTrue(History.objects.filter(id=history_id).exists())
 
-    @override_settings(POLLER_AUTOSTART_NEW=True)
     @patch.object(track.queries, 'get_closest_histories')
     @patch('poller.tasks.poll_history')
     def test_valid_inspections(self, mock_poll_history_task,

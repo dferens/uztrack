@@ -1,6 +1,8 @@
 from datetime import timedelta, datetime
 from mock import patch
 
+from django.test.utils import override_settings
+
 from core.tests import TestCase
 import poller.tasks
 from .. import utils
@@ -30,10 +32,12 @@ class TrackedWayTestCase(TestCase):
         for date in dates:
             self.assertIn(weekdays[date.weekday()], possible_days)
 
+
+    @override_settings(POLLER_AUTOSTART_NEW=True)
     @patch.object(poller.tasks, 'startup_tracked_way')
     def test_save(self, mock_startup_tracked_way):
         tracked_way = TrackedWayFactory()
-        mock_startup_tracked_way.assert_called_once_with(tracked_way)
+        mock_startup_tracked_way.delay.assert_called_once_with(tracked_way)
 
 
 class HistoryCheckSnapshotTestCase(TestCase):

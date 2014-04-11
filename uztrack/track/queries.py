@@ -24,6 +24,19 @@ def get_closest_histories(tracked_way):
     return histories_list
 
 
+def check_expired_histories():
+    """
+    Finds and sets ``active`` to ``False`` for each way history with expired
+    departure date.
+    """
+    today = timezone.now().date()
+    closed_count = (History.objects.filter(active=True,
+                                           departure_date__lt=today)
+                                   .update(active=False))
+    return closed_count
+
+
+
 def create_snapshot(history, stations_routes):
     """
     Creates :class:`Snapshot` snapshot from a given api call result.
