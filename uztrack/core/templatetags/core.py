@@ -23,4 +23,4 @@ def naturaldate(value):
         else:
             result = defaultfilters.timeuntil(value)
 
-        return pgettext('naturaltime', '%(delta)s from now') % {'delta': result}
+        return pgettext('naturaltime', result)

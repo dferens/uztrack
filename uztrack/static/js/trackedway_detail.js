@@ -64,4 +64,9 @@ $(function() {
         range: 4,
     });
     appendWeekdays(calendar);
+
+    $('.trackedway-histories .history .show-hidden .btn').click(function(event) {
+        var hiddenRow = $(event.currentTarget).parent().parent().next();
+        hiddenRow.toggle();
+    });
 });

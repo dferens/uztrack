@@ -24,6 +24,12 @@
 .trackedway .trackedway-histories tbody tr td .lead {
     margin: 0;
 }
+.trackedway .trackedway-histories .history-hidden .list-group {
+    margin-bottom: 0;
+}
+.history .date {
+    color: #2a6496;
+}
 
 .daysbar {
     margin: 0 0 -5px 0;

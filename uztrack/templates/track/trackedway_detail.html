@@ -7,6 +7,7 @@
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static 'cal-heatmap/cal-heatmap.css' %}">
   <link rel="stylesheet" href="{% static 'css/trackedway_detail.css' %}">
+  <link rel="stylesheet" href="http://ianlunn.github.io/Hover/css/hover.css">
 {% endblock %}
 
 {% block scripts %}
@@ -84,9 +85,10 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default">
-          <table class="table table-hover trackedway-histories">
+          <table class="table trackedway-histories">
             <thead>
               <tr>
+                <th></th>
                 <th>Day</th>
                 <th>Date</th>
                 <th>Seats</th>
@@ -97,7 +99,12 @@
             <tbody>
             {% for history in tracked_way.active_histories %}
               {% with day_name=history.departure_date|date:"l"|short_day_name %}
-              <tr>
+              <tr class="history">
+                <td class="show-hidden">
+                  <a class="btn btn-default" data-toggle="button">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                  </a>
+                </td>
                 <td>
                   {% with label_class=day_name|lower %}
                   <div class="daylabel daylabel-{{label_class}}">
@@ -105,7 +112,7 @@
                   </div>
                   {% endwith %}
                 </td>
-                <td>
+                <td class="date">
                   <h4>{{ history.departure_date|date:"F, jS" }}
                     <span class="label label-{% if history.days_left > 4 %}default{% else %}success{% endif %} pull-right">
                       {{ history.departure_date|naturaldate }}
@@ -136,6 +143,15 @@
                   {% endif %}
                     <a href="{{ history.get_absolute_url }}" class="btn btn-primary">Details</a>
                   </div>
+                </td>
+              </tr>
+              <tr class="history-hidden collapse">
+                <td colspan="6">
+                  <ul id="test" class="list-group">
+                    <li class="list-group-item">Train 1</li>
+                    <li class="list-group-item">Train 2</li>
+                    <li class="list-group-item">Train 3</li>
+                  </ul>
                 </td>
               </tr>
               {% endwith %}
