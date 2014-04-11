@@ -22,7 +22,7 @@
   <script>
     // Histories data
     var historiesCalendarData = {
-    {% for history in tracked_way.histories.all %}
+    {% for history in tracked_way.active_histories %}
       {% with last_snapshot=history.last_snapshot %}
         {% if last_snapshot %}
           '{{ history.departure_date|date:'U' }}': {{ last_snapshot.total_places_count }},
