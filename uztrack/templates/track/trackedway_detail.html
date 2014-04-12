@@ -7,18 +7,11 @@
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static 'cal-heatmap/cal-heatmap.css' %}">
   <link rel="stylesheet" href="{% static 'css/trackedway_detail.css' %}">
-  <link rel="stylesheet" href="http://ianlunn.github.io/Hover/css/hover.css">
+  <link rel="stylesheet" href="{% static 'bootstrap-sortable/bootstrap-sortable.css' %}">
 {% endblock %}
 
 {% block scripts %}
   {{ block.super }}
-  <script src="{% static 'highcharts/highstock.js' %}"></script>
-  <script src="{% static 'js/angular.js' %}"></script>
-  <script src="{% static 'bootstrap/js/ui-bootstrap.js' %}"></script>
-  <script src="{% static 'bootstrap/js/ui-bootstrap-tpls.js' %}"></script>
-  <script src="{% static 'd3.v3/d3.v3.js' %}"></script>
-  <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
-  <script src="{% static 'js/trackedway_detail.js' %}"></script>
   <script>
     // Histories data
     var historiesCalendarData = {
@@ -31,6 +24,15 @@
     {% endfor %}
     };
   </script>
+  <script src="{% static 'highcharts/highstock.js' %}"></script>
+  <script src="{% static 'js/angular.js' %}"></script>
+  <script src="{% static 'bootstrap/js/ui-bootstrap.js' %}"></script>
+  <script src="{% static 'bootstrap/js/ui-bootstrap-tpls.js' %}"></script>
+  <script src="{% static 'd3.v3/d3.v3.js' %}"></script>
+  <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
+  <script src="{% static 'js/trackedway_detail.js' %}"></script>
+  <script src="{% static 'js/moment-with-langs.js' %}"></script>
+  <script src="{% static 'bootstrap-sortable/bootstrap-sortable.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -147,11 +149,48 @@
               </tr>
               <tr class="history-hidden collapse">
                 <td colspan="6">
-                  <ul id="test" class="list-group">
-                    <li class="list-group-item">Train 1</li>
-                    <li class="list-group-item">Train 2</li>
-                    <li class="list-group-item">Train 3</li>
-                  </ul>
+                  {% with data=history.last_snapshot.snapshot_data %}
+                  <div class="panel panel-default">
+                    <table class="table sortable">
+                      <thead>
+                        <tr>
+                          <th class="col-md-1">Code</th>
+                          <th class="col-md-4">Way</th>
+                          <th><span class="glyphicon glyphicon-time"></span> Departure/Arrival</th>
+                          <th><span class="glyphicon glyphicon-time"></span> Total</th>
+                          <th><span class="glyphicon glyphicon-info-sign"></span> Seats</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for train_data in data.value %}
+                        <tr>
+                          <td>
+                            <h3 class="code"><code>{{ train_data.num }}</code></h3>
+                          </td>
+                          <td>
+                            <h5>{{ train_data.from.station }} <span class="glyphicon glyphicon-minus"></span> {{ train_data.till.station }}</h5>
+                          </td>
+                          {% with dep_time=train_data.from.date|timestamp arr_time=train_data.till.date|timestamp  %}
+                          <td>
+                            <h4>{{ dep_time|date:'G:i' }} - {{ arr_time|date:'G:i' }}</h4>
+                          </td>
+                          <td>
+                            <h4>{{ arr_time|timeuntil:dep_time }}</h4>
+                          </td>
+                          {% endwith %}
+                          <td>
+                            <ul class="seats">
+                              {% for seats_data in train_data.types %}
+                              <li>{{ seats_data.title }}({{ seats_data.places }})</li>
+                              {% endfor %}
+                            </ul>
+                          </td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                  {% endwith %}
                 </td>
               </tr>
               {% endwith %}

@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 from django import template
 from django.template import defaultfilters
@@ -24,3 +25,8 @@ def naturaldate(value):
             result = defaultfilters.timeuntil(value)
 
         return pgettext('naturaltime', result)
+
+
+@register.filter
+def timestamp(value):
+    return datetime.fromtimestamp(value)
