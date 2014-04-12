@@ -48,17 +48,21 @@
       <div class="col-md-4">
         <ul class="list-group">
           <li class="list-group-item trackedway-station">
+            {% if tracked_way.dep_min_time or tracked_way.dep_max_time %}
             <span class="badge">
               <span class="glyphicon glyphicon-time"></span>
               {{ tracked_way.dep_min_time|time_24h }} - {{ tracked_way.dep_max_time|time_24h }}
             </span>
+            {% endif %}
             <p class="lead">{{ way.station_from }} <span class="glyphicon glyphicon-arrow-right"></span></p>
           </li>
           <li class="list-group-item trackedway-station">
+            {% if tracked_way.arr_min_time or tracked_way.arr_max_time %}
             <span class="badge">
               <span class="glyphicon glyphicon-time"></span>
               {{ tracked_way.arr_min_time|time_24h }} - {{ tracked_way.arr_min_time|time_24h }}
             </span>
+            {% endif %}
             <p class="lead">{{ way.station_to }} <span class="glyphicon glyphicon-arrow-left"></span></p>
           </li>
           <li class="list-group-item">
