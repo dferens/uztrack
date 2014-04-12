@@ -96,7 +96,7 @@ def synchronize():
 
     if settings.POLLER_AUTOSTART:
         logger.info('checking for missing poller tasks...')
-        tracked_ways = TrackedWay.objects.all()
+        tracked_ways_ids = TrackedWay.objects.values_list('id', flat=True)
         planned_polls = total_polls = 0
         scheduled_polls = poller.get_scheduled_polls()
 
@@ -107,7 +107,7 @@ def synchronize():
 
         poll = functools.partial(startup_tracked_way,
                                  celery_scheduled_polls=scheduled_polls)
-        for (planned, total) in map(poll, tracked_ways):
+        for (planned, total) in map(poll, tracked_ways_ids):
             planned_polls += planned; total_polls += total;
 
         if total_polls == 0:

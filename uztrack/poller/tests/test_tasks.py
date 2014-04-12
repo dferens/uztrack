@@ -101,12 +101,13 @@ class StartupTaskTestCase(TestCase):
         mock_startup_tracked_way.return_value = (1, 2)
         
         tasks.startup()
-        all_tracked_ways = TrackedWay.objects.all()
-        self.assertEqual(mock_startup_tracked_way.call_count, len(all_tracked_ways))
+        all_tracked_ways_ids = [t.id for t in TrackedWay.objects.all()]
+        self.assertEqual(mock_startup_tracked_way.call_count,
+                         len(all_tracked_ways_ids))
         for mock_call in mock_startup_tracked_way.call_args_list:
             tracked_way_arg = mock_call[0][0]
             scheduled_polls_kwarg = mock_call[1]['celery_scheduled_polls']
-            self.assertIn(tracked_way_arg, all_tracked_ways)
+            self.assertIn(tracked_way_arg, all_tracked_ways_ids)
             self.assertEqual(scheduled_polls_kwarg, {})
 
 
