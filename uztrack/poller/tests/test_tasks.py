@@ -133,7 +133,7 @@ class SynchronizeTestCase(TestCase):
 
         for scheduled_polls in (None, dict()):
             mock_poll_history_task.reset_mock()
-            planned, total = tasks.startup_tracked_way(self.tracked_way,
+            planned, total = tasks.startup_tracked_way(self.tracked_way.id,
                                                        scheduled_polls)
             self.assertTrue(planned == total == History.objects.count())
             self.assertEqual(mock_poll_history_task.apply_async.call_count,
@@ -151,7 +151,7 @@ class SynchronizeTestCase(TestCase):
         planned_history = History.objects.all()[0]
         scheduled_polls = { planned_history.id: timezone.now() }
 
-        planned, total = tasks.startup_tracked_way(self.tracked_way, scheduled_polls)
+        planned, total = tasks.startup_tracked_way(self.tracked_way.id, scheduled_polls)
         self.assertTrue((planned + 1) == total == History.objects.count())
         mock_calls = mock_poll_history_task.apply_async.call_args_list
         called_history_ids = [c[1]['args'][0] for c in mock_calls]

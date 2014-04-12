@@ -27,8 +27,6 @@ class DATABASES(Config):
     @from_env(key='DATABASE_URL', through=dj_database_url.parse)
     def default(self): pass
 
-class Celery(Settings):
-    def CELERY_TASK_SERIALIZER(self): return 'json'
-    def CELERY_ACCEPT_CONTENT(self): return ['json']
+class Celery(Settings):    
     @from_env
     def BROKER_URL(self): pass

@@ -88,7 +88,7 @@ class TrackedWay(models.Model):
 
         if created and settings.POLLER_AUTOSTART_NEW:
             import poller.tasks
-            poller.tasks.startup_tracked_way.delay(self)
+            poller.tasks.startup_tracked_way.delay(self.id)
 
 
 class TrackedWayDayHistory(models.Model):

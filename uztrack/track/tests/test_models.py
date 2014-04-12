@@ -37,7 +37,7 @@ class TrackedWayTestCase(TestCase):
     @patch.object(poller.tasks, 'startup_tracked_way')
     def test_save(self, mock_startup_tracked_way):
         tracked_way = TrackedWayFactory()
-        mock_startup_tracked_way.delay.assert_called_once_with(tracked_way)
+        mock_startup_tracked_way.delay.assert_called_once_with(tracked_way.id)
 
 
 class HistoryCheckSnapshotTestCase(TestCase):

@@ -57,14 +57,14 @@ def poll_history(history_id):
 
 
 @app.task
-def startup_tracked_way(tracked_way, celery_scheduled_polls=None):
+def startup_tracked_way(tracked_way_id, celery_scheduled_polls=None):
     """
     Launches polling tasks for given tracked way.
 
-    :type tracked_way: :class:`track.models.TrackedWay`.
     :param celery_scheduled_polls: dict of "history_id:datetime".
     """
-    logger.info('checking tasks for tracked way %d ...', tracked_way.id)
+    logger.info('checking tasks for tracked way %d ...', tracked_way_id)
+    tracked_way = TrackedWay.objects.get(id=tracked_way_id)
     start = timezone.localtime(timezone.now())
     stop = start + settings.POLLER_WARMUP
     planned_polls = total_polls = 0

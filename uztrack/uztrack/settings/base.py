@@ -145,8 +145,10 @@ class OwnApps(Settings):
     def POLLER_WAIT_FOR_CELERY(self): return False
 
 class Celery(Settings):
-    def CELERY_TIMEZONE(self): return 'Europe/Kiev'
+    def CELERY_ACCEPT_CONTENT(self): return ['json']
     def CELERY_ENABLE_UTC(self): return True
+    def CELERY_TASK_SERIALIZER(self): return 'json'
+    def CELERY_TIMEZONE(self): return 'Europe/Kiev'
     def CELERYBEAT_SCHEDULE(self): return {
         'midnight-synchronise': {
             'task': 'poller.tasks.synchronize',
