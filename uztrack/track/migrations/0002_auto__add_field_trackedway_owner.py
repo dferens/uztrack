@@ -8,7 +8,12 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        db.clear_table(u'track_trackedwaydayhistorysnapshot')
+        db.clear_table(u'track_trackedwaydayhistory')
         db.clear_table(u'track_trackedway')
+        db.commit_transaction()
+        
+        db.start_transaction()
         # Adding field 'TrackedWay.owner'
         db.add_column(u'track_trackedway', 'owner',
                       self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['accounts.Profile']),
