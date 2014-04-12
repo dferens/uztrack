@@ -80,6 +80,8 @@ class Templates(Settings):
         'django.core.context_processors.tz',
         'django.contrib.messages.context_processors.messages',
         'django.core.context_processors.request',
+
+        'core.context_processors.site_name',
     )
     def TEMPLATE_LOADERS(self): return (
         'django.template.loaders.filesystem.Loader',
