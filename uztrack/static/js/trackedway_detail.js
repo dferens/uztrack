@@ -65,8 +65,11 @@ $(function() {
     });
     appendWeekdays(calendar);
 
-    $('.trackedway-histories .history .show-hidden .btn').click(function(event) {
-        var hiddenRow = $(event.currentTarget).parent().parent().next();
+    $('.trackedway-histories .history .show-hidden .btn').click(function(event) {        
+        var hiddenRow = $(this).parent().parent().next();
         hiddenRow.toggle();
+        $(this).find('span').toggleClass('glyphicon-align-justify')
+                            .toggleClass('glyphicon-remove')
+                            
     });
 });
