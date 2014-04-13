@@ -62,6 +62,16 @@ $(function() {
         subDomain: 'x_day',
         subDomainTextFormat: '%d',
         range: 4,
+
+        onClick: function(date, value) {
+            var dateString = moment(date).format('MM/DD/YYYY');
+            var history = $('.history[data-day="' + dateString + '"]');
+            var isClosed = !(history.next().is(':visible'));
+
+            if (isClosed) history.find('.show-hidden a').click();
+            var scrollValue = history.next().find('thead').position().top;
+            $('html, body').animate({scrollTop: scrollValue}, 200);
+        },
     });
     appendWeekdays(calendar);
 
