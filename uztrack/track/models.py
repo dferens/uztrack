@@ -5,8 +5,10 @@ from datetime import time
 from django.db import models
 from django.dispatch import Signal
 from django.conf import settings
-from django.contrib import admin
+from django.contrib import admin, sites
+from django.core import mail
 from django.core.urlresolvers import reverse
+from django.template.loader import render_to_string
 from django.utils import timezone
 
 from bitfield import BitField
@@ -157,12 +159,14 @@ class TrackedWayDayHistory(models.Model):
         """
         if self.places_appeared is None:
             if snapshot.total_places_count > 0:
+                self.subscription.notify_places_appeared(snapshot)
                 self.places_appeared = snapshot
                 self.save()
                 self.on_places_appeared.send(sender=self)
 
         elif self.places_disappeared is None:
             if snapshot.total_places_count == 0:
+                self.subscription.notify_places_disappeared(snapshot)
                 self.places_disappeared = snapshot
                 self.save()
                 self.on_places_disappeared.send(sender=self)
@@ -172,12 +176,47 @@ class TrackedWayDayHistory(models.Model):
 
 
 class HistorySubscription(models.Model):
+    class Meta:
+        verbose_name = u'history subscription'
+
+    DEFAULT_SUBJECT = 'Subscription update'
+    DEFAULT_TEMPLATE_TXT = 'email/subscription.txt'
+    DEFAULT_TEMPLATE_HTML = 'email/subscription.html'
 
     enabled = models.BooleanField(default=False)
     history = AutoOneToOneField(TrackedWayDayHistory, related_name='subscription')
 
+    @property
+    def target_user(self):
+        return self.history.tracked_way.owner
+
     def get_absolute_url(self):
         return self.history.get_subscription_url()
+
+    def _notify(self, context, subject=None):
+        subject = subject or self.DEFAULT_SUBJECT
+        from_email = settings.EMAIL_HOST_USER
+        to_email = self.target_user.email
+        context.update(subscription=self, history=self.history,
+                       tracked_way=self.history.tracked_way,
+                       SITE=sites.models.Site.objects.get_current().domain)
+        text_content = render_to_string(self.DEFAULT_TEMPLATE_TXT, context)
+        html_content = render_to_string(self.DEFAULT_TEMPLATE_HTML, context)
+
+        message = mail.EmailMultiAlternatives(subject, text_content,
+                                              from_email, [to_email])
+        message.attach_alternative(html_content, 'text/html')
+        message.send()
+
+    def notify_places_appeared(self, snapshot):
+        self._notify({    
+            'title': '%d new tickets appeared' % snapshot.total_places_count,
+        })
+
+    def notify_places_disappeared(self, snapshot):
+        self._notify({
+            'title': 'Tickets for your subscription just have run out',
+        })
 
 
 class TrackedWayDayHistorySnapshot(models.Model):

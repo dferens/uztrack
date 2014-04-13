@@ -18,7 +18,7 @@ class Emails(Settings):
     @from_env
     def EMAIL_HOST_USER(self): pass
     @from_env
-    def EMAIL_PORT(self): return 587
+    def EMAIL_PORT(self): return 465
     def EMAIL_SUBJECT_PREFIX(self): return '[%s] ' % SITE_NAME
     def EMAIL_USE_TLS(self): return True
     def SERVER_EMAIL(self): return self.EMAIL_HOST_USER()
