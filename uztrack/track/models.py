@@ -195,19 +195,21 @@ class HistorySubscription(models.Model):
         return self.history.get_subscription_url()
 
     def _notify(self, context, subject=None):
-        subject = subject or self.DEFAULT_SUBJECT
-        from_email = settings.EMAIL_HOST_USER
-        to_email = self.target_user.email
-        context.update(subscription=self, history=self.history,
-                       tracked_way=self.history.tracked_way,
-                       SITE=sites.models.Site.objects.get_current().domain)
-        text_content = render_to_string(self.DEFAULT_TEMPLATE_TXT, context)
-        html_content = render_to_string(self.DEFAULT_TEMPLATE_HTML, context)
+        if self.enabled:
+            subject = '%s %s' % (settings.EMAIL_SUBJECT_PREFIX,
+                                 subject or self.DEFAULT_SUBJECT)
+            from_email = settings.EMAIL_HOST_USER
+            to_email = self.target_user.email
+            context.update(subscription=self, history=self.history,
+                           tracked_way=self.history.tracked_way,
+                           SITE=sites.models.Site.objects.get_current().domain)
+            text_content = render_to_string(self.DEFAULT_TEMPLATE_TXT, context)
+            html_content = render_to_string(self.DEFAULT_TEMPLATE_HTML, context)
 
-        message = mail.EmailMultiAlternatives(subject, text_content,
-                                              from_email, [to_email])
-        message.attach_alternative(html_content, 'text/html')
-        message.send()
+            message = mail.EmailMultiAlternatives(subject, text_content,
+                                                  from_email, [to_email])
+            message.attach_alternative(html_content, 'text/html')
+            message.send()
 
     def notify_places_appeared(self, snapshot):
         self._notify({    
