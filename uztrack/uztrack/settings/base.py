@@ -18,10 +18,7 @@ class Pathes(Settings):
 # name in our dotted import paths:
 path.append(DJANGO_ROOT)
 
-class Administration(Settings):
-    def ADMINS(self): return (
-        ('Your Name', 'your_email@example.com'),
-    )
+class Administration(Settings):    
     def ALLOWED_HOSTS(self): return []
     def DEBUG(self): return False
     def MANAGERS(self): return self.ADMINS()

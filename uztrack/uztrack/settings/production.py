@@ -5,6 +5,8 @@ from .base import *
 
 
 class Administration(Settings):
+    @from_env(through=lambda s: [x.split(',') for x in s.split(';')])
+    def ADMINS(self): return ()
     def ALLOWED_HOSTS(self): return ['.swinemaker.org']
     @from_env
     def SECRET_KEY(self): pass
