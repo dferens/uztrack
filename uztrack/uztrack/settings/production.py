@@ -18,10 +18,11 @@ class Emails(Settings):
     @from_env
     def EMAIL_HOST_USER(self): pass
     @from_env
-    def EMAIL_PORT(self): return 465
+    def EMAIL_PORT(self): return 587
     def EMAIL_SUBJECT_PREFIX(self): return '[%s] ' % SITE_NAME
     def EMAIL_USE_TLS(self): return True
     def SERVER_EMAIL(self): return self.EMAIL_HOST_USER()
+    def DEFAULT_EMAIL_FROM(self): return self.EMAIL_HOST_USER()
 
 class DATABASES(Config):
     @from_env(key='DATABASE_URL', through=dj_database_url.parse)
