@@ -21,7 +21,6 @@ path.append(DJANGO_ROOT)
 class Administration(Settings):    
     def ALLOWED_HOSTS(self): return []
     def DEBUG(self): return False
-    def MANAGERS(self): return self.ADMINS()
     def SECRET_KEY(self): return "gj_(9d1j(@8bm3lm&b!0c4vkuw2(@3@(3r6d!8m1=48h7"
     def TEMPLATE_DEBUG(self): return self.DEBUG()
     def WSGI_APPLICATION(self): return '%s.wsgi.application' % SITE_NAME
