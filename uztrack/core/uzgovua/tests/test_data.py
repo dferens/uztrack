@@ -65,16 +65,16 @@ class RouteTrainsTestCase(TestCase):
         self.data = data.RouteTrains(self.raw_data)
 
     def test_valid(self):
-        self.assertEqual(len(self.data), 2)
+        self.assertEqual(len(self.data.trains), 2)
         self.assertEqual(self.data.seats_count, 692)
-        self.assertEqual(self.data[0].seats_count, 247)
-        self.assertEqual(self.data[0].station_from.date.day, 23)
-        self.assertEqual(len(self.data[0]), 2)
-        self.assertEqual(self.data[0][0].name, u'С1')
-        self.assertEqual(self.data[0][0].seats_count, 1)
-        self.assertEqual(self.data[0][1].seats_count, 246)
+        self.assertEqual(self.data.trains[0].seats_count, 247)
+        self.assertEqual(self.data.trains[0].station_from.date.day, 23)
+        self.assertEqual(len(self.data.trains[0].seat_types), 2)
+        self.assertEqual(self.data.trains[0].seat_types[0].name, u'С1')
+        self.assertEqual(self.data.trains[0].seat_types[0].seats_count, 1)
+        self.assertEqual(self.data.trains[0].seat_types[1].seats_count, 246)
         
-        for train in self.data:
+        for train in self.data.trains:
             self.assertIsInstance(train, data.RouteTrain)
-            for seats in train:
+            for seats in train.seat_types:
                 self.assertIsInstance(seats, data.SeatsData)

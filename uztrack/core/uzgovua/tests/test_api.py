@@ -17,19 +17,6 @@ def get_test_stations_routes(api_obj):
     return api_obj.get_stations_routes(1, 1, today, time, **kwargs)
 
 
-class UtilsTestCase(TestCase):
-
-    def test_token_requires(self):
-        @api.token_required
-        def testfunc(*args, **kwargs):
-            return 'ok'
-
-        with self.assertRaises(exceptions.TokenRequiredException):
-            testfunc('instance')
-
-        self.assertEqual(testfunc('instance', token='token'), 'ok')
-
-
 class HandleBanTestCase(TestCase):
 
     def test_ok(self):

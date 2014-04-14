@@ -15,6 +15,7 @@ from bitfield import BitField
 from jsonfield import JSONField
 from annoying.fields import AutoOneToOneField
 
+from core.uzgovua import data
 from core.utils import total_seconds
 from . import utils
 
@@ -232,6 +233,10 @@ class TrackedWayDayHistorySnapshot(models.Model):
     made_on = models.DateTimeField(auto_now_add=True)
     total_places_count = models.IntegerField()
     snapshot_data = JSONField()
+
+    @property
+    def route_trains(self):
+        return data.RouteTrains(self.snapshot_data)
 
     def save(self, *args, **kwargs):
         super(TrackedWayDayHistorySnapshot, self).save(*args, **kwargs)

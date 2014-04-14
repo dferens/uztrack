@@ -19,13 +19,12 @@ class ApiTestCase(TestCase):
 
     def test_get_stations_routes(self):
         history = TrackedWayDayHistoryFactory()
-        
+        mock_result = data.RouteTrains()
         with mock.patch.object(__builtin__, 'super') as mock_super:
-            get_routes = mock_super.return_value.get_stations_routes
-            get_routes.return_value = data.RouteTrains()
+            mock_super.return_value.get_stations_routes.return_value = mock_result
 
             route_trains = self.api.get_stations_routes(history)
-            get_routes.assert_called_once_with(
+            mock_super.return_value.get_stations_routes.assert_called_once_with(
                 history.tracked_way.way.station_id_from,
                 history.tracked_way.way.station_id_to,
                 history.departure_date, time(0, 0)
@@ -34,10 +33,10 @@ class ApiTestCase(TestCase):
     def test_get_stations_routes_with_dep_min_time(self):
         history = TrackedWayDayHistoryFactory()
         history.tracked_way.dep_min_time = time(1, 2)
-        
+        mock_result = data.RouteTrains()
         with mock.patch.object(__builtin__, 'super') as mock_super:
             get_routes = mock_super.return_value.get_stations_routes
-            get_routes.return_value = data.RouteTrains()
+            get_routes.return_value = mock_result
 
             route_trains = self.api.get_stations_routes(history)
             get_routes.assert_called_once_with(
@@ -82,7 +81,7 @@ class ApiTestCase(TestCase):
             ]})
 
         def assertNumberOfTrains(expected):
-            self.assertEqual(len(self.api.get_stations_routes(history)), expected)
+            self.assertEqual(len(self.api.get_stations_routes(history).trains), expected)
 
         with mock.patch.object(__builtin__, 'super') as mock_super:
             mock_super.return_value.get_stations_routes = response_factory

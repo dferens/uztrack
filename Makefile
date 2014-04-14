@@ -28,4 +28,7 @@ shell:
 run:
 	honcho start
 
+purge:
+	honcho run uztrack/celeryapp.py purge -f
+
 init: syncdb migrate test

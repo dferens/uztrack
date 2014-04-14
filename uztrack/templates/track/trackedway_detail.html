@@ -153,7 +153,7 @@
               </tr>
               <tr class="history-hidden collapse">
                 <td colspan="6">
-                  {% with data=history.last_snapshot.snapshot_data %}
+                  {% with route_trains=history.last_snapshot.route_trains %}
                   <div class="panel panel-default">
                     <table class="table sortable">
                       <thead>
@@ -166,15 +166,15 @@
                         </tr>
                       </thead>
                       <tbody>
-                        {% for train_data in data.value %}
+                        {% for train_data in route_trains.trains %}
                         <tr>
                           <td>
-                            <h3 class="code"><code>{{ train_data.num }}</code></h3>
+                            <h3 class="code"><code>{{ train_data.code }}</code></h3>
                           </td>
                           <td>
-                            <h5>{{ train_data.from.station }} <span class="glyphicon glyphicon-minus"></span> {{ train_data.till.station }}</h5>
+                            <h5>{{ train_data.station_from.name }} <span class="glyphicon glyphicon-minus"></span> {{ train_data.station_till.name }}</h5>
                           </td>
-                          {% with dep_time=train_data.from.date|timestamp arr_time=train_data.till.date|timestamp  %}
+                          {% with dep_time=train_data.station_from.date arr_time=train_data.station_till.date  %}
                           <td>
                             <h4>{{ dep_time|date:'G:i' }} - {{ arr_time|date:'G:i' }}</h4>
                           </td>
@@ -184,9 +184,14 @@
                           {% endwith %}
                           <td>
                             <ul class="seats">
-                              {% for seats_data in train_data.types %}
-                              <li>{{ seats_data.title }}({{ seats_data.places }})</li>
-                              {% endfor %}
+                            {% for seats_data in train_data.seat_types %}
+                              {% with price=seats_data.price %}    
+                              <li>
+                                {{ seats_data.full_name }}({{ seats_data.seats_count }})
+                                {% if price %}{{ price }} грн.{% endif %}
+                              </li>
+                              {% endwith %}
+                            {% endfor %}
                             </ul>
                           </td>
                         </tr>

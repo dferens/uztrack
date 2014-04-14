@@ -49,8 +49,9 @@ class Api(SmartApi):
         dep_min_time = tracked_way.dep_min_time
         dep_min_time = time(0, 0) if dep_min_time is None else dep_min_time
 
-        args = (way.station_id_from, way.station_id_to,
-                history.departure_date, dep_min_time)
+        base_args = (way.station_id_from, way.station_id_to,
+                     history.departure_date)
+        args = base_args + (dep_min_time,)
         route_trains = super(Api, self).get_stations_routes(*args)
 
         def filter_func(train):
@@ -69,5 +70,11 @@ class Api(SmartApi):
             return True
 
         route_trains.trains = filter(filter_func, route_trains.trains)
+
+        for train_data in route_trains.trains:
+            for seats_data in train_data.seat_types:
+                args = base_args + (train_data.code, seats_data.name)
+                seats_data.coaches = self.get_coaches(*args).coaches
+
         return route_trains
 

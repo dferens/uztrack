@@ -46,7 +46,7 @@ def create_snapshot(history, stations_routes):
     """
     return Snapshot.objects.create(history=history,
                                    total_places_count=stations_routes.seats_count,
-                                   snapshot_data=stations_routes._initial)
+                                   snapshot_data=stations_routes.to_primitive())
 
 def get_search_till_date():
     today = timezone.datetime.today().date()
