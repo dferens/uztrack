@@ -1,0 +1,10 @@
+{% extends 'email/subscription.txt' %}
+
+{% block content %}{{ block.super }}
+
+Tickets available: {{ history.last_snapshots.total_places_count }}
+{% for train in history.last_snapshot.route_trains.trains %}
+{{ forloop.counter }}. Train {{ train.code }} - {{ train.seats_count }} seats:
+{% for seats in train.seat_types %}
+ - {{ seats.full_name }}({{ seats.seats_count }}) - {{ seats.price }} грн.{% endfor %}
+{% endfor %}{% endblock %}

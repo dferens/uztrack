@@ -1,1 +1,7 @@
+{{ title }}
+-----------------
+{% block content %}Tracked way:  {{ tracked_way.way }}
+Date: {{ history.departure_date }}{% endblock %}
+-----------------
 You can change notification settings here - {{ subscription.get_absolute_url }}
+You can view information for this tracked way at http://{{ SITE }}{{history.get_absolute_url }} and change notification settings at http://{{ SITE }}{{ subscription.get_absolute_url }}.

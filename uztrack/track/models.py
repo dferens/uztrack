@@ -189,8 +189,7 @@ class HistorySubscription(models.Model):
         verbose_name = u'history subscription'
 
     DEFAULT_SUBJECT = 'Subscription update'
-    DEFAULT_TEMPLATE_TXT = 'email/subscription.txt'
-    DEFAULT_TEMPLATE_HTML = 'email/subscription.html'
+    DEFAULT_TEMPLATE = 'email/subscription'
 
     enabled = models.BooleanField(default=False)
     history = AutoOneToOneField(TrackedWayDayHistory, related_name='subscription')
@@ -202,17 +201,18 @@ class HistorySubscription(models.Model):
     def get_absolute_url(self):
         return self.history.get_subscription_url()
 
-    def _notify(self, context, subject=None):
+    def _notify(self, context, subject=None, template=None):
         if self.enabled:
-            subject = '%s %s' % (settings.EMAIL_SUBJECT_PREFIX,
-                                 subject or self.DEFAULT_SUBJECT)
+            subject = '%s%s' % (settings.EMAIL_SUBJECT_PREFIX,
+                                subject or self.DEFAULT_SUBJECT)
             from_email = settings.EMAIL_HOST_USER
             to_email = self.target_user.email
             context.update(subscription=self, history=self.history,
                            tracked_way=self.history.tracked_way,
                            SITE=sites.models.Site.objects.get_current().domain)
-            text_content = render_to_string(self.DEFAULT_TEMPLATE_TXT, context)
-            html_content = render_to_string(self.DEFAULT_TEMPLATE_HTML, context)
+            template = template or self.DEFAULT_TEMPLATE
+            text_content = render_to_string(template + '.txt', context)
+            html_content = render_to_string(template + '.html', context)
 
             message = mail.EmailMultiAlternatives(subject, text_content,
                                                   from_email, [to_email])
@@ -220,9 +220,10 @@ class HistorySubscription(models.Model):
             message.send()
 
     def notify_places_appeared(self, snapshot):
-        self._notify({    
-            'title': '%d new tickets appeared' % snapshot.total_places_count,
-        })
+        context = {    
+            'title': '%d new tickets appeared' % snapshot.total_places_count,            
+        }
+        self._notify(context, template='email/places_appeared')
 
     def notify_places_disappeared(self, snapshot):
         self._notify({

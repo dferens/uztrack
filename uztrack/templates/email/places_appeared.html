@@ -1,0 +1,18 @@
+{% extends 'email/subscription.html' %}
+
+{% block content %}
+{{ block.super }}
+<p>Tickets available: {{ history.last_snapshots.total_places_count }}</p>
+<ol>
+  {% for train in history.last_snapshot.route_trains.trains %}
+    <li>
+      <p>Train {{ train.code }} - {{ train.seats_count }} seats</p>
+      <ul>
+        {% for seats in train.seat_types %}
+        <li>{{ seats.full_name }}({{ seats.seats_count }}) - {{ seats.price }} грн.</li>
+        {% endfor %}
+      </ul>
+    </li>
+  {% endfor %}
+</ol>
+{% endblock %}
