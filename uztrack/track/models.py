@@ -153,6 +153,10 @@ class TrackedWayDayHistory(models.Model):
         return self.snapshots.latest()
 
     @property
+    def has_seats(self):
+        return self.last_snapshot.total_places_count > 0
+
+    @property
     def days_left(self):
         today =  timezone.datetime.today().date()
         return (self.departure_date - today).days

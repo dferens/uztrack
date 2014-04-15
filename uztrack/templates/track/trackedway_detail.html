@@ -105,11 +105,13 @@
             <tbody>
             {% for history in tracked_way.active_histories %}
               {% with day_name=history.departure_date|date:"l"|short_day_name %}
-              <tr class="history" data-day="{{ history.departure_date|date:'SHORT_DATE_FORMAT' }}">
+              <tr class="history {{ history.has_seats|yesno:',active' }}" data-day="{{ history.departure_date|date:'SHORT_DATE_FORMAT' }}">
                 <td class="show-hidden">
-                  <a class="btn btn-default" data-toggle="button">
-                    <span class="glyphicon glyphicon-align-justify"></span>
-                  </a>
+                {% if history.has_seats %}
+                    <a class="btn btn-default" data-toggle="button">
+                      <span class="glyphicon glyphicon-align-justify"></span>
+                    </a>
+                {% endif %}
                 </td>
                 <td>
                   {% with label_class=day_name|lower %}
