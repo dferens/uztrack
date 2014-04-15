@@ -9,6 +9,7 @@ from django.utils import timezone
 from celery.utils.log import get_task_logger
 from requests.exceptions import ConnectionError
 
+from core.uzgovua.exceptions import ServiceNotAvailableException
 from celeryapp import app
 import track.queries
 from track.api import Api
@@ -32,8 +33,13 @@ def poll_history(history_id):
     try:
         logger.info('Polling %d history', history_id)
         snapshot = poller.poll(history, api)
-    except ConnectionError, e:
-        logger.error('Connection error')
+    except (ConnectionError, ServiceNotAvailableException) as e:
+        if isinstance(e, ConnectionError):
+            message = 'Connection error' 
+        else:
+            message = 'Service not available'
+
+        logger.error(message)
         next_poll_eta = execution_time + settings.POLLER_CONNECTION_ERROR_RETRY
         logger.info(u'planned next poll for %s on %s' % (history_id, next_poll_eta))
         poll_history.apply_async(args=(history_id,), eta=next_poll_eta)
@@ -43,6 +49,7 @@ def poll_history(history_id):
                        'History id: %d, date: %s\nException: %s',
                         history_id, history.departure_date, message)
         logger.exception(e)
+        raise e
     else:
         next_poll_eta = poller.calc_next_eta(snapshot, history)
         stop_on = poller.calc_stop_eta(history)

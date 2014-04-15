@@ -38,8 +38,9 @@ class PollHistoryTaskTestCase(TestCase):
     def test_raised_other_exception(self, mock_poll, mocked_apply_async):
         mock_poll.side_effect = Exception
 
-        tasks.poll_history(self.history.id)
-        self.assertFalse(mocked_apply_async.called)
+        with self.assertRaises(Exception):
+            tasks.poll_history(self.history.id)
+            self.assertFalse(mocked_apply_async.called)
 
     @patch.object(tasks.poll_history, 'apply_async')
     @patch.object(poller, 'calc_stop_eta')
