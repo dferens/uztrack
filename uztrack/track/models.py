@@ -10,6 +10,7 @@ from django.core import mail
 from django.core.urlresolvers import reverse
 from django.template.loader import render_to_string
 from django.utils import timezone
+from django.utils.functional import cached_property
 
 from bitfield import BitField
 from jsonfield import JSONField
@@ -81,9 +82,12 @@ class TrackedWay(models.Model):
         """
         return (wday for wday, is_set in self.days if is_set)
 
-    @property
+    @cached_property
     def active_histories(self):
-        return self.histories.filter(active=True)
+        from . import queries
+        histories = list(self.histories.filter(active=True).select_related('subscription'))
+        queries.patch_last_snapshots(histories)
+        return histories
 
     def save(self, *args, **kwargs):
         created = self.pk is None
@@ -144,7 +148,7 @@ class TrackedWayDayHistory(models.Model):
                               total_seconds(settings.POLLER_INTERVAL))
         return (elapsed, elapsed_percentage)
 
-    @property
+    @cached_property
     def last_snapshot(self):
         return self.snapshots.latest()
 

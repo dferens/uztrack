@@ -52,13 +52,13 @@ class TrackedWayEditView(LoginRequiredMixin, UpdateView):
 
 
 class TrackedWayDetailView(LoginRequiredMixin, DetailView):
-    model = models.TrackedWay
+    queryset = models.TrackedWay.objects.select_related('way')
     template_name = 'track/trackedway_detail.html'
     context_object_name = 'tracked_way'
 
 
 class TrackedWayListView(LoginRequiredMixin, SingleTableView):
-    model = models.TrackedWay
+    queryset = models.TrackedWay.objects.select_related('way')
     table_class = TrackedWayTable
 
 

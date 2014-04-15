@@ -36,7 +36,6 @@ def check_expired_histories():
     return closed_count
 
 
-
 def create_snapshot(history, stations_routes):
     """
     Creates :class:`Snapshot` snapshot from a given api call result.
@@ -51,3 +50,19 @@ def create_snapshot(history, stations_routes):
 def get_search_till_date():
     today = timezone.datetime.today().date()
     return today + settings.TICKETS_SEARCH_RANGE
+
+
+def patch_last_snapshots(histories):
+    sql = 'SELECT m1.* FROM %s m1 LEFT JOIN %s m2' \
+          ' ON (m1.history_id = m2.history_id AND' \
+          '     m1.made_on < m2.made_on AND' \
+          '     m1.history_id IN (%s)) ' \
+          'WHERE m2.id IS NULL'
+    sql = sql % (Snapshot._meta.db_table, Snapshot._meta.db_table,
+                 ','.join(str(h.id) for h in histories))
+    snapshots = list(Snapshot.objects.raw(sql))
+    histories_snapshots_map = {s.history_id: s for s in snapshots}
+    for history in histories:
+        history.last_snapshot = histories_snapshots_map.get(history.id)
+
+    return histories

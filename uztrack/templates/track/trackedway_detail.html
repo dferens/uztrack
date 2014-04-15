@@ -125,14 +125,13 @@
                     </span>
                   </h4>
                 </td>
-                {% with last_snapshot=history.last_snapshot %}
                 <td>
                   <p class="lead">
-                    {% if last_snapshot %}{{ last_snapshot.total_places_count }}
+                    {% if history.last_snapshot %}
+                      {{ history.last_snapshot.total_places_count }}
                     {% else %}unknown{% endif %}
                   </p>
                 </td>
-                {% endwith %}
                 <td>
                   <div class="progress">
                     {% with relevance=history.relevance %}
