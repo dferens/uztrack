@@ -53,11 +53,10 @@ def get_search_till_date():
 
 
 def patch_last_snapshots(histories):
-    sql = 'SELECT m1.* FROM %s m1 LEFT JOIN %s m2' \
-          ' ON (m1.history_id = m2.history_id AND' \
-          '     m1.made_on < m2.made_on AND' \
-          '     m1.history_id IN (%s)) ' \
-          'WHERE m2.id IS NULL'
+    sql = 'SELECT * FROM %s WHERE id IN' \
+          ' (SELECT max(id) FROM %s ' \
+          '  WHERE history_id IN (%s) ' \
+          '  GROUP BY history_id)'
     sql = sql % (Snapshot._meta.db_table, Snapshot._meta.db_table,
                  ','.join(str(h.id) for h in histories))
     snapshots = list(Snapshot.objects.raw(sql))
