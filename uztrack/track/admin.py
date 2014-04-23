@@ -48,6 +48,7 @@ class HistoryAdmin(admin.ModelAdmin):
     ordering = ('tracked_way__way__id', 'tracked_way__days',
                 'tracked_way__dep_min_time', 'departure_date')
     list_display = ('way', 'weekdays', 'active', 'dep_min_time', 'departure_date')
+    readonly_fields = ('places_appeared', 'places_disappeared')
 
     def way(self, obj):
         return obj.tracked_way.way
