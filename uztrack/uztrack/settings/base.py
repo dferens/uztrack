@@ -59,6 +59,7 @@ class Static(Settings):
     def STATICFILES_FINDERS(self): return (
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
         'django.contrib.staticfiles.finders.FileSystemFinder',
+        'djangobower.finders.BowerFinder',
     )
 
 class Fixtures(Settings):
@@ -116,6 +117,7 @@ class Apps(Settings):
     )
     def THIRD_PARTY_APPS(self): return (
         'crispy_forms',
+        'djangobower',
         'django_tables2',
         'rest_framework',
         'south',
@@ -128,6 +130,19 @@ class Apps(Settings):
     )
     def INSTALLED_APPS(self):
         return self.DJANGO_APPS() + self.THIRD_PARTY_APPS() + self.OWN_APPS()
+
+class Bower(Settings):
+    def BOWER_COMPONENTS_ROOT(self): return SITE_ROOT
+    def BOWER_INSTALLED_APPS(self): return (
+        'jquery',
+        'underscore',
+        'angular',
+        'bootstrap#3',
+        'bootstrap-sortable',
+        'bootstrap-switch',
+        'angular-bootstrap',
+        'cal-heatmap',
+    )
 
 class CrispyForms(Settings):
     def CRISPY_TEMPLATE_PACK(self): return 'bootstrap3'

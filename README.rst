@@ -21,6 +21,10 @@ For production::
 
     $ pip install -r requirements.txt
 
+Install static with bower::
+
+    $ make bowerinstall
+
 Running
 =======
 

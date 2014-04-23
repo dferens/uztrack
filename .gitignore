@@ -27,8 +27,10 @@ build
 .coverage_data
 coverage_html/
 
-# Project files
+# Static
 assets/
+components/*
+!components/.gitkeep
 
 # Env. vars container
 .env

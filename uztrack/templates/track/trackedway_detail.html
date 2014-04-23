@@ -7,7 +7,7 @@
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static 'cal-heatmap/cal-heatmap.css' %}">
   <link rel="stylesheet" href="{% static 'css/trackedway_detail.css' %}">
-  <link rel="stylesheet" href="{% static 'bootstrap-sortable/bootstrap-sortable.css' %}">
+  <link rel="stylesheet" href="{% static 'bootstrap-sortable/Contents/bootstrap-sortable.css' %}">
 {% endblock %}
 
 {% block scripts %}
@@ -24,15 +24,11 @@
     {% endfor %}
     };
   </script>
-  <script src="{% static 'highcharts/highstock.js' %}"></script>
-  <script src="{% static 'js/angular.js' %}"></script>
-  <script src="{% static 'bootstrap/js/ui-bootstrap.js' %}"></script>
-  <script src="{% static 'bootstrap/js/ui-bootstrap-tpls.js' %}"></script>
-  <script src="{% static 'd3.v3/d3.v3.js' %}"></script>
+  <script src="{% static 'd3/d3.js' %}"></script>
   <script src="{% static 'cal-heatmap/cal-heatmap.js' %}"></script>
   <script src="{% static 'js/trackedway_detail.js' %}"></script>
-  <script src="{% static 'js/moment-with-langs.js' %}"></script>
-  <script src="{% static 'bootstrap-sortable/bootstrap-sortable.js' %}"></script>
+  <script src="{% static 'moment/moment.js' %}"></script>
+  <script src="{% static 'bootstrap-sortable/Scripts/bootstrap-sortable.js' %}"></script>
 {% endblock %}
 
 {% block breadcrumbs %}

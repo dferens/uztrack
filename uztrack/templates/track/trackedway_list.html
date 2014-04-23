@@ -10,6 +10,9 @@
 {% endblock %}
 
 {% block content %}
-  {% render_table table %}
+  <p class="lead">Repeated tracked ways</p>
+  {% render_table table_repeated %}
+  <p class="lead">Specific tracked ways</p>
+  {% render_table table_nonrepeated %}
   <a class="btn btn-success" href="{% url 'trackedway-create' %}">Create new</a>
 {% endblock %}

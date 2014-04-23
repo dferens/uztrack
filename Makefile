@@ -20,6 +20,9 @@ testcover:
 	coverage report
 	coverage html
 
+bowerinstall:
+	$(MANAGE) bower_install
+
 collectstatic:
 	$(MANAGE) collectstatic --noinput
 
