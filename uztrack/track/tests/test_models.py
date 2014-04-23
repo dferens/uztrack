@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime, date
 from mock import patch
 
+from django.utils import timezone
 from django.test.utils import override_settings
 
 from core.tests import TestCase
@@ -15,16 +16,22 @@ from .helpers import TrackedWayFactory, \
 class TrackedWayTestCase(TestCase):
 
     def test_closest_histories(self):
+        # Repeated history
         tracked_way = TrackedWayFactory()
-
         dates = tracked_way.next_dates(queries.get_search_till_date())
         for history in tracked_way.closest_histories:
             self.assertIn(history.departure_date, dates)
             self.assertEqual(history.tracked_way, tracked_way)
 
+        # Single-day history
         today = date.today()
         tracked_way = TrackedWayFactory(departure_date=today)
         self.assertTrue(tracked_way.closest_histories[0].departure_date == today)
+
+        # expired
+        with patch('track.models.timezone') as mock_timezone:
+            mock_timezone.now.return_value = timezone.now() + timedelta(days=1)
+            self.assertEqual(tracked_way.closest_histories, [])
 
     def test_is_repeated(self):
         today = date.today()
