@@ -18,6 +18,7 @@ test:
 testcover:
 	$(TEST_HONCHO) coverage run $(TEST_CMD)
 	coverage report
+	coverage html
 
 collectstatic:
 	$(MANAGE) collectstatic --noinput
