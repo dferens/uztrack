@@ -1,11 +1,11 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from mock import patch
 
 from django.test.utils import override_settings
 
 from core.tests import TestCase
 import poller.tasks
-from .. import utils
+from .. import queries, utils
 from ..models import TrackedWayDayHistory as History
 from .helpers import TrackedWayFactory, \
                      TrackedWayDayHistoryFactory as HistoryFactory, \
@@ -13,6 +13,26 @@ from .helpers import TrackedWayFactory, \
 
 
 class TrackedWayTestCase(TestCase):
+
+    def test_closest_histories(self):
+        tracked_way = TrackedWayFactory()
+
+        dates = tracked_way.next_dates(queries.get_search_till_date())
+        for history in tracked_way.closest_histories:
+            self.assertIn(history.departure_date, dates)
+            self.assertEqual(history.tracked_way, tracked_way)
+
+        today = date.today()
+        tracked_way = TrackedWayFactory(departure_date=today)
+        self.assertTrue(tracked_way.closest_histories[0].departure_date == today)
+
+    def test_is_repeated(self):
+        today = date.today()
+        repeated_tracked_way = TrackedWayFactory(departure_date=None)
+        single_day_tracked_way = TrackedWayFactory(departure_date=today)
+
+        self.assertTrue(repeated_tracked_way.is_repeated)
+        self.assertFalse(single_day_tracked_way.is_repeated)
 
     def test_unicode(self):
         tracked_way = TrackedWayFactory()

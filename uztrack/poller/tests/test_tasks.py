@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from mock import patch
+from mock import Mock, patch
 from requests.exceptions import ConnectionError
 
 from django.core.exceptions import ImproperlyConfigured
@@ -127,14 +127,15 @@ class SynchronizeTestCase(TestCase):
         tasks.synchronize()
         mock_track.queries.check_expired_histories.assert_called_once_with()
 
-    @patch.object(track.queries, 'get_closest_histories')
     @patch('poller.tasks.poll_history')
-    def test_no_or_empty_inspections(self, mock_poll_history_task,
-                                           mock_get_closest_histories):
-        mock_get_closest_histories.return_value = History.objects.all()
+    def test_no_or_empty_inspections(self, mock_poll_history_task):
 
         for scheduled_polls in (None, dict()):
             mock_poll_history_task.reset_mock()
+
+            with patch.object(TrackedWay, 'closest_histories') as mock_closest_histories:
+                mock_closest_histories.__get__ = Mock(return_value=History.objects.all())
+
             planned, total = tasks.startup_tracked_way(self.tracked_way.id,
                                                        scheduled_polls)
             self.assertTrue(planned == total == History.objects.count())
@@ -145,15 +146,15 @@ class SynchronizeTestCase(TestCase):
                 history_id = call_kwargs['args'][0]
                 self.assertTrue(History.objects.filter(id=history_id).exists())
 
-    @patch.object(track.queries, 'get_closest_histories')
     @patch('poller.tasks.poll_history')
-    def test_valid_inspections(self, mock_poll_history_task,
-                                     mock_get_closest_histories):
-        mock_get_closest_histories.return_value = History.objects.all()
+    def test_valid_inspections(self, mock_poll_history_task):        
         planned_history = History.objects.all()[0]
         scheduled_polls = { planned_history.id: timezone.now() }
 
-        planned, total = tasks.startup_tracked_way(self.tracked_way.id, scheduled_polls)
+        with patch.object(TrackedWay, 'closest_histories') as mock_closest_histories:
+            mock_closest_histories.__get__ = Mock(return_value=History.objects.all())
+            planned, total = tasks.startup_tracked_way(self.tracked_way.id, scheduled_polls)        
+        
         self.assertTrue((planned + 1) == total == History.objects.count())
         mock_calls = mock_poll_history_task.apply_async.call_args_list
         called_history_ids = [c[1]['args'][0] for c in mock_calls]

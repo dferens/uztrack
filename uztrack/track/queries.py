@@ -5,25 +5,6 @@ from .models import TrackedWayDayHistory as History, \
                     TrackedWayDayHistorySnapshot as Snapshot
 
 
-def get_closest_histories(tracked_way):
-    """
-    Returns collection of closest :class:`History` objects for a given way.
-    Creates new records if needed.
-    """
-    closest_dates = tracked_way.next_dates(get_search_till_date())
-    found_histories = History.objects.filter(active=True,
-                                             departure_date__in=closest_dates)
-    found_dates = found_histories.values_list('departure_date', flat=True)
-    not_found_dates = filter(lambda d: d not in found_dates, closest_dates)
-    histories_list = list(found_histories)
-    for not_found_date in not_found_dates:
-        histories_list.append(
-            History.objects.create(tracked_way=tracked_way,
-                                   departure_date=not_found_date)
-        )
-    return histories_list
-
-
 def check_expired_histories():
     """
     Finds and sets ``active`` to ``False`` for each way history with expired

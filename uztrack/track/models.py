@@ -44,6 +44,7 @@ class TrackedWay(models.Model):
     way = models.ForeignKey(Way)
     days = BitField(flags=utils.WEEKDAYS.keys())
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
+    departure_date = models.DateField(null=True, blank=True)
     dep_min_time = models.TimeField(null=True, verbose_name=u'departure min time')
     dep_max_time = models.TimeField(null=True, verbose_name=u'departure max time')
     arr_min_time = models.TimeField(null=True, verbose_name=u'arrival min time')
@@ -51,6 +52,34 @@ class TrackedWay(models.Model):
 
     def __unicode__(self):
         return self.way.__unicode__()
+
+    @property
+    def is_repeated(self):
+        return self.departure_date is None
+
+    @property
+    def closest_histories(self):
+        """
+        Returns collection of closest :class:`History` objects for a given way.
+        Creates new records if needed.
+        """
+        from .models import TrackedWayDayHistory as History
+        from .queries import get_search_till_date
+
+        closest_dates = self.next_dates(get_search_till_date())
+
+        if self.is_repeated:
+            found_histories = History.objects.filter(active=True,
+                                                     departure_date__in=closest_dates)
+            found_dates = found_histories.values_list('departure_date', flat=True)
+            not_found_dates = filter(lambda d: d not in found_dates, closest_dates)
+            histories_list = list(found_histories)
+            histories_list.extend(self.histories.create(departure_date=date)
+                                  for date in not_found_dates)
+            return histories_list
+        else:
+            creator = lambda d: self.histories.get_or_create(departure_date=d)[0]
+            return map(creator, closest_dates)
 
     def get_absolute_url(self):
         return reverse('trackedway-detail', kwargs=dict(pk=self.pk))
@@ -69,9 +98,14 @@ class TrackedWay(models.Model):
         :return: list of :class:`datetime.date` objects
         """
         starts_from = timezone.now()
-        dateutil_weekdays = map(utils.get_dateutil_weekday, self.selected_weekdays)
-        rule = rrule.rrule(rrule.WEEKLY, byweekday=dateutil_weekdays, until=till)
-        return [x.date() for x in rule]
+
+        if self.is_repeated:
+            dateutil_weekdays = map(utils.get_dateutil_weekday, self.selected_weekdays)
+            rule = rrule.rrule(rrule.WEEKLY, byweekday=dateutil_weekdays, until=till)
+            return [x.date() for x in rule]
+        else:
+            is_expired = starts_from.date() > self.departure_date
+            return [] if is_expired else [self.departure_date]
 
     @property
     def selected_weekdays(self):

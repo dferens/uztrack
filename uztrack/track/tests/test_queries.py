@@ -7,15 +7,8 @@ from core.uzgovua.data import RouteTrains
 from .helpers import TrackedWayFactory
 from .. import models, queries
 
+
 class QueriesTestCase(TestCase):
-
-    def test_get_closest_histories(self):
-        tracked_way = TrackedWayFactory()
-
-        dates = tracked_way.next_dates(queries.get_search_till_date())
-        for history in queries.get_closest_histories(tracked_way):
-            self.assertIn(history.departure_date, dates)
-            self.assertEqual(history.tracked_way, tracked_way)
 
     def test_create_snapshot(self):
         history = mommy.make(models.TrackedWayDayHistory)
