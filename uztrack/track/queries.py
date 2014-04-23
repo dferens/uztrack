@@ -34,15 +34,16 @@ def get_search_till_date():
 
 
 def patch_last_snapshots(histories):
-    sql = 'SELECT * FROM %s WHERE id IN' \
-          ' (SELECT max(id) FROM %s ' \
-          '  WHERE history_id IN (%s) ' \
-          '  GROUP BY history_id)'
-    sql = sql % (Snapshot._meta.db_table, Snapshot._meta.db_table,
-                 ','.join(str(h.id) for h in histories))
-    snapshots = list(Snapshot.objects.raw(sql))
-    histories_snapshots_map = {s.history_id: s for s in snapshots}
-    for history in histories:
-        history.last_snapshot = histories_snapshots_map.get(history.id)
+    if histories:
+      sql = 'SELECT * FROM %s WHERE id IN' \
+            ' (SELECT max(id) FROM %s ' \
+            '  WHERE history_id IN (%s) ' \
+            '  GROUP BY history_id)'
+      sql = sql % (Snapshot._meta.db_table, Snapshot._meta.db_table,
+                   ','.join(str(h.id) for h in histories))
+      snapshots = list(Snapshot.objects.raw(sql))
+      histories_snapshots_map = {s.history_id: s for s in snapshots}
+      for history in histories:
+          history.last_snapshot = histories_snapshots_map.get(history.id)
 
     return histories
