@@ -3,14 +3,14 @@ import json
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.utils import timezone
 
 from django_tables2 import SingleTableView
 from braces.views import LoginRequiredMixin, AjaxResponseMixin, JSONResponseMixin
 
-from . import forms, models
+from . import forms, models, tables
 from .tables import WayTable, TrackedWayTable
 
 
@@ -57,9 +57,23 @@ class TrackedWayDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'tracked_way'
 
 
-class TrackedWayListView(LoginRequiredMixin, SingleTableView):
-    queryset = models.TrackedWay.objects.select_related('way')
-    table_class = TrackedWayTable
+class TrackedWayListView(LoginRequiredMixin, TemplateView):
+
+    template_name = 'track/trackedway_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(TrackedWayListView, self).get_context_data(**kwargs)
+
+        tracked_ways = models.TrackedWay.objects.select_related('way')
+        tables_data = {
+            'repeated': filter(lambda way: way.is_repeated, tracked_ways),
+            'nonrepeated': filter(lambda way: not way.is_repeated, tracked_ways)
+        }
+        for name in tables_data:
+            table = tables.TrackedWayTable(tables_data[name])
+            context['table_%s' % name] = table
+
+        return context
 
 
 class HistoryRelatedMixin(object):

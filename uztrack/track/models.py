@@ -78,7 +78,7 @@ class TrackedWay(models.Model):
                                   for date in not_found_dates)
             return histories_list
         else:
-            return [self.histories.all()[0]]
+            return [self.histories.all()[0]] if closest_dates else []
 
     def get_absolute_url(self):
         return reverse('trackedway-detail', kwargs=dict(pk=self.pk))
@@ -110,6 +110,7 @@ class TrackedWay(models.Model):
     def selected_weekdays(self):
         """
         Returns days it should check tickets on.
+        Makes sense for repeated t-ways only.
 
         :return: generator of weekday names, like ('Monday', 'Friday', ...)
         """

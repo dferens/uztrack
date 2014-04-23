@@ -20,11 +20,9 @@ class TrackedWayTable(Table):
     class Meta:
         model = TrackedWay
         attrs = {'class': 'table table-striped table-bordered table-hover'}
-        # exclude = ('id', 'owner')
         fields = ('way', 'days', 'departure_time', 'arrival_time', 'detail')
 
     way = columns.LinkColumn('way-detail', kwargs={'pk': A('way.pk')})
-    days = columns.TemplateColumn(template_name='blocks/bitfield.html')
     detail = FixedLinkColumn('trackedway-detail', kwargs={'pk': A('pk')}, text='See tickets')
     departure_time = columns.Column(accessor=A('id'),
                                     verbose_name=u'departure time')
@@ -33,6 +31,14 @@ class TrackedWayTable(Table):
 
     def __render_time(self, value):
         return value.strftime('%H:%M') if value else '...'
+
+    def render_days(self, value, bound_row=None, **kwargs):
+        tracked_way = bound_row.record
+
+        if tracked_way.is_repeated:
+            return ', '.join(k for (k, v) in tracked_way.days.iteritems() if v)
+        else:
+            return tracked_way.departure_date
 
     def render_departure_time(self, value, bound_row=None, **kwargs):
         tracked_way = bound_row.record
