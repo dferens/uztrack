@@ -78,8 +78,7 @@ class TrackedWay(models.Model):
                                   for date in not_found_dates)
             return histories_list
         else:
-            creator = lambda d: self.histories.get_or_create(departure_date=d)[0]
-            return map(creator, closest_dates)
+            return [self.histories.all()[0]]
 
     def get_absolute_url(self):
         return reverse('trackedway-detail', kwargs=dict(pk=self.pk))
@@ -126,6 +125,9 @@ class TrackedWay(models.Model):
     def save(self, *args, **kwargs):
         created = self.pk is None
         super(TrackedWay, self).save(*args, **kwargs)
+
+        if not self.is_repeated:
+            self.histories.create(departure_date=self.departure_date)
 
         if created and settings.POLLER_AUTOSTART_NEW:
             import poller.tasks
