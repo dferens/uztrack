@@ -19,6 +19,12 @@ class AuthorizedTestCase(TestCase):
         self.auth('testuser', 'password')
 
 
+class HomeTestCase(TestCase):
+
+    def test_access(self):
+        self.assertEqual(self.client.get(self.url('home')).status_code, 200)
+
+
 class TrackedWayTestCase(AuthorizedTestCase):
 
     def test_list(self):

@@ -15,6 +15,10 @@ from . import forms, models, tables
 from .tables import WayTable, TrackedWayTable
 
 
+class Home(TemplateView):
+    template_name = 'home.html'
+
+
 class TrackedWayCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.TrackedWayCreateForm
     success_url = reverse_lazy('trackedway-list')
