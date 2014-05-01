@@ -30,7 +30,7 @@ class TrackedWayTestCase(TestCase):
 
         # expired
         with patch('track.models.timezone') as mock_timezone:
-            mock_timezone.now.return_value = timezone.now() + timedelta(days=1)
+            mock_timezone.now.return_value = timezone.now() + timedelta(days=2)
             self.assertEqual(tracked_way.closest_histories, [])
 
     def test_is_repeated(self):
