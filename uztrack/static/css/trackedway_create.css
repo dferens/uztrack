@@ -9,3 +9,6 @@
 .checkbox-inline input[type=checkbox] {
     display: none;
 }
+input[type=radio] {
+    display: none;
+}
