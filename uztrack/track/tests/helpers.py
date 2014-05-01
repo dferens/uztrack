@@ -3,7 +3,7 @@ from random import sample, randrange
 from bitfield.types import BitHandler
 from model_mommy.recipe import Recipe
 
-from ..models import TrackedWay, \
+from ..models import Way, TrackedWay, \
                      TrackedWayDayHistory as History, \
                      TrackedWayDayHistorySnapshot as Snapshot
 
@@ -30,6 +30,8 @@ def _recipe_wrapper(recipe):
     return lambda **kwargs: recipe.make(**kwargs)
 
 
+WayRecipe = Recipe(Way)
+WayFactory = _recipe_wrapper(WayRecipe)
 TrackedWayRecipe = Recipe(TrackedWay,
     days = tracked_way_days_generator,
 )

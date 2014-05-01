@@ -1,6 +1,6 @@
 import json
 
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView, DetailView
@@ -17,6 +17,7 @@ from .tables import WayTable, TrackedWayTable
 
 class TrackedWayCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.TrackedWayCreateForm
+    success_url = reverse_lazy('trackedway-list')
     template_name = 'track/trackedway_create.html'
 
     def form_valid(self, form):
@@ -27,9 +28,6 @@ class TrackedWayCreateView(LoginRequiredMixin, CreateView):
 
     def form_invalid(self, form):
         return JsonResponse({'errors': form.errors})
-
-    def get_success_url(self):
-        return reverse('trackedway-list')
 
 
 class TrackedWayEditView(LoginRequiredMixin, UpdateView):
