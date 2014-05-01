@@ -10,27 +10,10 @@ from django.utils import timezone
 from django_tables2 import SingleTableView
 from braces.views import LoginRequiredMixin, AjaxResponseMixin, JSONResponseMixin
 
+from core.utils import JsonResponse
 from . import forms, models, tables
 from .tables import WayTable, TrackedWayTable
 
-
-class WayCreateView(LoginRequiredMixin, CreateView):
-    form_class = forms.WayCreateForm
-    template_name = 'track/way_create.html'
-
-    def get_success_url(self):
-        return reverse('way-list')
-
-
-class WayDetailView(LoginRequiredMixin, UpdateView):
-    context_object_name = 'way'
-    form_class = forms.WayDetailForm
-    model = models.Way
-
-
-class WayListView(LoginRequiredMixin, SingleTableView):
-    model = models.Way
-    table_class = WayTable
 
 class TrackedWayCreateView(LoginRequiredMixin, CreateView):
     form_class = forms.TrackedWayCreateForm
@@ -40,7 +23,10 @@ class TrackedWayCreateView(LoginRequiredMixin, CreateView):
         self.object = form.save(commit=False)
         self.object.owner = self.request.user
         self.object.save()
-        return HttpResponseRedirect(self.get_success_url())
+        return JsonResponse({'redirect': self.get_success_url()})
+
+    def form_invalid(self, form):
+        return JsonResponse({'errors': form.errors})
 
     def get_success_url(self):
         return reverse('trackedway-list')

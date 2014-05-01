@@ -1,0 +1,11 @@
+.station-select {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 0;
+}
+
+.checkbox-inline input[type=checkbox] {
+    display: none;
+}

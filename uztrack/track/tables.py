@@ -22,7 +22,7 @@ class TrackedWayTable(Table):
         attrs = {'class': 'table table-striped table-bordered table-hover'}
         fields = ('way', 'days', 'departure_time', 'arrival_time', 'detail')
 
-    way = columns.LinkColumn('way-detail', kwargs={'pk': A('way.pk')})
+    way = columns.Column()
     detail = FixedLinkColumn('trackedway-detail', kwargs={'pk': A('pk')}, text='See tickets')
     departure_time = columns.Column(accessor=A('id'),
                                     verbose_name=u'departure time')

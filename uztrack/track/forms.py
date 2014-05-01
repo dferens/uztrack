@@ -9,52 +9,43 @@ from crispy_forms.layout import Submit
 
 from core.uzgovua.api import Api
 from core.forms import SubmitFormMixin
-from . import models
+from . import models, queries
 
 
-class WayCreateForm(SubmitFormMixin, forms.ModelForm):
-    class Meta:
-        model = models.Way
-
-    def __init__(self, *args, **kwargs):
-        super(WayCreateForm, self).__init__(*args, **kwargs)
-        self.fields['station_id_from'].widget = forms.HiddenInput()
-        self.fields['station_id_to'].widget = forms.HiddenInput()
-        for key in self.fields:
-            self.fields[key].required = True
-
-    def _clean_station_attr(self, name_attr, id_attr):
-        api = Api()
-        station_name = self.cleaned_data[name_attr]
-        station_id = api.get_station_id(station_name)
-
-        if station_id is None:
-            raise forms.ValidationError('Station "%s" does not exist' % station_name)
-
-        del self.errors[id_attr]
-        self.cleaned_data[id_attr] = station_id
-        return station_name
-
-    def clean_station_from(self):
-        return self._clean_station_attr('station_from', 'station_id_from')
-
-    def clean_station_to(self):
-        return self._clean_station_attr('station_to', 'station_id_to')
-
-
-class WayDetailForm(WayCreateForm):
-    pass
-
-
-class TrackedWayCreateForm(SubmitFormMixin, forms.ModelForm):
+class TrackedWayCreateForm(forms.ModelForm):
     class Meta:
         model = models.TrackedWay
         exclude = ('owner',)
+        widgets = {
+            'way': forms.HiddenInput()
+        }
+
+    is_repeated = forms.BooleanField(required=False)
+    station_name_from = forms.CharField(min_length=2)
+    station_name_to = forms.CharField(min_length=2)
 
     def __init__(self, *args, **kwargs):
         super(TrackedWayCreateForm, self).__init__(*args, **kwargs)
-        for field_name in ('arr_min_time', 'arr_max_time', 'dep_min_time', 'dep_max_time'):
-            self.fields[field_name].required = False
+        self.fields['way'].required = False
+
+    def clean(self):
+        cleaned_data = super(TrackedWayCreateForm, self).clean()
+
+        if cleaned_data['is_repeated']:
+            if cleaned_data['days'] == 0:
+                self._errors['days'] = self.error_class(['At least one day should be specified'])
+        else:
+            if not cleaned_data['departure_date']:
+                self._errors['departure_date'] = self.error_class(['Departure date not specified'])
+
+        if 'station_name_from' in cleaned_data and \
+           'station_name_to' in cleaned_data:
+            cleaned_data['way'] = queries.get_way(cleaned_data['station_name_from'],
+                                                  cleaned_data['station_name_to'])
+            if cleaned_data['way'] is None:
+                raise forms.ValidationError('No such way')
+
+        return cleaned_data
 
 
 class TrackedWayDetailForm(TrackedWayCreateForm):

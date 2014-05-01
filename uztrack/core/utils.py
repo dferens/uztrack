@@ -1,12 +1,20 @@
+import json
 import calendar
 import datetime
 
+from django.http import HttpResponse
 from django.utils import timezone
 
 
 class DotDict(dict):
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
+
+
+class JsonResponse(HttpResponse):
+
+    def __init__(self, data):
+        return super(JsonResponse, self).__init__(json.dumps(data), 'application/json')
 
 
 def total_seconds(td):

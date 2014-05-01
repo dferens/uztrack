@@ -26,7 +26,8 @@ class Way(models.Model):
     Defines abstract directed way between two train stations.
     """
     class Meta:
-        unique_together = (('station_id_from', 'station_id_to'))
+        unique_together = (('station_id_from', 'station_id_to'),
+                           ('station_from', 'station_to'))
 
     station_id_from = models.IntegerField()
     station_from = models.CharField(max_length=30)
@@ -45,10 +46,10 @@ class TrackedWay(models.Model):
     days = BitField(flags=utils.WEEKDAYS.keys())
     owner = models.ForeignKey(settings.AUTH_USER_MODEL)
     departure_date = models.DateField(null=True, blank=True)
-    dep_min_time = models.TimeField(null=True, verbose_name=u'departure min time')
-    dep_max_time = models.TimeField(null=True, verbose_name=u'departure max time')
-    arr_min_time = models.TimeField(null=True, verbose_name=u'arrival min time')
-    arr_max_time = models.TimeField(null=True, verbose_name=u'arrival max time')
+    dep_min_time = models.TimeField(null=True, blank=True, verbose_name=u'departure min time')
+    dep_max_time = models.TimeField(null=True, blank=True, verbose_name=u'departure max time')
+    arr_min_time = models.TimeField(null=True, blank=True, verbose_name=u'arrival min time')
+    arr_max_time = models.TimeField(null=True, blank=True, verbose_name=u'arrival max time')
 
     def __unicode__(self):
         return self.way.__unicode__()

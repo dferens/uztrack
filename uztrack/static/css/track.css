@@ -1,3 +1,25 @@
+.daylabel {
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    padding: 7px;
+    margin: 2px;
+    border-radius: 20px;
+    width: 35px;
+    height: 35px;
+    line-height: 23px;
+    display: inline-block;
+}
+
+.daylabel-mo {background-color: #5cb85c;}
+.daylabel-tu {background-color: #5bc0de;}
+.daylabel-we {background-color: #f0ad4e;}
+.daylabel-th {background-color: #d9534f;}
+.daylabel-fr {background-color: #428bca;}
+.daylabel-sa {background-color: #d9534f;}
+.daylabel-su {background-color: #d9534f;}
+
 .waytable, .trackedwaytable {
     width: 100%;
 }

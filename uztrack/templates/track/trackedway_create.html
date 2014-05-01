@@ -1,12 +1,135 @@
 {% extends 'track/base.html' %}
 
+{% load static %}
 {% load crispy_forms_tags %}
 
+{% block scripts %}
+  {{ block.super }}
+  <script src="{% static 'moment/moment.js' %}"></script>
+  <script src="{% static 'select2/select2.js' %}"></script>
+  <script src="{% static 'angular/angular.js' %}"></script>
+  <script src="{% static 'eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker.js' %}"></script>  
+  <script src="{% static 'angular-rangeslider/angular.rangeSlider.js' %}"></script>
+  <script src="{% static 'angular-ui-select2/src/select2.js' %}"></script>
+  <script src="{% static 'js/trackedway_create.js' %}"></script>
+{% endblock %}
+
+{% block styles %}
+  {{ block.super }}
+  <link rel="stylesheet" href="{% static 'angular-rangeslider/angular.rangeSlider.css' %}">
+  <link rel="stylesheet" href="{% static 'select2/select2.css' %}">
+  <link rel="stylesheet" href="{% static 'select2-bootstrap-css/select2-bootstrap.css' %}">
+  <link rel="stylesheet" href="{% static 'css/trackedway_create.css' %}">
+  <link rel="stylesheet" href="{% static 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css' %}">
+{% endblock %}
+  
 {% block content %}
-  <div class="row">
-    <div class="col-md-4 col-md-offset-4">
-      <h3>Add new tracked way</h3>
-      {% crispy form %}
+  {% verbatim %}
+  <div ng-app="TrackedWayApp" ng-controller="CreateCtrl" class="row">
+    <div class="col-md-5 col-md-offset-3">
+      <form name="form" method="post" ng-submit="submit()">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Add new tracked way</h3>
+          </div>
+          <ul class="list-group">
+            <li class="list-group-item">
+              <div class="row">
+                <input type="hidden" ng-model="csrftoken" name="csrfmiddlewaretoken">
+
+                <div class="col-md-6 form-group"
+                 ng-class="{'has-error': form.station_from.$error.required}">
+                  <label class="control-label">Station from</label>
+                  <div class="controls">
+                    <input class="select2-input select2-default station-select" type="hidden"
+                     ui-select2="stationFromSelectOptions" ng-model="station_from" name="station_from" required />
+                    <span class="help-block" ng-show="form.station_from.$error.required">This field is required</span>
+                  </div>
+                </div>
+                <div class="col-md-6 form-group"
+                 ng-class="{'has-error': form.station_to.$error.required}">
+                  <label class="control-label">Station to</label>
+                  <div class="controls">
+                    <input class="select2-input select2-default station-select" type="hidden"
+                     ui-select2="stationToSelectOptions" ng-model="station_to" name="station_to" required />
+                     <span class="help-block" ng-show="form.station_to.$error.required">This field is required</span>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <li class="list-group-item">
+              <label class="control-label">Should I check it periodically?</label>
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="btn-group btn-group-justified">
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default" ng-model="is_repeated" btn-radio="true">Yes</button>
+                    </div>
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-default" ng-model="is_repeated" btn-radio="false">No</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+            <li class="list-group-item" ng-show="is_repeated">              
+              <div class="row">                
+                <div class="col-md-12 form-group"
+                 ng-class="{'has-error': getSelectedDays() == 0}">
+                  <label class="control-label">Select week days i should check tickets on</label>
+                  <div class="btn-group btn-group-justified">
+                    <label class="checkbox-inline btn btn-default" ng-repeat="day in days"
+                     ng-class="day.enabled?'btn-success':'btn-default'">
+                      <input type="checkbox" ng-model="days[$index].enabled" />
+                      {{ day.title }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item" ng-show="!is_repeated">
+              <div class="form-horizontal">
+                <div class="form-group" ng-class="{'has-error': !departure_date}">
+                  <label class="control-label col-md-6">Select departure date</label>
+                  <div class="col-md-6">
+                    <div class="input-group date" data-date-format="MMM Do" my-datepicker>
+                      <p ng-show="form.departure_date.$error.required">Error</p>
+                      <input type="text" class="form-control" name="departure_date"
+                       ng-required="!is_repeated" />
+                      <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>              
+            </li>
+
+            <li class="list-group-item">
+              <label class="control-label">Departure time</label>
+              <div class="form-group">
+                <div range-slider min="0" max="24" filter="hours" prevent-equal-min-max
+                 model-min="dep_min_time" model-max="dep_max_time"></div>
+              </div>
+              <label class="control-label">Arrival time</label>
+              <div class="form-group">
+                <div range-slider min="0" max="24" filter="hours" prevent-equal-min-max
+                 model-min="arr_min_time" model-max="arr_max_time"></div>
+              </div>
+            </li>
+
+            <li class="list-group-item">
+              <div class="form-actions">
+                <input type="submit" id="submit-id-submit" class="btn btn-primary btn-block"
+                 ng-disabled="!isValid()" />
+              </div>
+            </li>
+          </ul>
+        </div>
+      </form>
     </div>
   </div>
+  {% endverbatim %}
 {% endblock %}
