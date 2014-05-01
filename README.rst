@@ -33,3 +33,8 @@ You can use foreman/honcho to run it locally::
     $ cp .env.default .env
     $ ln -s Procfile.dev Procfile
     $ make run
+
+Production notes
+================
+
+Redis used as celery broker has some `problems <http://docs.celeryproject.org/en/latest/getting-started/brokers/redis.html#caveats>`_ with ETA tasks, use rabbitmq instead.
