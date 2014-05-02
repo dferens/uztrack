@@ -1,20 +1,19 @@
-from django.conf.urls import patterns, include, url
+from classsettings.urls import url, Scope
 
 from . import views
 
-urlpatterns = patterns('',
-    url(r'^track/$', views.TrackedWayListView.as_view(), name='trackedway-list'),
-    url(r'^track/create/$', views.TrackedWayCreateView.as_view(), name='trackedway-create'),
-    url(r'^track/(?P<pk>\d+)/$',
-        views.TrackedWayDetailView.as_view(),
-        name='trackedway-detail'),
-    url(r'^track/(?P<pk>\d+)/edit/$',
-        views.TrackedWayEditView.as_view(),
-        name='trackedway-edit'),
-    url(r'^track/(?P<pk>\d+)/(?P<date>\d{4}-\d{2}-\d{2})/$',
-        views.TrackedWayHistoryDetailView.as_view(),
-        name='trackedway-history-detail'),
-    url(r'track/(?P<pk>\d+)/(?P<date>\d{4}-\d{2}-\d{2})/subscribe/$',
-        views.HistorySubscriptionDetailView.as_view(),
-        name='history-subscription-detail'),
-)
+
+with Scope(regex=r'^track/', view=views, name='trackedway') as root:
+    url('{}$', 'TrackedWayListView', name='{}-list')
+    url('{}create/$', 'TrackedWayCreateView', name='{}-create')
+
+    with Scope(regex=r'{}(?P<pk>\d+)/') as trackedway:
+        url('{}$', 'TrackedWayDetailView', name='{}-detail')
+        url('{}edit/$', 'TrackedWayEditView', name='{}-edit')
+
+        with Scope(id=r'(?P<date>\d{4}-\d{2}-\d{2})') as history:
+            url('{}{id}/$', 'TrackedWayHistoryDetailView', name='{}-history-detail')
+            url('{}{id}/subscribe/$', 'HistorySubscriptionDetailView', name='history-subscription-detail')
+
+
+urlpatterns = list(root.urls)
