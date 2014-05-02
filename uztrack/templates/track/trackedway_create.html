@@ -63,18 +63,18 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="btn-group btn-group-justified">
-                    <label class="btn btn-default" ng-class="{active: is_repeated}">
-                      <input type="radio" ng-model="is_repeated" ng-value="true" />Yes
+                    <label class="btn btn-default" ng-class="{active: is_regular}">
+                      <input type="radio" ng-model="is_regular" ng-value="true" />Yes
                     </label>
-                    <label class="btn btn-default" ng-class="{active: !is_repeated}">
-                      <input type="radio" ng-model="is_repeated" ng-value="false" />No
+                    <label class="btn btn-default" ng-class="{active: !is_regular}">
+                      <input type="radio" ng-model="is_regular" ng-value="false" />No
                     </label>
                   </div>
                 </div>
               </div>
             </li>
 
-            <li class="list-group-item" ng-show="is_repeated">              
+            <li class="list-group-item" ng-show="is_regular">              
               <div class="row">                
                 <div class="col-md-12 form-group"
                  ng-class="{'has-error': getSelectedDays() == 0}">
@@ -89,7 +89,7 @@
                 </div>
               </div>
             </li>
-            <li class="list-group-item" ng-show="!is_repeated">
+            <li class="list-group-item" ng-show="!is_regular">
               <div class="form-horizontal">
                 <div class="form-group" ng-class="{'has-error': !departure_date}">
                   <label class="control-label col-md-6">Select departure date</label>
@@ -97,7 +97,7 @@
                     <div class="input-group date" data-date-format="MMM Do" my-datepicker>
                       <p ng-show="form.departure_date.$error.required">Error</p>
                       <input type="text" class="form-control" name="departure_date"
-                       ng-required="!is_repeated" />
+                       ng-required="!is_regular" />
                       <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                       </span>

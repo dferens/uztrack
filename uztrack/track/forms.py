@@ -17,7 +17,7 @@ class TrackedWayCreateForm(forms.ModelForm):
         model = models.TrackedWay
         exclude = ('owner',)
 
-    is_repeated = forms.BooleanField(required=False)
+    is_regular = forms.BooleanField(required=False)
     station_name_from = forms.CharField(min_length=2)
     station_name_to = forms.CharField(min_length=2)
     way = forms.Field(widget=forms.HiddenInput(), required=False)
@@ -42,7 +42,7 @@ class TrackedWayCreateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(TrackedWayCreateForm, self).clean()
 
-        if cleaned_data['is_repeated']:
+        if cleaned_data['is_regular']:
             if cleaned_data['days'] == 0:
                 self._errors['days'] = \
                     self.error_class(['At least one day should be specified'])

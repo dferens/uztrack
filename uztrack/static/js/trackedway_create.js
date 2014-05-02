@@ -31,8 +31,8 @@ var app = angular.module('TrackedWayApp', ['ui.select2', 'ui-rangeSlider'])
     return (
       $scope.station_from && 
       $scope.station_to && (
-        ($scope.is_repeated && ($scope.getSelectedDays().length > 0)) ||
-        (!($scope.is_repeated) && $scope.departure_date)
+        ($scope.is_regular && ($scope.getSelectedDays().length > 0)) ||
+        (!($scope.is_regular) && $scope.departure_date)
       )
     );
   };
@@ -46,7 +46,7 @@ var app = angular.module('TrackedWayApp', ['ui.select2', 'ui-rangeSlider'])
       csrfmiddlewaretoken: $scope.csrftoken,
       station_name_from: $scope.station_from.text,
       station_name_to: $scope.station_to.text,
-      is_repeated: $scope.is_repeated,
+      is_regular: $scope.is_regular,
     };
 
     var filters = ['dep_max_time', 'dep_min_time',
@@ -58,7 +58,7 @@ var app = angular.module('TrackedWayApp', ['ui.select2', 'ui-rangeSlider'])
         data[filter] = hoursFormatter(value);
     });
 
-    if ($scope.is_repeated) {
+    if ($scope.is_regular) {
       // Original ``$.param`` will make
       //   ... &days[]=Monday&days[]=Tuesday ...
       // instead of
@@ -97,7 +97,7 @@ var app = angular.module('TrackedWayApp', ['ui.select2', 'ui-rangeSlider'])
   $scope.stationFromSelectOptions = angular.copy(select2Options.station);
   $scope.stationToSelectOptions = angular.copy(select2Options.station);
   $scope.station_from = $scope.station_to = null;
-  $scope.is_repeated = true;
+  $scope.is_regular = true;
   $scope.days = _.map(_.zip(moment.weekdays(), moment.weekdaysShort()), function(pair) {
     return {name: pair[0],  // Monday
             title: pair[1], // Mn
