@@ -9,10 +9,10 @@ from classsettings import Settings, Config, from_env
 
 class Pathes(Settings):
     # Absolute filesystem path to the Django project directory:
-    def DJANGO_ROOT(self):  return dirname(dirname(dirname(abspath(__file__))))
+    DJANGO_ROOT = dirname(dirname(dirname(abspath(__file__))))
     # Absolute filesystem path to the top-level project folder:
-    def SITE_ROOT(self): return dirname(self.DJANGO_ROOT())
-    def SITE_NAME(self): return basename(self.DJANGO_ROOT())
+    SITE_ROOT = dirname(DJANGO_ROOT)
+    SITE_NAME = basename(DJANGO_ROOT)
 
 # Add our project to our pythonpath, this way we don't need to type our project
 # name in our dotted import paths:

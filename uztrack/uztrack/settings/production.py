@@ -5,12 +5,14 @@ from .base import *
 
 
 class Administration(Settings):
-    def PROFILE(self): return True
     @from_env(through=lambda s: [x.split(',') for x in s.split(';')])
     def ADMINS(self): return ()
     def ALLOWED_HOSTS(self): return ['.swinemaker.org']
     @from_env
     def SECRET_KEY(self): pass
+
+    PROFILE = True
+    SESSION_ENGINE = 'redis_sessions.session'
 
 class Emails(Settings):
     def EMAIL_BACKEND(self): return 'django.core.mail.backends.smtp.EmailBackend'

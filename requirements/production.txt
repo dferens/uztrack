@@ -4,3 +4,4 @@
 
 uWSGI==2.0.1
 dj-database-url==0.2.2
+django-redis-sessions==0.4.0
