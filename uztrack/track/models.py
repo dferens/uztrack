@@ -26,8 +26,7 @@ class Way(models.Model):
     Defines abstract directed way between two train stations.
     """
     class Meta:
-        unique_together = (('station_id_from', 'station_id_to'),
-                           ('station_from', 'station_to'))
+        unique_together = (('station_id_from', 'station_id_to'),)
 
     station_id_from = models.IntegerField()
     station_from = models.CharField(max_length=30)
@@ -155,7 +154,8 @@ class TrackedWayDayHistory(models.Model):
 
     active = models.BooleanField(default=True)
     tracked_way = models.ForeignKey(TrackedWay, related_name='histories')
-    departure_date = models.DateField()    
+    departure_date = models.DateField()
+    is_critical = models.BooleanField(default=False)
     places_appeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
                                             related_name='marks_appear', null=True)
     places_disappeared = models.OneToOneField('track.TrackedWayDayHistorySnapshot',
@@ -210,7 +210,6 @@ class TrackedWayDayHistory(models.Model):
                 self.places_appeared = snapshot
                 self.save()
                 self.on_places_appeared.send(sender=self)
-
         elif self.places_disappeared is None:
             if snapshot.total_places_count == 0:
                 self.subscription.notify_places_disappeared(snapshot)
@@ -227,6 +226,7 @@ class HistorySubscription(models.Model):
         verbose_name = u'history subscription'
 
     DEFAULT_SUBJECT = 'Subscription update'
+    CRITICAL_PREFIX = '[CRITICAL]'
     DEFAULT_TEMPLATE = 'email/subscription'
 
     enabled = models.BooleanField(default=False)
@@ -241,8 +241,9 @@ class HistorySubscription(models.Model):
 
     def _notify(self, context, subject=None, template=None):
         if self.enabled:
-            subject = '%s%s' % (settings.EMAIL_SUBJECT_PREFIX,
-                                subject or self.DEFAULT_SUBJECT)
+            prefix = settings.EMAIL_SUBJECT_PREFIX
+            prefix += self.CRITICAL_PREFIX if self.history.is_critical else ''
+            subject = '%s %s' % (prefix, subject or self.DEFAULT_SUBJECT)
             from_email = settings.EMAIL_HOST_USER
             to_email = self.target_user.email
             context.update(subscription=self, history=self.history,

@@ -39,7 +39,7 @@ class TrackedWayTestCase(AuthorizedTestCase):
         self.assertContains(resp, 'new tracked way')
 
     def test_create_post_valid(self):
-        data = dict(is_repeated=True, days=['Monday', 'Tuesday'],
+        data = dict(is_regular=True, days=['Monday', 'Tuesday'],
                     station_name_from='test1', station_name_to='test2')
         with mock.patch('track.forms.queries') as mock_queries:
             kwargs = dict(station_id_from=1, station_id_to=2,
@@ -48,7 +48,7 @@ class TrackedWayTestCase(AuthorizedTestCase):
 
             resp = self.client.post(self.url('trackedway-create'), data=data)
             redirect_url = json.loads(resp.content).get('redirect', '')
-            self.assertEqual(redirect_url, views.TrackedWayCreateView.success_url)
+            self.assertTrue(views.TrackedWayCreateView.success_url == redirect_url)
 
     def test_create_post_invalid(self):
         resp = self.client.post(self.url('trackedway-create'), data=dict())

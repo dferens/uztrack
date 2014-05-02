@@ -21,13 +21,13 @@ class TrackedWayCreateTestCase(TestCase):
             mock_queries.get_way.return_value = WayFactory(**kwargs)
 
             self.assertIsValid(self.FORM, {
-                'is_repeated': True,
+                'is_regular': True,
                 'days': ['Monday', 'Tuesday'],
                 'station_name_from': 'test1',
                 'station_name_to': 'test2'
             })
             self.assertIsValid(self.FORM, {
-                'is_repeated': False,
+                'is_regular': False,
                 'departure_date': date.today(),
                 'station_name_from': 'test1',
                 'station_name_to': 'test2'
@@ -35,7 +35,7 @@ class TrackedWayCreateTestCase(TestCase):
 
     def test_clean_no_station_names(self):
         form = self.FORM({
-            'is_repeated': True,
+            'is_regular': True,
             'days': ['Monday']
         })
         self.assertFalse(form.is_valid())
@@ -45,7 +45,7 @@ class TrackedWayCreateTestCase(TestCase):
 
     def test_clean_no_days(self):
         form = self.FORM({
-            'is_repeated': True,
+            'is_regular': True,
             'station_name_from': 'test1',
             'station_name_to': 'test2'
         })
@@ -60,7 +60,7 @@ class TrackedWayCreateTestCase(TestCase):
 
     def test_clean_no_way(self):
         form = self.FORM({
-            'is_repeated': True,
+            'is_regular': True,
             'days': ['Monday'],
             'station_name_from': 'test1',
             'station_name_to': 'test2'
@@ -73,7 +73,7 @@ class TrackedWayCreateTestCase(TestCase):
 
     def test_clean_no_departure_date(self):
         form = self.FORM({
-            'is_repeated': False,
+            'is_regular': False,
             'station_name_from': 'test1',
             'station_name_to': 'test2'
         })

@@ -32,7 +32,7 @@ def poll_history(history_id):
     execution_time = timezone.now()
     try:
         logger.info('Polling %d history', history_id)
-        snapshot = poller.poll(history, api)
+        new_snapshot = poller.poll(history, api)
     except (ConnectionError, ServiceNotAvailableException) as e:
         if isinstance(e, ConnectionError):
             message = 'Connection error' 
@@ -51,7 +51,7 @@ def poll_history(history_id):
         logger.exception(e)
         raise e
     else:
-        next_poll_eta = poller.calc_next_eta(snapshot, history)
+        next_poll_eta = poller.calc_next_eta(new_snapshot, history)
         stop_on = poller.calc_stop_eta(history)
         if next_poll_eta < stop_on:
             next_poll_eta = timezone.localtime(next_poll_eta)

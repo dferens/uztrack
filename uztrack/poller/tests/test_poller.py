@@ -39,6 +39,12 @@ class PollerTestCase(TestCase):
         self.assertIsInstance(eta, timezone.datetime)
         self.assertTrue(timezone.is_aware(eta))
 
+        resolver = MagicMock()
+        with override_settings(POLLER_INTERVAL_CRITICAL=resolver):
+            self.history.is_critical = True; self.history.save()
+            eta = poller.calc_next_eta(self.history.last_snapshot, self.history)
+            resolver.assert_called_once_with(self.history.last_snapshot.total_places_count)
+
     def test_calc_random_eta(self):
         start, stop = timezone.now(), timezone.now() + timezone.timedelta(seconds=1)
         eta = poller.calc_random_eta(start, stop)

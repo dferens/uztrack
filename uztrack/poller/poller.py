@@ -26,11 +26,14 @@ def poll(history, api):
         return queries.create_snapshot(history, stations_routes)
 
 
-def calc_next_eta(snapshot, history):
+def calc_next_eta(new_snapshot, history):
     """
     Calculates eta for next poll basing on previous poll's results.
     """
-    return snapshot.made_on + settings.POLLER_INTERVAL
+    if history.is_critical:
+        return settings.POLLER_INTERVAL_CRITICAL(new_snapshot.total_places_count)
+
+    return new_snapshot.made_on + settings.POLLER_INTERVAL
 
 
 def calc_random_eta(start, stop):

@@ -166,6 +166,22 @@ class OwnApps(Settings):
     def POLLER_AUTOSTART(self): return True
     def POLLER_AUTOSTART_NEW(self): return True
     def POLLER_INTERVAL(self): return timedelta(hours=1)
+    def POLLER_INTERVAL_CRITICAL(self):
+        def poll_eta_resolver(places_count):
+            """
+            Calculates next poll eta for critical tracked ways.
+
+            Example:
+                seats | eta (mins)
+                    0          10
+                   10          20
+                   50          60
+            """
+            min_eta = timedelta(minutes=10)
+            limited_seats = min(places_count, 50)
+            return min_eta + limited_seats * timedelta(minutes=1)
+
+        return poll_eta_resolver
     def POLLER_CONNECTION_ERROR_RETRY(self): return timedelta(minutes=5)
     def POLLER_WAIT_FOR_CELERY(self): return False
 
