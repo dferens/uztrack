@@ -21,6 +21,7 @@ path.append(DJANGO_ROOT)
 class Administration(Settings):    
     def ALLOWED_HOSTS(self): return []
     def DEBUG(self): return False
+    def PROFILE(selF): return False
     def SECRET_KEY(self): return "gj_(9d1j(@8bm3lm&b!0c4vkuw2(@3@(3r6d!8m1=48h7"
     def TEMPLATE_DEBUG(self): return self.DEBUG()
     def WSGI_APPLICATION(self): return '%s.wsgi.application' % SITE_NAME
@@ -91,15 +92,16 @@ class Templates(Settings):
 class Routing(Settings):
     def LOGIN_URL(self): return '/admin/'
     def ROOT_URLCONF(self): return '%s.urls' % SITE_NAME
-    def MIDDLEWARE_CLASSES(self): return (
+    def MIDDLEWARE_CLASSES(self): 
         # Default Django middleware.
-        'django.middleware.common.CommonMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    )
+        base = ('django.middleware.common.CommonMiddleware',
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.middleware.csrf.CsrfViewMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+                'django.middleware.clickjacking.XFrameOptionsMiddleware')
+        base += ('profiler.middleware.ProfilerMiddleware',) if PROFILE else ()
+        return base
 
 class Apps(Settings):
     def DJANGO_APPS(self): return (
@@ -115,13 +117,16 @@ class Apps(Settings):
         'django.contrib.sites',
         'django.contrib.staticfiles',
     )
-    def THIRD_PARTY_APPS(self): return (
-        'crispy_forms',
-        'djangobower',
-        'django_tables2',
-        'rest_framework',
-        'south',
-    )
+    def THIRD_PARTY_APPS(self): 
+        base = ('profiler',
+                'crispy_forms',
+                'djangobower',
+                'django_tables2',
+                'rest_framework',
+                'south')
+        base +=  ('profiler',) if PROFILE else ()
+        return base
+
     def OWN_APPS(self): return (
         'accounts',
         'core',

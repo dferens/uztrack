@@ -5,6 +5,7 @@ from .base import *
 
 
 class Administration(Settings):
+    def PROFILE(self): return True
     @from_env(through=lambda s: [x.split(',') for x in s.split(';')])
     def ADMINS(self): return ()
     def ALLOWED_HOSTS(self): return ['.swinemaker.org']

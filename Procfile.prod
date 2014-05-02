@@ -1,0 +1,4 @@
+redis: redis-server
+celery: python uztrack/celeryapp.py worker -B -l info
+web: uwsgi --socket 127.0.0.1:8081 --chdir uztrack/ --wsgi-file uztrack/wsgi.py
+aggregator: aggregated --host 127.0.0.1 --port 5556
