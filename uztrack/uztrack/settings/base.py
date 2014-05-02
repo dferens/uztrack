@@ -139,18 +139,21 @@ class Apps(Settings):
 class Bower(Settings):
     def BOWER_COMPONENTS_ROOT(self): return SITE_ROOT
     def BOWER_INSTALLED_APPS(self): return (
-        'angular',
-        'angular-bootstrap',
-        'angular-ui-select2',
-        'angular-rangeslider',
-        'bootstrap#3',
-        'bootstrap-sortable',
-        'bootstrap-switch',
-        'cal-heatmap',
-        'eonasdan-bootstrap-datetimepicker',
-        'jquery',
-        'select2-bootstrap-css',
-        'underscore',
+        'angular#1.2.16',
+        'angular-bootstrap#0.10.0',
+        'angular-rangeslider#0.0.7',
+        'angular-ui-select2#0.0.5',
+        'bootstrap#3.1.1',
+        'bootstrap-sortable#1.8.0',
+        'bootstrap-switch#3.0.0',
+        'cal-heatmap#3.4.0',
+        'd3#3.4.6',
+        'eonasdan-bootstrap-datetimepicker#3.0.0',
+        'jquery#2.1.0',
+        'moment#2.6.0',
+        'select2#3.4.6',
+        'select2-bootstrap-css#1.3.0',
+        'underscore#1.6.0',
     )
 
 class CrispyForms(Settings):
