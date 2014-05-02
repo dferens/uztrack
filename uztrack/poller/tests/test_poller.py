@@ -35,14 +35,14 @@ class PollerTestCase(TestCase):
         mocked_api.get_stations_routes.assert_called_once_with(self.history)
 
     def test_calc_next_eta(self):
-        eta = poller.calc_next_eta(self.history.last_snapshot, self.history)
+        eta = poller.calc_next_eta(self.history.last_snapshot)
         self.assertIsInstance(eta, timezone.datetime)
         self.assertTrue(timezone.is_aware(eta))
 
         resolver = lambda seats: timezone.timedelta(minutes=5)
         with override_settings(POLLER_INTERVAL_CRITICAL=resolver):
             self.history.is_critical = True; self.history.save()
-            eta = poller.calc_next_eta(self.history.last_snapshot, self.history)
+            eta = poller.calc_next_eta(self.history.last_snapshot)
             # resolver.assert_called_once_with(self.history.last_snapshot.total_places_count)
             self.assertIsInstance(eta, timezone.datetime)
             self.assertTrue(timezone.is_aware(eta))
