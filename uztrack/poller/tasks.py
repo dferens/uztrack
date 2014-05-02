@@ -76,7 +76,7 @@ def startup_tracked_way(tracked_way_id, celery_scheduled_polls=None):
     stop = start + settings.POLLER_WARMUP
     planned_polls = total_polls = 0
 
-    for history in tracked_way.closest_histories:
+    for history in tracked_way.active_histories:
         total_polls += 1
         if celery_scheduled_polls and \
            celery_scheduled_polls.get(history.id) is not None:

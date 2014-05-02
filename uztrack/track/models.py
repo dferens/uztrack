@@ -58,7 +58,7 @@ class TrackedWay(models.Model):
         return self.departure_date is None
 
     @property
-    def closest_histories(self):
+    def active_histories(self):
         """
         Returns collection of closest :class:`History` objects for a given way.
         Creates new records if needed.
@@ -78,7 +78,8 @@ class TrackedWay(models.Model):
                                   for date in not_found_dates)
             return histories_list
         else:
-            return [self.histories.all()[0]] if closest_dates else []
+            histories = self.histories.all()[:1]
+            return [] if histories[0].active is False else histories
 
     def get_absolute_url(self):
         return reverse('trackedway-detail', kwargs=dict(pk=self.pk))
@@ -116,19 +117,14 @@ class TrackedWay(models.Model):
         """
         return (wday for wday, is_set in self.days if is_set)
 
-    @cached_property
-    def active_histories(self):
-        from . import queries
-        histories = list(self.histories.filter(active=True).select_related('subscription'))
-        queries.patch_last_snapshots(histories)
-        return histories
-
-    def save(self, *args, **kwargs):
+    def save(self, is_critical=None):
         created = self.pk is None
-        super(TrackedWay, self).save(*args, **kwargs)
+        super(TrackedWay, self).save()
 
         if not self.is_repeated:
-            self.histories.create(departure_date=self.departure_date)
+            kwargs = dict(departure_date=self.departure_date)
+            kwargs.update(is_critical=True) if is_critical else None
+            self.histories.create(**kwargs)
 
         if created and settings.POLLER_AUTOSTART_NEW:
             import poller.tasks

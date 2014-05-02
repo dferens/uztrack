@@ -28,6 +28,8 @@
   <div ng-app="TrackedWayApp" ng-controller="CreateCtrl" class="row">
     <div class="col-md-5 col-md-offset-3">
       <form name="form" method="post" ng-submit="submit()">
+        <input type="hidden" ng-model="csrftoken" name="csrfmiddlewaretoken">
+
         <div class="panel panel-default">
           <div class="panel-heading">
             <h3 class="panel-title">Add new tracked way</h3>
@@ -35,24 +37,24 @@
           <ul class="list-group">
             <li class="list-group-item">
               <div class="row">
-                <input type="hidden" ng-model="csrftoken" name="csrfmiddlewaretoken">
-
-                <div class="col-md-6 form-group"
-                 ng-class="{'has-error': form.station_from.$error.required}">
-                  <label class="control-label">Station from</label>
-                  <div class="controls">
-                    <input class="select2-input select2-default station-select" type="hidden"
-                     ui-select2="stationFromSelectOptions" ng-model="station_from" name="station_from" required />
-                    <span class="help-block" ng-show="form.station_from.$error.required">This field is required</span>
+                <div class="col-md-6">
+                  <div class="form-group" ng-class="{'has-error': form.station_from.$error.required}">
+                    <label class="control-label">Station from</label>
+                    <div class="controls">
+                      <input class="select2-input select2-default station-select" type="hidden"
+                       ui-select2="stationFromSelectOptions" ng-model="station_from" name="station_from" required />
+                      <span class="help-block" ng-show="form.station_from.$error.required">This field is required</span>
+                    </div>
                   </div>
                 </div>
-                <div class="col-md-6 form-group"
-                 ng-class="{'has-error': form.station_to.$error.required}">
-                  <label class="control-label">Station to</label>
-                  <div class="controls">
-                    <input class="select2-input select2-default station-select" type="hidden"
-                     ui-select2="stationToSelectOptions" ng-model="station_to" name="station_to" required />
-                     <span class="help-block" ng-show="form.station_to.$error.required">This field is required</span>
+                <div class="col-md-6">
+                  <div class="form-group" ng-class="{'has-error': form.station_to.$error.required}">
+                    <label class="control-label">Station to</label>
+                    <div class="controls">
+                      <input class="select2-input select2-default station-select" type="hidden"
+                       ui-select2="stationToSelectOptions" ng-model="station_to" name="station_to" required />
+                       <span class="help-block" ng-show="form.station_to.$error.required">This field is required</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -104,7 +106,20 @@
                     </div>
                   </div>
                 </div>
-              </div>              
+                <div class="form-group">
+                  <label class="control-label col-md-6">Critical mode</label>
+                  <div class="col-md-6">
+                    <div class="btn-group btn-group-justified">
+                      <label class="btn btn-default" ng-class="{active: is_critical}">
+                        <input type="radio" ng-model="is_critical" ng-value="true" />Yes
+                      </label>
+                      <label class="btn btn-default" ng-class="{active: !is_critical}">
+                        <input type="radio" ng-model="is_critical" ng-value="false" />No
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </li>
 
             <li class="list-group-item">

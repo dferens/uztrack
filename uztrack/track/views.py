@@ -25,9 +25,7 @@ class TrackedWayCreateView(LoginRequiredMixin, CreateView):
     template_name = 'track/trackedway_create.html'
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.owner = self.request.user
-        self.object.save()
+        self.object = form.save(self.request)
         return JsonResponse({'redirect': self.get_success_url()})
 
     def form_invalid(self, form):

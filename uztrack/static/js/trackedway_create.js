@@ -68,6 +68,7 @@ var app = angular.module('TrackedWayApp', ['ui.select2', 'ui-rangeSlider'])
       }, $.param(data));
     } else {
       data.departure_date = $scope.departure_date.format('MM/DD/YYYY');
+      data.is_critical = $scope.is_critical;
       var encodedData = $.param(data);
     }
 
@@ -98,10 +99,9 @@ var app = angular.module('TrackedWayApp', ['ui.select2', 'ui-rangeSlider'])
   $scope.stationToSelectOptions = angular.copy(select2Options.station);
   $scope.station_from = $scope.station_to = null;
   $scope.is_regular = true;
+  $scope.is_critical = false;
   $scope.days = _.map(_.zip(moment.weekdays(), moment.weekdaysShort()), function(pair) {
-    return {name: pair[0],  // Monday
-            title: pair[1], // Mn
-            enabled: false};
+    return {name: pair[0], title: pair[1], enabled: false};
   });
   // Making monday as first day of the week
   $scope.days.push($scope.days.shift());

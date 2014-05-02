@@ -133,7 +133,7 @@ class SynchronizeTestCase(TestCase):
         for scheduled_polls in (None, dict()):
             mock_poll_history_task.reset_mock()
 
-            with patch.object(TrackedWay, 'closest_histories') as mock_closest_histories:
+            with patch.object(TrackedWay, 'active_histories') as mock_closest_histories:
                 mock_closest_histories.__get__ = Mock(return_value=History.objects.all())
 
             planned, total = tasks.startup_tracked_way(self.tracked_way.id,
@@ -151,7 +151,7 @@ class SynchronizeTestCase(TestCase):
         planned_history = History.objects.all()[0]
         scheduled_polls = { planned_history.id: timezone.now() }
 
-        with patch.object(TrackedWay, 'closest_histories') as mock_closest_histories:
+        with patch.object(TrackedWay, 'active_histories') as mock_closest_histories:
             mock_closest_histories.__get__ = Mock(return_value=History.objects.all())
             planned, total = tasks.startup_tracked_way(self.tracked_way.id, scheduled_polls)        
         

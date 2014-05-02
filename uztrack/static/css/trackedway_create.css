@@ -2,7 +2,7 @@
     width: 100%;
 }
 
-.form-group {
+.form-group:last-child {
     margin-bottom: 0;
 }
 

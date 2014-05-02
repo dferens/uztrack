@@ -15,23 +15,23 @@ from .helpers import TrackedWayFactory, \
 
 class TrackedWayTestCase(TestCase):
 
-    def test_closest_histories(self):
+    def test_active_histories(self):
         # Repeated history
         tracked_way = TrackedWayFactory()
         dates = tracked_way.next_dates(queries.get_search_till_date())
-        for history in tracked_way.closest_histories:
+        for history in tracked_way.active_histories:
             self.assertIn(history.departure_date, dates)
             self.assertEqual(history.tracked_way, tracked_way)
 
         # Single-day history
         today = date.today()
         tracked_way = TrackedWayFactory(departure_date=today)
-        self.assertTrue(tracked_way.closest_histories[0].departure_date == today)
+        self.assertTrue(tracked_way.active_histories[0].departure_date == today)
 
         # expired
         with patch('track.models.timezone') as mock_timezone:
-            mock_timezone.now.return_value = timezone.now() + timedelta(days=2)
-            self.assertEqual(tracked_way.closest_histories, [])
+            tracked_way.histories.update(active=False)
+            self.assertEqual(tracked_way.active_histories, [])
 
     def test_is_repeated(self):
         today = date.today()
@@ -58,7 +58,6 @@ class TrackedWayTestCase(TestCase):
         weekdays = utils.WEEKDAYS.keys()
         for date in dates:
             self.assertIn(weekdays[date.weekday()], possible_days)
-
 
     @override_settings(POLLER_AUTOSTART_NEW=True)
     @patch.object(poller.tasks, 'startup_tracked_way')

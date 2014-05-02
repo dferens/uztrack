@@ -18,6 +18,7 @@ class TrackedWayCreateForm(forms.ModelForm):
         exclude = ('owner',)
 
     is_regular = forms.BooleanField(required=False)
+    is_critical = forms.BooleanField(required=False)
     station_name_from = forms.CharField(min_length=2)
     station_name_to = forms.CharField(min_length=2)
     way = forms.Field(widget=forms.HiddenInput(), required=False)
@@ -52,6 +53,18 @@ class TrackedWayCreateForm(forms.ModelForm):
                     self.error_class(['Departure date is not specified'])        
 
         return cleaned_data
+
+    def save(self, request):
+        obj = super(TrackedWayCreateForm, self).save(commit=False)
+        obj.owner = request.user
+        single_day = not self.cleaned_data['is_regular']
+
+        if single_day and self.cleaned_data['is_critical']:
+            obj.save(is_critical=True)
+        else:
+            obj.save()
+
+        return obj
 
 
 class TrackedWayDetailForm(TrackedWayCreateForm):

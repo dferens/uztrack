@@ -31,9 +31,11 @@ def calc_next_eta(new_snapshot, history):
     Calculates eta for next poll basing on previous poll's results.
     """
     if history.is_critical:
-        return settings.POLLER_INTERVAL_CRITICAL(new_snapshot.total_places_count)
+        diff = settings.POLLER_INTERVAL_CRITICAL(new_snapshot.total_places_count)
+    else:
+        diff = settings.POLLER_INTERVAL
 
-    return new_snapshot.made_on + settings.POLLER_INTERVAL
+    return new_snapshot.made_on + diff
 
 
 def calc_random_eta(start, stop):
