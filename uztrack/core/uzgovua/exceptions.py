@@ -7,6 +7,12 @@ class ApiException(Exception):
     pass
 
 
+class JsonEncodingError(ApiException):
+
+    def __init__(self, source):
+        self.source = source
+
+
 class TokenRequiredException(ApiException):
     pass
 

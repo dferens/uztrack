@@ -84,9 +84,14 @@ class RawApi(object):
                 'train': train_code,
                 'coach_type': coach_type}
         data.update(model=0, round_trip=0, another_ec=0)
-        json_data = token.patch_request(requests.post, url, data=data).json()
-        self._check_for_errors(json_data)
-        return json_data
+        response = token.patch_request(requests.post, url, data=data)
+        try:
+            json_data = response.json()
+        except ValueError as e:
+            raise exceptions.JsonEncodingError(response.content)
+        else:
+            self._check_for_errors(json_data)
+            return json_data
 
     def get_stations_routes(self, station_id_from, station_id_to,
                                   departure_date, start_time, token=None):
