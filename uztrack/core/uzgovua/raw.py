@@ -42,14 +42,17 @@ class Token(object):
 
     def __init__(self):
         response = requests.get(self._TOKEN_SOURCE_URL)
-        content = response.content
-        token_encoded = self._pat_token.search(content).group('token')
-        token_symbols_encoded = [x.split('$$_.')[1] for x in token_encoded.split('+')]
-        token_symbols_decoded = [self._encoded_token_subs[x] for x in token_symbols_encoded]
-        token_decoded = ''.join(token_symbols_decoded)
 
-        self.token = token_decoded
-        self.cookies = response.cookies
+        if response.status_code == 200:
+            token_encoded = self._pat_token.search(response.content).group('token')
+            token_symbols_encoded = [x.split('$$_.')[1] for x in token_encoded.split('+')]
+            token_symbols_decoded = [self._encoded_token_subs[x] for x in token_symbols_encoded]
+            token_decoded = ''.join(token_symbols_decoded)
+
+            self.token = token_decoded
+            self.cookies = response.cookies
+        else:
+            raise exceptions.ServiceNotAvailableException()
 
     def __unicode__(self):
         return u'<Access token "%s">' % self.token

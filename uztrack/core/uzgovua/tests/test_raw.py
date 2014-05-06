@@ -9,9 +9,10 @@ from .. import exceptions, raw
 
 class ResponseMock(object):
 
-    def __init__(self, content, cookies=None):
+    def __init__(self, content, cookies=None, status_code=200):
         self.content = content
         self.cookies = cookies
+        self.status_code = status_code
 
 
 class TokenMock(raw.Token):
