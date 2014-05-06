@@ -69,8 +69,7 @@ class TrackedWay(models.Model):
         closest_dates = self.next_dates(get_search_till_date())
 
         if self.is_repeated:
-            found_histories = History.objects.filter(active=True,
-                                                     departure_date__in=closest_dates)
+            found_histories = History.objects.filter(departure_date__in=closest_dates)
             found_dates = found_histories.values_list('departure_date', flat=True)
             not_found_dates = filter(lambda d: d not in found_dates, closest_dates)
             histories_list = list(found_histories)
@@ -177,6 +176,7 @@ class TrackedWayDayHistory(models.Model):
 
     @property
     def relevance(self):
+        # TODO: remove and move to client
         elapsed = timezone.now() - self.last_snapshot.made_on
         elapsed_percentage = (total_seconds(elapsed) * 100 /
                               total_seconds(settings.POLLER_INTERVAL))
